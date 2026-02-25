@@ -32,3 +32,9 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Unit, Integration & Component Tests
+        run: pnpm test
+        env:
+          AUTH_SECRET: ci-test-secret-32-chars-minimum!!
+          DATABASE_URL: postgresql://unused-for-unit-tests
