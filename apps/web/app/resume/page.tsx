@@ -6,11 +6,11 @@ const experience = [
     location: "Nashville, TN",
     bullets: [
       "Architected configurable, multi-tenant platform services processing millions of requests daily across multiple global regions — enabling downstream teams to ship new capabilities without platform rewrites or service interruptions.",
-      "Built and enforced engineering standards — shared service contracts, component libraries, observability baselines — that aligned 10–20 engineers and reduced integration friction across teams.",
-      "Drove a step-change in release discipline: took platform deployments from ad-hoc to four structured weekly releases, paired with reliability improvements that reduced incidents and improved uptime across multi-region infrastructure.",
+      "Established engineering standards that turned the platform into a force multiplier — shared service contracts, component libraries, and observability baselines that eliminated integration friction and allowed the broader engineering organization to build on the platform predictably and at speed.",
+      "Raised the reliability ceiling of a multi-region platform by replacing ad-hoc deployments with automated validation gates and staged rollouts — producing a consistent uptime track record that stakeholders could plan against and downstream teams could build on with confidence.",
       "Partnered with product, operations, and global business stakeholders to translate complex, evolving requirements into durable platform abstractions, reducing the integration cost of new capabilities across teams.",
       "Mentored engineers across levels on distributed systems and production ownership, reducing ramp time for new team members and growing mid-level engineers into independent contributors on complex platform work.",
-      "Introduced AI-assisted workflows across the team, cutting time spent on boilerplate and routine review — freeing capacity for higher-leverage architectural and design work.",
+      "Applied hands-on expertise in agentic AI systems to reshape how the team builds — introducing autonomous pipelines for code generation, automated review, and AI-driven operations that compressed delivery cycles and positioned the team ahead of industry adoption curves.",
     ],
   },
   {
