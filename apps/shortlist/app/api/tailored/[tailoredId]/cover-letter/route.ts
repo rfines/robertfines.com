@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateCoverLetter } from "@/lib/generate-cover-letter";
+import { captureEvent } from "@/lib/posthog";
 
 export const maxDuration = 60;
 
@@ -46,6 +47,8 @@ export async function POST(_req: Request, { params }: Params) {
       coverLetterTokensUsed: tokensUsed,
     },
   });
+
+  await captureEvent(session.user.id, "cover_letter_generated", { tokensUsed });
 
   return NextResponse.json({
     coverLetterText: updated.coverLetterText,

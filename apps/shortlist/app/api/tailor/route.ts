@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { tailorResume } from "@/lib/tailor-resume";
 import { tailorResumeSchema } from "@/types";
+import { captureEvent } from "@/lib/posthog";
 
 export const maxDuration = 60;
 
@@ -48,6 +49,12 @@ export async function POST(req: Request) {
       tailoredText,
       tokensUsed,
     },
+  });
+
+  await captureEvent(session.user.id, "resume_tailored", {
+    intensity: parsed.data.intensity,
+    tokensUsed,
+    hasCompany: !!parsed.data.company,
   });
 
   return NextResponse.json(tailoredResume, { status: 201 });

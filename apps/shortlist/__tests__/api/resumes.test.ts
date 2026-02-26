@@ -13,6 +13,10 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
+vi.mock("@/lib/posthog", () => ({
+  captureEvent: vi.fn(),
+}));
+
 import { GET, POST } from "@/app/api/resumes/route";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";

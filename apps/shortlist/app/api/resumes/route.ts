@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createResumeSchema } from "@/types";
+import { captureEvent } from "@/lib/posthog";
 
 export async function GET() {
   const session = await auth();
@@ -50,6 +51,8 @@ export async function POST(req: Request) {
       rawText: parsed.data.rawText,
     },
   });
+
+  await captureEvent(session.user.id, "resume_created");
 
   return NextResponse.json(resume, { status: 201 });
 }

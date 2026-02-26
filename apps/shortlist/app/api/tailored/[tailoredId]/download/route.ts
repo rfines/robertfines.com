@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateDocx } from "@/lib/generate-docx";
 import { NextResponse } from "next/server";
+import { captureEvent } from "@/lib/posthog";
 
 interface Params {
   params: Promise<{ tailoredId: string }>;
@@ -27,6 +28,8 @@ export async function GET(_req: Request, { params }: Params) {
     tailoredResume.jobTitle,
     tailoredResume.company
   );
+
+  await captureEvent(session.user.id, "resume_downloaded");
 
   const slug = [tailoredResume.jobTitle, tailoredResume.company]
     .filter(Boolean)

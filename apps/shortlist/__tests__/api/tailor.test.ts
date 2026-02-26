@@ -19,6 +19,10 @@ vi.mock("@/lib/tailor-resume", () => ({
   tailorResume: vi.fn(),
 }));
 
+vi.mock("@/lib/posthog", () => ({
+  captureEvent: vi.fn(),
+}));
+
 import { POST } from "@/app/api/tailor/route";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";

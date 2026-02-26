@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getObjectBuffer } from "@/lib/s3";
 import { extractText } from "@/lib/extract-text";
 import { uploadResumeFileSchema } from "@/types";
+import { captureEvent } from "@/lib/posthog";
 
 interface Params {
   params: Promise<{ resumeId: string }>;
@@ -45,6 +46,8 @@ export async function POST(req: Request, { params }: Params) {
       fileType: parsed.data.fileType,
     },
   });
+
+  await captureEvent(session.user.id, "resume_uploaded");
 
   return NextResponse.json(updated);
 }

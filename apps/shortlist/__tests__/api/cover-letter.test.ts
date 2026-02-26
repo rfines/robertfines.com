@@ -17,6 +17,10 @@ vi.mock("@/lib/generate-cover-letter", () => ({
   generateCoverLetter: vi.fn(),
 }));
 
+vi.mock("@/lib/posthog", () => ({
+  captureEvent: vi.fn(),
+}));
+
 import { POST } from "@/app/api/tailored/[tailoredId]/cover-letter/route";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";

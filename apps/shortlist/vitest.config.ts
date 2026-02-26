@@ -20,6 +20,7 @@ export default defineConfig({
       exclude: [
         "lib/prisma.ts",
         "lib/anthropic.ts",
+        "lib/posthog.ts",
         "**/*.d.ts",
         "**/node_modules/**",
       ],

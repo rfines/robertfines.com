@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./prisma";
+import { captureEvent } from "./posthog";
 
 const allowedEmails = process.env.ALLOWED_EMAILS
   ? process.env.ALLOWED_EMAILS.split(",").map((e) => e.trim()).filter(Boolean)
@@ -33,6 +34,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.id as string;
       }
       return session;
+    },
+  },
+  events: {
+    async signIn({ user }) {
+      if (user.id) {
+        await captureEvent(user.id, "user_signed_in", {
+          email: user.email ?? undefined,
+        });
+      }
     },
   },
   pages: {
