@@ -20,6 +20,7 @@ model User {
   tailoredResumes   TailoredResume[]
   marketingConsent  Boolean?
   plan              String           @default("free")
+  role              String           @default("user")
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
 }

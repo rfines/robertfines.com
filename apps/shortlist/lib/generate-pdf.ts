@@ -116,5 +116,6 @@ function ResumePdf({ text }: { text: string }) {
 
 export async function generatePdf(tailoredText: string): Promise<Buffer> {
   const element = React.createElement(ResumePdf, { text: tailoredText });
-  return renderToBuffer(element);
+  // @react-pdf/renderer uses its own React renderer; cast to satisfy its renderToBuffer types
+  return renderToBuffer(element as Parameters<typeof renderToBuffer>[0]);
 }
