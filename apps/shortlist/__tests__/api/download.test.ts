@@ -82,26 +82,16 @@ describe("GET /api/tailored/[tailoredId]/download", () => {
   });
 
   it("returns 404 when tailored resume not found", async () => {
+    vi.mocked(getUserPlan).mockResolvedValue("starter");
     vi.mocked(prisma.tailoredResume.findFirst).mockResolvedValue(null as never);
     const res = await GET(makeRequest(), params);
     expect(res.status).toBe(404);
   });
 
-  it("returns docx by default", async () => {
+  it("returns 403 for docx when on free plan", async () => {
+    vi.mocked(getUserPlan).mockResolvedValue("free");
     const res = await GET(makeRequest(), params);
-    expect(res.status).toBe(200);
-    expect(res.headers.get("Content-Type")).toContain("wordprocessingml");
-  });
-
-  it("returns docx when format=docx", async () => {
-    const res = await GET(makeRequest("docx"), params);
-    expect(res.status).toBe(200);
-    expect(res.headers.get("Content-Type")).toContain("wordprocessingml");
-  });
-
-  it("returns 400 for invalid format", async () => {
-    const res = await GET(makeRequest("xlsx"), params);
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(403);
   });
 
   it("returns 403 for markdown when on free plan", async () => {
@@ -114,6 +104,19 @@ describe("GET /api/tailored/[tailoredId]/download", () => {
     vi.mocked(getUserPlan).mockResolvedValue("free");
     const res = await GET(makeRequest("pdf"), params);
     expect(res.status).toBe(403);
+  });
+
+  it("returns docx for starter plan", async () => {
+    vi.mocked(getUserPlan).mockResolvedValue("starter");
+    const res = await GET(makeRequest(), params);
+    expect(res.status).toBe(200);
+    expect(res.headers.get("Content-Type")).toContain("wordprocessingml");
+  });
+
+  it("returns 400 for invalid format", async () => {
+    vi.mocked(getUserPlan).mockResolvedValue("starter");
+    const res = await GET(makeRequest("xlsx"), params);
+    expect(res.status).toBe(400);
   });
 
   it("returns 403 for pdf when on starter plan", async () => {

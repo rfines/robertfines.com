@@ -12,6 +12,8 @@ import { cn } from "@/lib/cn";
 import { CoverLetterSection } from "@/components/tailoring/cover-letter-section";
 import { VariationTabs } from "@/components/tailoring/variation-tabs";
 import { DownloadMenu } from "@/components/tailoring/download-menu";
+import { CopyButton } from "@/components/tailoring/copy-button";
+import { canDownload } from "@/lib/plan";
 
 interface Props {
   params: Promise<{ tailoredId: string }>;
@@ -83,7 +85,9 @@ export default async function TailoredResumePage({ params }: Props) {
             <div className="flex items-center gap-2">
               <TailoredDeleteButton tailoredId={tailored.id} />
               {!hasVariations && (
-                <DownloadMenu tailoredId={tailored.id} plan={plan} />
+                canDownload(plan)
+                  ? <DownloadMenu tailoredId={tailored.id} plan={plan} />
+                  : <CopyButton text={tailored.tailoredText} />
               )}
             </div>
           }

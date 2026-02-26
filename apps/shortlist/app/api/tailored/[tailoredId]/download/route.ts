@@ -6,7 +6,7 @@ import { generatePdf } from "@/lib/generate-pdf";
 import { NextResponse } from "next/server";
 import { captureEvent } from "@/lib/posthog";
 import { getUserPlan } from "@/lib/get-user-plan";
-import { canExportMarkdown, canExportPdf } from "@/lib/plan";
+import { canDownload, canExportMarkdown, canExportPdf } from "@/lib/plan";
 
 interface Params {
   params: Promise<{ tailoredId: string }>;
@@ -26,6 +26,13 @@ export async function GET(req: Request, { params }: Params) {
   }
 
   const plan = await getUserPlan(session.user.id);
+
+  if (!canDownload(plan)) {
+    return NextResponse.json(
+      { error: "File downloads require a paid plan" },
+      { status: 403 }
+    );
+  }
 
   if (format === "md" && !canExportMarkdown(plan)) {
     return NextResponse.json(

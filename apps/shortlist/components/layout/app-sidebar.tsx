@@ -18,7 +18,7 @@ export function AppSidebar() {
     <aside className="w-56 shrink-0 border-r border-[var(--border)] flex flex-col min-h-screen">
       <div className="p-5 border-b border-[var(--border)]">
         <Link href="/dashboard" className="text-lg font-bold text-[var(--foreground)]">
-          Shortlist
+          Retold
         </Link>
       </div>
 

@@ -4,7 +4,9 @@ import { useState } from "react";
 import { cn } from "@/lib/cn";
 import type { KeywordMatchResult } from "@/lib/keyword-match";
 import type { Plan } from "@/lib/plan";
+import { canDownload } from "@/lib/plan";
 import { DownloadMenu } from "@/components/tailoring/download-menu";
+import { CopyButton } from "@/components/tailoring/copy-button";
 
 interface Variation {
   id: string;
@@ -131,13 +133,17 @@ export function VariationTabs({ variations, activeId, plan }: VariationTabsProps
         </pre>
       </div>
 
-      {/* Download button for active variation */}
+      {/* Download / copy button for active variation */}
       <div className="flex justify-end">
-        <DownloadMenu
-          tailoredId={active.id}
-          plan={plan}
-          label={`Download Version ${active.variationIndex + 1}`}
-        />
+        {canDownload(plan) ? (
+          <DownloadMenu
+            tailoredId={active.id}
+            plan={plan}
+            label={`Download Version ${active.variationIndex + 1}`}
+          />
+        ) : (
+          <CopyButton text={active.tailoredText} label={`Copy Version ${active.variationIndex + 1}`} />
+        )}
       </div>
     </div>
   );

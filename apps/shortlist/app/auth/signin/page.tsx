@@ -20,7 +20,7 @@ export default async function SignInPage({
       <div className="max-w-sm w-full space-y-8">
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-bold text-[var(--foreground)]">
-            Welcome to Shortlist
+            Welcome to Retold
           </h1>
           <p className="text-sm text-[var(--muted)]">
             Sign in with Google to continue

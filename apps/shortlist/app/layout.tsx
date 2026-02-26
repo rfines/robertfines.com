@@ -6,9 +6,9 @@ import { AuthSessionProvider } from "@/components/layout/session-provider";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Shortlist — AI Resume Tailoring",
+  title: "Retold — Your Resume, Retold",
   description:
-    "Tailor your resume to any job description with AI. Land more interviews.",
+    "AI-powered resume tailoring. Paste a job description, get a resume that speaks directly to the role and lands more interviews.",
 };
 
 export default function RootLayout({
