@@ -5,12 +5,25 @@ export const PLAN_PRICING = {
 } as const;
 
 export const PLAN_LIMITS = {
-  free: { variations: 1 },
-  starter: { variations: 2 },
-  pro: { variations: 3 },
+  free:    { variations: 1, monthlyRuns: 10 },
+  starter: { variations: 2, monthlyRuns: 100 },
+  pro:     { variations: 3, monthlyRuns: null }, // null = unlimited
 } as const;
 
 export type Plan = keyof typeof PLAN_LIMITS;
+
+/**
+ * Returns the effective monthly run limit for a user.
+ * A per-user admin override takes precedence over the plan default.
+ * null means unlimited.
+ */
+export function getEffectiveMonthlyLimit(
+  plan: Plan,
+  userOverride: number | null
+): number | null {
+  if (userOverride !== null) return userOverride;
+  return PLAN_LIMITS[plan].monthlyRuns;
+}
 
 export const PLANS = ["free", "starter", "pro"] as const;
 

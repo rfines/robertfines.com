@@ -5,7 +5,7 @@ import { tailorResume } from "@/lib/tailor-resume";
 import { tailorResumeSchema } from "@/types";
 import { captureEvent } from "@/lib/posthog";
 import { getUserPlan } from "@/lib/get-user-plan";
-import { PLAN_LIMITS, canUseInstructions } from "@/lib/plan";
+import { PLAN_LIMITS, canUseInstructions, getEffectiveMonthlyLimit } from "@/lib/plan";
 import { requireAuth, parseBody } from "@/lib/route-helpers";
 
 export const maxDuration = 60;
@@ -18,6 +18,31 @@ export async function POST(req: Request) {
   if (parseError) return parseError;
 
   const plan = await getUserPlan(session.user.id);
+
+  // Check monthly run limit
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { monthlyRunLimit: true },
+  });
+  const monthlyLimit = getEffectiveMonthlyLimit(plan, user?.monthlyRunLimit ?? null);
+  if (monthlyLimit !== null) {
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+    const runsThisMonth = await prisma.tailoredResume.count({
+      where: {
+        userId: session.user.id,
+        variationIndex: 0, // one record per session
+        createdAt: { gte: startOfMonth },
+      },
+    });
+    if (runsThisMonth >= monthlyLimit) {
+      return NextResponse.json(
+        { error: "Monthly tailoring limit reached", limit: monthlyLimit },
+        { status: 403 }
+      );
+    }
+  }
 
   // Gate custom instructions to paid plans
   if (data.userInstructions && !canUseInstructions(plan)) {

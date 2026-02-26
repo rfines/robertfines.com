@@ -10,25 +10,44 @@ interface AdminUserActionsProps {
   userId: string;
   plan: string;
   role: string;
+  monthlyRunLimit: number | null;
 }
 
-export function AdminUserActions({ userId, plan, role }: AdminUserActionsProps) {
+export function AdminUserActions({
+  userId,
+  plan,
+  role,
+  monthlyRunLimit,
+}: AdminUserActionsProps) {
   const router = useRouter();
   const [planValue, setPlanValue] = useState(plan);
   const [roleValue, setRoleValue] = useState(role);
+  // Empty string = "use plan default" (null in DB); a number string = custom override
+  const [runLimitValue, setRunLimitValue] = useState(
+    monthlyRunLimit !== null ? String(monthlyRunLimit) : ""
+  );
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  const isDirty = planValue !== plan || roleValue !== role;
+  const isDirty =
+    planValue !== plan ||
+    roleValue !== role ||
+    runLimitValue !== (monthlyRunLimit !== null ? String(monthlyRunLimit) : "");
 
   async function handleSave() {
     setSaving(true);
     setSaveError(null);
     try {
+      const monthlyRunLimitPayload =
+        runLimitValue === "" ? null : parseInt(runLimitValue, 10);
       const res = await fetch(`/api/admin/users/${userId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: planValue, role: roleValue }),
+        body: JSON.stringify({
+          plan: planValue,
+          role: roleValue,
+          monthlyRunLimit: monthlyRunLimitPayload,
+        }),
       });
       if (!res.ok) {
         const data = await res.json();
@@ -45,7 +64,7 @@ export function AdminUserActions({ userId, plan, role }: AdminUserActionsProps) 
   return (
     <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5">
       <h2 className="text-sm font-medium text-[var(--foreground)] mb-4">Account Settings</h2>
-      <div className="flex items-end gap-4">
+      <div className="flex items-end gap-4 flex-wrap">
         <div>
           <label className="block text-xs text-[var(--muted)] mb-1">Plan</label>
           <select
@@ -68,6 +87,22 @@ export function AdminUserActions({ userId, plan, role }: AdminUserActionsProps) 
             <option value="user">User</option>
             <option value="admin">Admin</option>
           </select>
+        </div>
+        <div>
+          <label className="block text-xs text-[var(--muted)] mb-1">
+            Monthly run limit
+          </label>
+          <input
+            type="number"
+            min={0}
+            placeholder="Plan default"
+            value={runLimitValue}
+            onChange={(e) => setRunLimitValue(e.target.value)}
+            className="text-xs bg-[var(--background)] border border-[var(--border)] rounded-lg px-3 py-1.5 text-[var(--foreground)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] w-32 placeholder:text-[var(--muted)]"
+          />
+          <p className="text-[10px] text-[var(--muted)] mt-0.5">
+            Empty = plan default · free: 10 · starter: 100 · pro: ∞
+          </p>
         </div>
         <Button size="sm" onClick={handleSave} disabled={!isDirty || saving}>
           {saving ? "Saving…" : "Save Changes"}

@@ -91,7 +91,12 @@ export default async function AdminUserDetailPage({ params }: Props) {
       </div>
 
       {/* Plan + role actions */}
-      <AdminUserActions userId={user.id} plan={user.plan} role={user.role} />
+      <AdminUserActions
+        userId={user.id}
+        plan={user.plan}
+        role={user.role}
+        monthlyRunLimit={user.monthlyRunLimit}
+      />
 
       {/* Resumes */}
       {user.resumes.length > 0 && (

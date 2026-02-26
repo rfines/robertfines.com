@@ -45,10 +45,16 @@ export const adminUserPatchSchema = z
   .object({
     plan: z.enum(["free", "starter", "pro"]).optional(),
     role: z.enum(["user", "admin"]).optional(),
+    // null = remove override (use plan default), number = custom limit, omit = no change
+    monthlyRunLimit: z.number().int().min(0).nullable().optional(),
   })
-  .refine((d) => d.plan !== undefined || d.role !== undefined, {
-    message: "At least one of plan or role must be provided",
-  });
+  .refine(
+    (d) =>
+      d.plan !== undefined ||
+      d.role !== undefined ||
+      d.monthlyRunLimit !== undefined,
+    { message: "At least one field must be provided" }
+  );
 
 export const checkoutSessionSchema = z.object({
   priceId: z.string().min(1),
