@@ -1,18 +1,20 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getRunUsage } from "@/lib/get-run-usage";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Sparkles, Plus } from "lucide-react";
+import { FileText, Sparkles, Plus, Zap } from "lucide-react";
 
 export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/auth/signin");
 
-  const [resumeCount, tailoredCount] = await Promise.all([
+  const [resumeCount, tailoredCount, usage] = await Promise.all([
     prisma.resume.count({ where: { userId: session.user.id } }),
     prisma.tailoredResume.count({ where: { userId: session.user.id } }),
+    getRunUsage(session.user.id),
   ]);
 
   return (
@@ -58,6 +60,39 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
         </Link>
+
+        {usage.limit !== null && (
+          <Link href="/dashboard/billing" className="col-span-2">
+            <Card className="hover:border-[var(--accent)]/50 transition-colors cursor-pointer">
+              <CardContent className="p-5 flex items-center gap-4">
+                <div className="w-10 h-10 rounded-lg bg-[var(--accent)]/10 flex items-center justify-center shrink-0">
+                  <Zap size={18} className="text-[var(--accent)]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-baseline justify-between">
+                    <p className="text-2xl font-bold text-[var(--foreground)]">
+                      {usage.remaining}
+                    </p>
+                    <p className="text-xs text-[var(--muted)]">
+                      {usage.used} / {usage.limit} used
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between gap-2 mt-1">
+                    <p className="text-xs text-[var(--muted)]">Runs left this month</p>
+                  </div>
+                  <div className="h-1 rounded-full bg-[var(--border)] mt-2">
+                    <div
+                      className="h-1 rounded-full bg-[var(--accent)] transition-all"
+                      style={{
+                        width: `${Math.min(100, Math.round((usage.used / usage.limit) * 100))}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+        )}
       </div>
 
       <div>

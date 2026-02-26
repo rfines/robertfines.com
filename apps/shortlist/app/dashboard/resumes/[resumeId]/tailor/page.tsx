@@ -2,7 +2,9 @@ import { auth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getUserPlan } from "@/lib/get-user-plan";
+import { getRunUsage } from "@/lib/get-run-usage";
 import { PageHeader } from "@/components/shared/page-header";
+import { RunUsageBanner } from "@/components/shared/run-usage-banner";
 import { TailorForm } from "@/components/tailoring/tailor-form";
 
 interface Props {
@@ -14,22 +16,24 @@ export default async function TailorPage({ params }: Props) {
   if (!session?.user?.id) redirect("/auth/signin");
 
   const { resumeId } = await params;
-  const [resume, plan] = await Promise.all([
+  const [resume, plan, usage] = await Promise.all([
     prisma.resume.findFirst({
       where: { id: resumeId, userId: session.user.id },
       select: { id: true, title: true },
     }),
     getUserPlan(session.user.id),
+    getRunUsage(session.user.id),
   ]);
 
   if (!resume) notFound();
 
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-2xl space-y-4">
       <PageHeader
         title="Tailor Resume"
         description="Paste a job description and Claude will tailor your resume to match."
       />
+      <RunUsageBanner usage={usage} />
       <TailorForm resumeId={resume.id} resumeTitle={resume.title} plan={plan} />
     </div>
   );
