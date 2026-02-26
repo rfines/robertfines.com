@@ -42,10 +42,14 @@ ANTHROPIC_API_KEY     your Anthropic key
 In the shortlist service → Settings → Build & Deploy:
 
 Build command:
-pnpm install --frozen-lockfile && pnpm --filter shortlist exec prisma migrate deploy && pnpm --filter shortlist build
+pnpm install --frozen-lockfile && pnpm --filter shortlist build
 
 Start command:
-pnpm --filter shortlist start
+pnpm --filter shortlist exec prisma migrate deploy && pnpm --filter shortlist start
+
+Note: prisma migrate deploy must run at startup (not build time) because the
+internal Railway database hostname (postgres.railway.internal) is only reachable
+from running containers, not from the Railpack build environment.
 
 6. Add GitHub Actions variable
 In your repo → Settings → Variables → Actions, add:
