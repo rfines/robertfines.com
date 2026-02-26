@@ -24,6 +24,8 @@ export const tailorResumeSchema = z.object({
   company: z.string().max(200).optional(),
   jobDescription: z.string().min(1, "Job description is required"),
   intensity: z.enum(["conservative", "moderate", "aggressive"]).default("moderate"),
+  variations: z.number().int().min(1).max(5).default(1),
+  userInstructions: z.string().max(500).optional(),
 });
 
 export const presignUploadSchema = z.object({

@@ -26,7 +26,7 @@ describe("TailorForm", () => {
 
   function renderForm() {
     return render(
-      <TailorForm resumeId="clxxxxxxxxxxxxxxxxxxxxxx" resumeTitle="My Resume" />
+      <TailorForm resumeId="clxxxxxxxxxxxxxxxxxxxxxx" resumeTitle="My Resume" plan="free" />
     );
   }
 

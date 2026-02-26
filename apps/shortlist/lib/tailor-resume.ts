@@ -7,6 +7,7 @@ interface TailorInput {
   company?: string;
   jobDescription: string;
   intensity?: Intensity;
+  userInstructions?: string;
 }
 
 interface TailorResult {
@@ -43,6 +44,7 @@ export async function tailorResume({
   company,
   jobDescription,
   intensity = "moderate",
+  userInstructions,
 }: TailorInput): Promise<TailorResult> {
   const roleTarget = company ? `${jobTitle} at ${company}` : jobTitle;
 
@@ -54,7 +56,11 @@ ${jobDescription}
 BASE RESUME:
 ${baseResume}
 
-Please tailor the base resume for this specific role.`;
+Please tailor the base resume for this specific role.${
+    userInstructions
+      ? `\n\nAdditional instructions from the candidate:\n${userInstructions}`
+      : ""
+  }`;
 
   const response = await anthropic.messages.create({
     model: "claude-sonnet-4-6",

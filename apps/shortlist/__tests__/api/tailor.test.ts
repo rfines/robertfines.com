@@ -10,7 +10,7 @@ vi.mock("@/lib/prisma", () => ({
       findFirst: vi.fn(),
     },
     tailoredResume: {
-      create: vi.fn(),
+      createManyAndReturn: vi.fn(),
     },
   },
 }));
@@ -23,10 +23,15 @@ vi.mock("@/lib/posthog", () => ({
   captureEvent: vi.fn(),
 }));
 
+vi.mock("@/lib/get-user-plan", () => ({
+  getUserPlan: vi.fn().mockResolvedValue("free"),
+}));
+
 import { POST } from "@/app/api/tailor/route";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { tailorResume } from "@/lib/tailor-resume";
+import { getUserPlan } from "@/lib/get-user-plan";
 
 const AUTHED_SESSION = {
   user: { id: "user_test123", email: "test@example.com" },
@@ -47,6 +52,18 @@ const VALID_BODY = {
   jobDescription: "We need a great engineer.",
 };
 
+const CREATED_RECORD = {
+  id: "t1",
+  ...VALID_BODY,
+  userId: "user_test123",
+  tailoredText: "Tailored resume content",
+  tokensUsed: 150,
+  variationGroup: null,
+  variationIndex: 0,
+  userInstructions: null,
+  createdAt: new Date("2025-01-01"),
+};
+
 function makeRequest(body: unknown) {
   return new Request("http://localhost/api/tailor", {
     method: "POST",
@@ -57,20 +74,17 @@ function makeRequest(body: unknown) {
 
 describe("POST /api/tailor", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     vi.mocked(auth).mockResolvedValue(AUTHED_SESSION as never);
     vi.mocked(prisma.resume.findFirst).mockResolvedValue(RESUME as never);
+    vi.mocked(getUserPlan).mockResolvedValue("free");
     vi.mocked(tailorResume).mockResolvedValue({
       tailoredText: "Tailored resume content",
       tokensUsed: 150,
     });
-    vi.mocked(prisma.tailoredResume.create).mockResolvedValue({
-      id: "t1",
-      ...VALID_BODY,
-      userId: "user_test123",
-      tailoredText: "Tailored resume content",
-      tokensUsed: 150,
-      createdAt: new Date("2025-01-01"),
-    } as never);
+    vi.mocked(prisma.tailoredResume.createManyAndReturn).mockResolvedValue([
+      CREATED_RECORD,
+    ] as never);
   });
 
   it("returns 401 when not authenticated", async () => {
@@ -114,10 +128,45 @@ describe("POST /api/tailor", () => {
 
   it("saves tokensUsed from tailorResume result", async () => {
     await POST(makeRequest(VALID_BODY));
-    expect(prisma.tailoredResume.create).toHaveBeenCalledWith(
+    expect(prisma.tailoredResume.createManyAndReturn).toHaveBeenCalledWith(
       expect.objectContaining({
-        data: expect.objectContaining({ tokensUsed: 150 }),
+        data: expect.arrayContaining([
+          expect.objectContaining({ tokensUsed: 150 }),
+        ]),
       })
     );
+  });
+
+  it("returns 403 when free user submits userInstructions", async () => {
+    vi.mocked(getUserPlan).mockResolvedValue("free");
+    const res = await POST(
+      makeRequest({ ...VALID_BODY, userInstructions: "Emphasize leadership" })
+    );
+    expect(res.status).toBe(403);
+  });
+
+  it("allows userInstructions for starter plan", async () => {
+    vi.mocked(getUserPlan).mockResolvedValue("starter");
+    const res = await POST(
+      makeRequest({ ...VALID_BODY, userInstructions: "Emphasize leadership" })
+    );
+    expect(res.status).toBe(201);
+  });
+
+  it("caps variations to plan limit for free users", async () => {
+    vi.mocked(getUserPlan).mockResolvedValue("free");
+    await POST(makeRequest({ ...VALID_BODY, variations: 3 }));
+    // Free plan limit is 1, so tailorResume should be called once
+    expect(tailorResume).toHaveBeenCalledTimes(1);
+  });
+
+  it("allows 2 variations for starter plan", async () => {
+    vi.mocked(getUserPlan).mockResolvedValue("starter");
+    vi.mocked(prisma.tailoredResume.createManyAndReturn).mockResolvedValue([
+      CREATED_RECORD,
+      { ...CREATED_RECORD, id: "t2", variationIndex: 1 },
+    ] as never);
+    await POST(makeRequest({ ...VALID_BODY, variations: 2 }));
+    expect(tailorResume).toHaveBeenCalledTimes(2);
   });
 });
