@@ -77,7 +77,10 @@ model TailoredResume {
   company        String?
   jobDescription String   @db.Text
   tailoredText   String   @db.Text
-  tokensUsed     Int?
+  tokensUsed            Int?
+  intensity             String?
+  coverLetterText       String?  @db.Text
+  coverLetterTokensUsed Int?
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   resume         Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
   createdAt      DateTime @default(now())

@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+export const INTENSITIES = ["conservative", "moderate", "aggressive"] as const;
+export type Intensity = (typeof INTENSITIES)[number];
+
 export const createResumeSchema = z.object({
   title: z.string().min(1, "Title is required").max(100),
   rawText: z.string().min(1, "Resume text is required"),
@@ -20,6 +23,7 @@ export const tailorResumeSchema = z.object({
   jobTitle: z.string().min(1, "Job title is required").max(200),
   company: z.string().max(200).optional(),
   jobDescription: z.string().min(1, "Job description is required"),
+  intensity: z.enum(["conservative", "moderate", "aggressive"]).default("moderate"),
 });
 
 export const presignUploadSchema = z.object({

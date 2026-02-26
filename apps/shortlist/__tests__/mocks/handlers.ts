@@ -70,4 +70,11 @@ export const handlers = [
       text: "Extracted resume content from file.",
     });
   }),
+
+  http.post("/api/tailored/:tailoredId/cover-letter", () => {
+    return HttpResponse.json({
+      coverLetterText: "Dear Hiring Manager, I am excited to apply.",
+      coverLetterTokensUsed: 300,
+    });
+  }),
 ];

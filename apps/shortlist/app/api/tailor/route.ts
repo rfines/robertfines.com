@@ -34,6 +34,7 @@ export async function POST(req: Request) {
     jobTitle: parsed.data.jobTitle,
     company: parsed.data.company,
     jobDescription: parsed.data.jobDescription,
+    intensity: parsed.data.intensity,
   });
 
   const tailoredResume = await prisma.tailoredResume.create({
@@ -43,6 +44,7 @@ export async function POST(req: Request) {
       jobTitle: parsed.data.jobTitle,
       company: parsed.data.company ?? null,
       jobDescription: parsed.data.jobDescription,
+      intensity: parsed.data.intensity,
       tailoredText,
       tokensUsed,
     },

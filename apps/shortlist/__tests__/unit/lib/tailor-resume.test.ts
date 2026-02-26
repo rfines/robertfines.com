@@ -102,4 +102,25 @@ describe("tailorResume", () => {
     const callArgs = mockCreate.mock.calls[0][0];
     expect(callArgs.model).toBe("claude-sonnet-4-6");
   });
+
+  it("uses MODERATE intensity instructions by default", async () => {
+    await tailorResume(BASE_INPUT);
+
+    const callArgs = mockCreate.mock.calls[0][0];
+    expect(callArgs.system).toContain("MODERATE");
+  });
+
+  it("uses MINIMAL intensity instructions for conservative", async () => {
+    await tailorResume({ ...BASE_INPUT, intensity: "conservative" });
+
+    const callArgs = mockCreate.mock.calls[0][0];
+    expect(callArgs.system).toContain("MINIMAL");
+  });
+
+  it("uses AGGRESSIVE intensity instructions for aggressive", async () => {
+    await tailorResume({ ...BASE_INPUT, intensity: "aggressive" });
+
+    const callArgs = mockCreate.mock.calls[0][0];
+    expect(callArgs.system).toContain("AGGRESSIVE");
+  });
 });

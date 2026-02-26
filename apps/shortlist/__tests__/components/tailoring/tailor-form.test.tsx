@@ -141,4 +141,40 @@ describe("TailorForm", () => {
       screen.getByRole("button", { name: /tailor resume/i })
     ).toBeEnabled();
   });
+
+  it("moderate intensity button is active by default", () => {
+    renderForm();
+    const moderateBtn = screen.getByRole("button", { name: "Moderate" });
+    expect(moderateBtn.className).toContain("bg-[var(--accent)]");
+  });
+
+  it("clicking aggressive switches the active intensity button", async () => {
+    renderForm();
+    await userEvent.click(screen.getByRole("button", { name: "Aggressive" }));
+    expect(screen.getByRole("button", { name: "Aggressive" }).className).toContain("bg-[var(--accent)]");
+    expect(screen.getByRole("button", { name: "Moderate" }).className).not.toContain("bg-[var(--accent)]");
+  });
+
+  it("includes selected intensity in the API request body", async () => {
+    let capturedBody: Record<string, unknown> | null = null;
+    server.use(
+      http.post("/api/tailor", async ({ request }) => {
+        capturedBody = (await request.json()) as Record<string, unknown>;
+        return HttpResponse.json({ id: "t1", tailoredText: "Tailored" }, { status: 201 });
+      })
+    );
+
+    renderForm();
+    await userEvent.type(screen.getByLabelText(/job title/i), "Software Engineer");
+    await userEvent.type(
+      screen.getByLabelText(/job description/i),
+      "We need a great engineer."
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Aggressive" }));
+    await userEvent.click(screen.getByRole("button", { name: /tailor resume/i }));
+
+    await waitFor(() => {
+      expect(capturedBody?.intensity).toBe("aggressive");
+    });
+  });
 });

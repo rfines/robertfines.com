@@ -33,3 +33,9 @@ jobs:
         run: railway up --service ${{ vars.RAILWAY_API_SERVICE }} --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Deploy shortlist
+        working-directory: apps/shortlist
+        run: railway up --service ${{ vars.RAILWAY_SHORTLIST_SERVICE }} --detach
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}

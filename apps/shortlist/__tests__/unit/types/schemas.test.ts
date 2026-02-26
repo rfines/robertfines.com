@@ -117,6 +117,46 @@ describe("tailorResumeSchema", () => {
     });
     expect(result.success).toBe(false);
   });
+
+  it("defaults intensity to moderate when omitted", () => {
+    const result = tailorResumeSchema.safeParse({
+      resumeId: VALID_CUID,
+      jobTitle: "Engineer",
+      jobDescription: "Description",
+    });
+    expect(result.success).toBe(true);
+    expect(result.data?.intensity).toBe("moderate");
+  });
+
+  it("accepts conservative intensity", () => {
+    const result = tailorResumeSchema.safeParse({
+      resumeId: VALID_CUID,
+      jobTitle: "Engineer",
+      jobDescription: "Description",
+      intensity: "conservative",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts aggressive intensity", () => {
+    const result = tailorResumeSchema.safeParse({
+      resumeId: VALID_CUID,
+      jobTitle: "Engineer",
+      jobDescription: "Description",
+      intensity: "aggressive",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects invalid intensity value", () => {
+    const result = tailorResumeSchema.safeParse({
+      resumeId: VALID_CUID,
+      jobTitle: "Engineer",
+      jobDescription: "Description",
+      intensity: "extreme",
+    });
+    expect(result.success).toBe(false);
+  });
 });
 
 describe("presignUploadSchema", () => {
