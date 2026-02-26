@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import { assertAdmin } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 import { captureEvent } from "@/lib/posthog";
+import { adminUserPatchSchema } from "@/types";
 
 interface Params {
   params: Promise<{ userId: string }>;
@@ -25,15 +25,6 @@ export async function GET(_req: Request, { params }: Params) {
   return NextResponse.json(user);
 }
 
-const patchSchema = z
-  .object({
-    plan: z.enum(["free", "starter", "pro"]).optional(),
-    role: z.enum(["user", "admin"]).optional(),
-  })
-  .refine((d) => d.plan !== undefined || d.role !== undefined, {
-    message: "At least one of plan or role must be provided",
-  });
-
 export async function PATCH(req: Request, { params }: Params) {
   const { session, error } = await assertAdmin();
   if (error) return error;
@@ -42,7 +33,7 @@ export async function PATCH(req: Request, { params }: Params) {
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
 
-  const parsed = patchSchema.safeParse(body);
+  const parsed = adminUserPatchSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }

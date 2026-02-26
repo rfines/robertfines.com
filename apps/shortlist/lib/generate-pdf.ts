@@ -14,6 +14,7 @@ import {
   StyleSheet,
   renderToBuffer,
 } from "@react-pdf/renderer";
+import { parseResumeLines } from "@/lib/parse-resume-lines";
 
 const styles = StyleSheet.create({
   page: {
@@ -55,33 +56,8 @@ const styles = StyleSheet.create({
   },
 });
 
-interface LineBlock {
-  type: "header" | "bullet" | "line" | "spacer";
-  text: string;
-}
-
-function parseLines(text: string): LineBlock[] {
-  return text.split("\n").map((raw) => {
-    const trimmed = raw.trim();
-    if (!trimmed) return { type: "spacer", text: "" };
-
-    const isHeader =
-      trimmed === trimmed.toUpperCase() &&
-      trimmed.length < 50 &&
-      !/[^A-Z\s\-/&]/.test(trimmed);
-
-    if (isHeader) return { type: "header", text: trimmed };
-
-    if (trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.startsWith("·")) {
-      return { type: "bullet", text: trimmed.replace(/^[•\-·]\s*/, "") };
-    }
-
-    return { type: "line", text: trimmed };
-  });
-}
-
 function ResumePdf({ text }: { text: string }) {
-  const blocks = parseLines(text);
+  const lines = parseResumeLines(text);
 
   return React.createElement(
     Document,
@@ -92,22 +68,22 @@ function ResumePdf({ text }: { text: string }) {
       React.createElement(
         View,
         null,
-        ...blocks.map((block, i) => {
-          if (block.type === "spacer") {
+        ...lines.map((line, i) => {
+          if (line.type === "empty") {
             return React.createElement(View, { key: i, style: { height: 4 } });
           }
-          if (block.type === "header") {
-            return React.createElement(Text, { key: i, style: styles.header }, block.text);
+          if (line.type === "header") {
+            return React.createElement(Text, { key: i, style: styles.header }, line.text);
           }
-          if (block.type === "bullet") {
+          if (line.type === "bullet") {
             return React.createElement(
               View,
               { key: i, style: styles.bullet },
               React.createElement(Text, { style: styles.bulletDot }, "•"),
-              React.createElement(Text, { style: styles.bulletText }, block.text)
+              React.createElement(Text, { style: styles.bulletText }, line.text)
             );
           }
-          return React.createElement(Text, { key: i, style: styles.line }, block.text);
+          return React.createElement(Text, { key: i, style: styles.line }, line.text);
         })
       )
     )

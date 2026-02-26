@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateCoverLetter } from "@/lib/generate-cover-letter";
 import { captureEvent } from "@/lib/posthog";
+import { requireAuth } from "@/lib/route-helpers";
 
 export const maxDuration = 60;
 
@@ -11,10 +11,8 @@ interface Params {
 }
 
 export async function POST(_req: Request, { params }: Params) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const { session, error } = await requireAuth();
+  if (error) return error;
 
   const { tailoredId } = await params;
   const tailored = await prisma.tailoredResume.findFirst({

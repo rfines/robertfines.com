@@ -36,8 +36,29 @@ export const presignUploadSchema = z.object({
   ]),
 });
 
+export const extractResumeSchema = z.object({
+  s3Key: z.string().min(1),
+  fileType: z.enum(["pdf", "docx"]),
+});
+
+export const adminUserPatchSchema = z
+  .object({
+    plan: z.enum(["free", "starter", "pro"]).optional(),
+    role: z.enum(["user", "admin"]).optional(),
+  })
+  .refine((d) => d.plan !== undefined || d.role !== undefined, {
+    message: "At least one of plan or role must be provided",
+  });
+
 export type CreateResumeInput = z.infer<typeof createResumeSchema>;
 export type UpdateResumeInput = z.infer<typeof updateResumeSchema>;
 export type UploadResumeFileInput = z.infer<typeof uploadResumeFileSchema>;
 export type TailorResumeInput = z.infer<typeof tailorResumeSchema>;
 export type PresignUploadInput = z.infer<typeof presignUploadSchema>;
+export type ExtractResumeInput = z.infer<typeof extractResumeSchema>;
+export type AdminUserPatchInput = z.infer<typeof adminUserPatchSchema>;
+
+// Re-exported from lib files for single-import convenience
+export type { KeywordMatchResult } from "@/lib/keyword-match";
+export type { AtsWarning } from "@/lib/ats-warnings";
+export type { ParsedLine } from "@/lib/parse-resume-lines";

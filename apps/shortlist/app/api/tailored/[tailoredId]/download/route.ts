@@ -1,4 +1,3 @@
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateDocx } from "@/lib/generate-docx";
 import { generateMarkdown } from "@/lib/generate-markdown";
@@ -7,16 +6,15 @@ import { NextResponse } from "next/server";
 import { captureEvent } from "@/lib/posthog";
 import { getUserPlan } from "@/lib/get-user-plan";
 import { canDownload, canExportMarkdown, canExportPdf } from "@/lib/plan";
+import { requireAuth } from "@/lib/route-helpers";
 
 interface Params {
   params: Promise<{ tailoredId: string }>;
 }
 
 export async function GET(req: Request, { params }: Params) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const { session, error: authError } = await requireAuth();
+  if (authError) return authError;
 
   const { searchParams } = new URL(req.url);
   const format = searchParams.get("format") ?? "docx";

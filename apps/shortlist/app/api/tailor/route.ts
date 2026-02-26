@@ -1,34 +1,26 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { tailorResume } from "@/lib/tailor-resume";
 import { tailorResumeSchema } from "@/types";
 import { captureEvent } from "@/lib/posthog";
 import { getUserPlan } from "@/lib/get-user-plan";
 import { PLAN_LIMITS, canUseInstructions } from "@/lib/plan";
+import { requireAuth, parseBody } from "@/lib/route-helpers";
 
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const { session, error: authError } = await requireAuth();
+  if (authError) return authError;
 
-  const body = await req.json().catch(() => null);
-  const parsed = tailorResumeSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.flatten() },
-      { status: 400 }
-    );
-  }
+  const { data, error: parseError } = await parseBody(req, tailorResumeSchema);
+  if (parseError) return parseError;
 
   const plan = await getUserPlan(session.user.id);
 
   // Gate custom instructions to paid plans
-  if (parsed.data.userInstructions && !canUseInstructions(plan)) {
+  if (data.userInstructions && !canUseInstructions(plan)) {
     return NextResponse.json(
       { error: "Custom instructions require a paid plan" },
       { status: 403 }
@@ -37,11 +29,11 @@ export async function POST(req: Request) {
 
   // Cap variations to plan limit
   const maxVariations = PLAN_LIMITS[plan].variations;
-  const variationCount = Math.min(parsed.data.variations, maxVariations);
+  const variationCount = Math.min(data.variations, maxVariations);
 
   // Verify resume ownership
   const resume = await prisma.resume.findFirst({
-    where: { id: parsed.data.resumeId, userId: session.user.id },
+    where: { id: data.resumeId, userId: session.user.id },
   });
   if (!resume) {
     return NextResponse.json({ error: "Resume not found" }, { status: 404 });
@@ -51,11 +43,11 @@ export async function POST(req: Request) {
 
   const tailorInput = {
     baseResume: resume.rawText,
-    jobTitle: parsed.data.jobTitle,
-    company: parsed.data.company,
-    jobDescription: parsed.data.jobDescription,
-    intensity: parsed.data.intensity,
-    userInstructions: parsed.data.userInstructions,
+    jobTitle: data.jobTitle,
+    company: data.company,
+    jobDescription: data.jobDescription,
+    intensity: data.intensity,
+    userInstructions: data.userInstructions,
   };
 
   const results = await Promise.all(
@@ -66,11 +58,11 @@ export async function POST(req: Request) {
     data: results.map(({ tailoredText, tokensUsed }, i) => ({
       userId: session.user.id!,
       resumeId: resume.id,
-      jobTitle: parsed.data.jobTitle,
-      company: parsed.data.company ?? null,
-      jobDescription: parsed.data.jobDescription,
-      intensity: parsed.data.intensity,
-      userInstructions: parsed.data.userInstructions ?? null,
+      jobTitle: data.jobTitle,
+      company: data.company ?? null,
+      jobDescription: data.jobDescription,
+      intensity: data.intensity,
+      userInstructions: data.userInstructions ?? null,
       tailoredText,
       tokensUsed,
       variationGroup,
@@ -80,11 +72,11 @@ export async function POST(req: Request) {
 
   const totalTokens = results.reduce((sum, r) => sum + (r.tokensUsed ?? 0), 0);
   await captureEvent(session.user.id, "resume_tailored", {
-    intensity: parsed.data.intensity,
+    intensity: data.intensity,
     tokensUsed: totalTokens,
-    hasCompany: !!parsed.data.company,
+    hasCompany: !!data.company,
     variations: variationCount,
-    hasInstructions: !!parsed.data.userInstructions,
+    hasInstructions: !!data.userInstructions,
   });
 
   return NextResponse.json(records[0], { status: 201 });

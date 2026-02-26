@@ -1,17 +1,15 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { updateResumeSchema } from "@/types";
+import { requireAuth, parseBody } from "@/lib/route-helpers";
 
 interface Params {
   params: Promise<{ resumeId: string }>;
 }
 
 export async function GET(_req: Request, { params }: Params) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const { session, error } = await requireAuth();
+  if (error) return error;
 
   const { resumeId } = await params;
   const resume = await prisma.resume.findFirst({
@@ -26,28 +24,17 @@ export async function GET(_req: Request, { params }: Params) {
 }
 
 export async function PATCH(req: Request, { params }: Params) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const { session, error: authError } = await requireAuth();
+  if (authError) return authError;
 
   const { resumeId } = await params;
-  const body = await req.json().catch(() => null);
-  if (!body) {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-  }
 
-  const parsed = updateResumeSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.flatten() },
-      { status: 400 }
-    );
-  }
+  const { data, error: parseError } = await parseBody(req, updateResumeSchema);
+  if (parseError) return parseError;
 
   const resume = await prisma.resume.updateMany({
     where: { id: resumeId, userId: session.user.id },
-    data: parsed.data,
+    data,
   });
 
   if (resume.count === 0) {
@@ -59,10 +46,8 @@ export async function PATCH(req: Request, { params }: Params) {
 }
 
 export async function DELETE(_req: Request, { params }: Params) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const { session, error } = await requireAuth();
+  if (error) return error;
 
   const { resumeId } = await params;
   const deleted = await prisma.resume.deleteMany({

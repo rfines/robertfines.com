@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createResumeSchema } from "@/types";
 import { captureEvent } from "@/lib/posthog";
+import { requireAuth, parseBody } from "@/lib/route-helpers";
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const { session, error } = await requireAuth();
+  if (error) return error;
 
   const resumes = await prisma.resume.findMany({
     where: { userId: session.user.id },
@@ -26,29 +24,17 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const { session, error: authError } = await requireAuth();
+  if (authError) return authError;
 
-  const body = await req.json().catch(() => null);
-  if (!body) {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-  }
-
-  const parsed = createResumeSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.flatten() },
-      { status: 400 }
-    );
-  }
+  const { data, error: parseError } = await parseBody(req, createResumeSchema);
+  if (parseError) return parseError;
 
   const resume = await prisma.resume.create({
     data: {
       userId: session.user.id,
-      title: parsed.data.title,
-      rawText: parsed.data.rawText,
+      title: data.title,
+      rawText: data.rawText,
     },
   });
 

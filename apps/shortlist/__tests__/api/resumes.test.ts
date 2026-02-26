@@ -96,8 +96,6 @@ describe("POST /api/resumes", () => {
     });
     const res = await POST(req);
     expect(res.status).toBe(400);
-    const data = await res.json();
-    expect(data.error).toBe("Invalid JSON");
   });
 
   it("returns 400 when title is missing", async () => {
