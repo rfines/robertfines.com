@@ -55,7 +55,11 @@ if (parseError) return parseError;
 - Plan-gated UI: show `CopyButton` (free) or `DownloadMenu` (starter+) based on `canDownload(plan)`
 
 ## Commands
+
+pnpm is installed via corepack and is NOT in the default PATH. Always activate nvm first, then run pnpm normally (nvm activates the corepack shim):
+
 ```sh
+source ~/.nvm/nvm.sh && nvm use  # activates node v22 (see .nvmrc) + pnpm shim
 pnpm --filter shortlist test        # run tests (should be 209 passing)
 pnpm --filter shortlist test:watch  # watch mode
 pnpm --filter shortlist build       # TypeScript check + build

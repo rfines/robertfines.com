@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
-import type { ZodType } from "zod";
+import { z, type ZodTypeAny } from "zod";
 
 /**
  * For API route handlers.
@@ -21,8 +21,9 @@ export async function requireAuth() {
 /**
  * Parses and validates the request body against a Zod schema.
  * Returns { data } on success or { error: NextResponse } on 400.
+ * Uses z.output<S> so default values are reflected in the return type.
  */
-export async function parseBody<T>(req: Request, schema: ZodType<T>) {
+export async function parseBody<S extends ZodTypeAny>(req: Request, schema: S) {
   const body = await req.json().catch(() => null);
   const parsed = schema.safeParse(body);
   if (!parsed.success) {
@@ -31,5 +32,5 @@ export async function parseBody<T>(req: Request, schema: ZodType<T>) {
       error: NextResponse.json({ error: parsed.error.flatten() }, { status: 400 }),
     };
   }
-  return { data: parsed.data, error: null };
+  return { data: parsed.data as z.output<S>, error: null };
 }

@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { FileText, Sparkles, LayoutDashboard } from "lucide-react";
+import { FileText, Sparkles, LayoutDashboard, CreditCard } from "lucide-react";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dashboard/resumes", label: "My Resumes", icon: FileText },
   { href: "/dashboard/tailored", label: "Tailored Versions", icon: Sparkles },
+  { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
 ];
 
 export function AppSidebar() {

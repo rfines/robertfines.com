@@ -50,6 +50,10 @@ export const adminUserPatchSchema = z
     message: "At least one of plan or role must be provided",
   });
 
+export const checkoutSessionSchema = z.object({
+  priceId: z.string().min(1),
+});
+
 export type CreateResumeInput = z.infer<typeof createResumeSchema>;
 export type UpdateResumeInput = z.infer<typeof updateResumeSchema>;
 export type UploadResumeFileInput = z.infer<typeof uploadResumeFileSchema>;
@@ -57,6 +61,7 @@ export type TailorResumeInput = z.infer<typeof tailorResumeSchema>;
 export type PresignUploadInput = z.infer<typeof presignUploadSchema>;
 export type ExtractResumeInput = z.infer<typeof extractResumeSchema>;
 export type AdminUserPatchInput = z.infer<typeof adminUserPatchSchema>;
+export type CheckoutSessionInput = z.infer<typeof checkoutSessionSchema>;
 
 // Re-exported from lib files for single-import convenience
 export type { KeywordMatchResult } from "@/lib/keyword-match";

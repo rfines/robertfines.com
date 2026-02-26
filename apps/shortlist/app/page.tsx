@@ -4,12 +4,101 @@ import Link from "next/link";
 import { Check, X } from "lucide-react";
 import { PLAN_PRICING, type Plan } from "@/lib/plan";
 
+const softwareApplicationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "Retold",
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web",
+  url: "https://retold.dev",
+  description:
+    "AI-powered resume tailoring. Upload your resume, paste a job description, and get a tailored version in 30 seconds with keyword matching and ATS analysis.",
+  offers: [
+    {
+      "@type": "Offer",
+      name: "Free",
+      price: "0",
+      priceCurrency: "USD",
+      description: "1 tailored variation, plain text copy, keyword match score",
+    },
+    {
+      "@type": "Offer",
+      name: "Starter",
+      price: "9.99",
+      priceCurrency: "USD",
+      description: "2 variations, DOCX + Markdown export, custom instructions",
+    },
+    {
+      "@type": "Offer",
+      name: "Pro",
+      price: "19.99",
+      priceCurrency: "USD",
+      description: "3 variations, all exports including PDF",
+    },
+  ],
+};
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "What is Retold?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Retold is an AI-powered resume tailoring tool. You upload your resume once, paste a job description, and in about 30 seconds you get a version restructured specifically for that role — with keyword match scoring and ATS analysis built in.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How does AI resume tailoring work?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Retold uses Claude (Anthropic's AI) to analyze the job description, extract key requirements and keywords, then restructure and rewrite your resume to match — emphasizing the most relevant experience and using language that mirrors the role.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Will my resume still sound like me?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes. Retold rewrites your story, not your identity. It works from your actual experience and preserves your voice — it reorders sections, adjusts emphasis, and mirrors the job's language without fabricating anything.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What does ATS-optimized mean?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Applicant Tracking Systems (ATS) are software used by employers to filter resumes before a human sees them. Retold formats your resume to pass ATS filters by using plain text, standard section headers, and the exact keywords from the job description.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Is Retold free to use?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes. The free plan lets you tailor one resume variation and copy the result. Paid plans ($9.99–$19.99/month) unlock multiple variations, file downloads (DOCX, Markdown, PDF), and custom tailoring instructions.",
+      },
+    },
+  ],
+};
+
 export default async function LandingPage() {
   const session = await auth();
   if (session) redirect("/dashboard");
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       {/* Navbar */}
       <nav className="sticky top-0 z-10 border-b border-[var(--border)] bg-[var(--background)]/90 backdrop-blur-sm">
         <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">

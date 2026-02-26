@@ -21,6 +21,7 @@ model User {
   marketingConsent  Boolean?
   plan              String           @default("free")
   role              String           @default("user")
+  stripeCustomerId  String?          @unique
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
 }
