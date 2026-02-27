@@ -13,20 +13,20 @@ const planFeatures: {
   pro: boolean | string;
   agency: boolean | string;
 }[] = [
-  { label: "Tailored resume variations", free: "1", starter: "2", pro: "3", agency: "5" },
-  { label: "Monthly tailoring runs",      free: "10", starter: "100", pro: "Unlimited", agency: "Unlimited" },
-  { label: "Plain text view + Copy",      free: true, starter: true, pro: true, agency: true },
-  { label: "Keyword match score",          free: true, starter: true, pro: true, agency: true },
-  { label: "DOCX download",               free: false, starter: true, pro: true, agency: true },
-  { label: "Markdown export",             free: false, starter: true, pro: true, agency: true },
-  { label: "Custom instructions",         free: false, starter: true,  pro: true, agency: true },
-  { label: "Before/after diff view",     free: false, starter: true,  pro: true, agency: true },
-  { label: "Cover letter generation",    free: false, starter: true,  pro: true, agency: true },
-  { label: "Bullet rewriter",            free: false, starter: true,  pro: true, agency: true },
-  { label: "PDF export",                 free: false, starter: false, pro: true, agency: true },
-  { label: "Fix ATS issues",             free: false, starter: false, pro: true, agency: true },
-  { label: "LinkedIn optimizer",         free: false, starter: false, pro: true, agency: true },
-  { label: "Candidate name labeling",    free: false, starter: false, pro: false, agency: true },
+  { label: "Tailored resume variations per session", free: "1", starter: "2", pro: "3", agency: "5" },
+  { label: "Monthly tailoring runs",                 free: "10", starter: "100", pro: "Unlimited", agency: "Unlimited" },
+  { label: "Keyword match score vs. job posting",    free: true, starter: true, pro: true, agency: true },
+  { label: "Plain text view + one-click copy",       free: true, starter: true, pro: true, agency: true },
+  { label: "DOCX download",                          free: false, starter: true, pro: true, agency: true },
+  { label: "Markdown export",                        free: false, starter: true, pro: true, agency: true },
+  { label: "Custom tailoring instructions",          free: false, starter: true,  pro: true, agency: true },
+  { label: "Before/after diff view",                 free: false, starter: true,  pro: true, agency: true },
+  { label: "AI cover letter generation",             free: false, starter: true,  pro: true, agency: true },
+  { label: "Bullet point rewriter tool",             free: false, starter: true,  pro: true, agency: true },
+  { label: "PDF export",                             free: false, starter: false, pro: true, agency: true },
+  { label: "ATS issue detection + auto-fix",         free: false, starter: false, pro: true, agency: true },
+  { label: "LinkedIn headline + About generator",    free: false, starter: false, pro: true, agency: true },
+  { label: "Label resumes by candidate name",        free: false, starter: false, pro: false, agency: true },
 ];
 
 export default async function BillingPage({
@@ -163,10 +163,29 @@ function UpgradeTierCard({ tier, currentPlan }: { tier: Plan; currentPlan: Plan 
 
   const highlights =
     tier === "starter"
-      ? [`${variations} tailored variations`, "100 tailoring runs/month", "DOCX + Markdown export", "Custom instructions"]
+      ? [
+          `${variations} tailored variations per session`,
+          "100 tailoring runs/month",
+          "AI cover letter generation",
+          "Before/after diff view",
+          "Bullet point rewriter tool",
+          "DOCX + Markdown export",
+        ]
       : tier === "pro"
-      ? [`${variations} tailored variations`, "Unlimited tailoring runs", "All export formats + PDF", "Custom instructions"]
-      : [`${variations} tailored variations`, "Unlimited tailoring runs", "All export formats + PDF", "Candidate name labeling"];
+      ? [
+          `${variations} tailored variations per session`,
+          "Unlimited tailoring runs",
+          "ATS issue detection + auto-fix",
+          "LinkedIn headline + About generator",
+          "PDF export",
+          "Everything in Starter",
+        ]
+      : [
+          `${variations} tailored variations per session`,
+          "Unlimited tailoring runs",
+          "Label resumes by candidate name",
+          "Everything in Pro",
+        ];
 
   return (
     <div className="border border-[var(--border)] rounded-xl p-5 flex flex-col gap-4 bg-[var(--surface)]">

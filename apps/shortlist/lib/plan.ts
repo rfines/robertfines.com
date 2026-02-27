@@ -1,8 +1,8 @@
 export const PLAN_PRICING = {
   free:    { label: "Free",    price: "$0",     period: "",    description: "Get started with AI resume tailoring" },
-  starter: { label: "Starter", price: "$9.99",  period: "/mo", description: "More variations and export options" },
-  pro:     { label: "Pro",     price: "$19.99", period: "/mo", description: "Everything you need to land the role" },
-  agency:  { label: "Agency",  price: "$49.99", period: "/mo", description: "For talent acquisition professionals" },
+  starter: { label: "Starter", price: "$9.99",  period: "/mo", description: "Cover letters, diff view, bullet rewriter, and more" },
+  pro:     { label: "Pro",     price: "$19.99", period: "/mo", description: "ATS fixes, LinkedIn optimizer, PDF export, and unlimited runs" },
+  agency:  { label: "Agency",  price: "$49.99", period: "/mo", description: "Everything in Pro plus multi-candidate resume management" },
 } as const;
 
 export const PLAN_LIMITS = {
