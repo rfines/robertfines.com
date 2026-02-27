@@ -6,6 +6,11 @@ import type Stripe from "stripe";
 
 export const maxDuration = 30;
 
+// Diagnostic — lets us confirm Railway is routing to this handler
+export function GET() {
+  return NextResponse.json({ ok: true, ts: Date.now() });
+}
+
 export async function POST(req: Request) {
   let buf: Buffer;
   try {
