@@ -5,10 +5,11 @@ export default auth((req) => {
   const isAuthenticated = !!req.auth;
 
   const isAuthRoute = nextUrl.pathname.startsWith("/api/auth");
+  const isPublicApi = nextUrl.pathname === "/api/stripe/webhook";
   const isApiRoute = nextUrl.pathname.startsWith("/api");
   const isDashboard = nextUrl.pathname.startsWith("/dashboard");
 
-  if (isAuthRoute) return;
+  if (isAuthRoute || isPublicApi) return;
 
   if (!isAuthenticated && isApiRoute) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
