@@ -39,6 +39,21 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
+  // Idempotency check — Stripe retries can deliver the same event multiple times.
+  // Return 200 immediately if we've already processed this event ID.
+  try {
+    await prisma.processedStripeEvent.create({ data: { id: event.id } });
+  } catch (err: unknown) {
+    const isUniqueViolation =
+      err instanceof Error && "code" in err && (err as { code: string }).code === "P2002";
+    if (isUniqueViolation) {
+      console.log(`Webhook: duplicate event ${event.id} — skipping`);
+      return NextResponse.json({ received: true });
+    }
+    // Any other DB error — fail open and continue processing rather than dropping the event
+    console.error("Webhook: idempotency check failed, processing anyway", err);
+  }
+
   try {
     switch (event.type) {
       // Plan assigned when subscription is first created — subscription data
@@ -98,7 +113,12 @@ export async function POST(req: Request) {
             : subscription.customer.id;
 
         const priceId = subscription.items.data[0]?.price.id;
-        const isActive = subscription.status === "active" || subscription.status === "trialing";
+        // Treat past_due as still active — payment failed but we give a grace period.
+        // Only fully downgrade on unpaid or canceled.
+        const isActive =
+          subscription.status === "active" ||
+          subscription.status === "trialing" ||
+          subscription.status === "past_due";
         const plan = isActive && priceId ? planFromPriceId(priceId) : "free";
         if (!plan) {
           console.error("Webhook: unknown priceId in customer.subscription.updated", priceId);
@@ -125,6 +145,16 @@ export async function POST(req: Request) {
           data: { plan: "free", stripeSubscriptionId: null },
         });
         console.log(`Webhook: subscription.deleted — customer ${customerId} → free`);
+        break;
+      }
+
+      // Log payment failures but do NOT downgrade — customer.subscription.updated
+      // will fire with status "past_due" which already has a grace period above.
+      case "invoice.payment_failed": {
+        const invoice = event.data.object as Stripe.Invoice;
+        const customerId =
+          typeof invoice.customer === "string" ? invoice.customer : invoice.customer?.id;
+        console.warn(`Webhook: invoice.payment_failed — customer ${customerId}, attempt ${invoice.attempt_count}`);
         break;
       }
     }

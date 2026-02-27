@@ -6,6 +6,9 @@ vi.mock("@/lib/prisma", () => ({
       updateMany: vi.fn(),
       update: vi.fn(),
     },
+    processedStripeEvent: {
+      create: vi.fn(),
+    },
   },
 }));
 
@@ -76,6 +79,8 @@ describe("POST /api/stripe/webhook", () => {
 
     vi.mocked(prisma.user.updateMany).mockResolvedValue({ count: 1 } as never);
     vi.mocked(prisma.user.update).mockResolvedValue({} as never);
+    // Default: idempotency check succeeds (new event, not a duplicate)
+    vi.mocked(prisma.processedStripeEvent.create).mockResolvedValue({} as never);
   });
 
   // ── Request validation ──────────────────────────────────────────────────────
@@ -108,6 +113,49 @@ describe("POST /api/stripe/webhook", () => {
     expect(res.status).toBe(400);
     const data = await res.json();
     expect(data.error).toBe("Invalid signature");
+  });
+
+  // ── Idempotency ─────────────────────────────────────────────────────────────
+
+  describe("idempotency", () => {
+    it("returns 200 without processing when the event has already been handled", async () => {
+      mockConstructEvent.mockReturnValue({
+        id: "evt_duplicate123",
+        type: "customer.subscription.deleted",
+        data: { object: makeSubscription() },
+      });
+
+      // Simulate unique constraint violation (P2002) — event already exists
+      const uniqueError = Object.assign(new Error("Unique constraint failed"), { code: "P2002" });
+      vi.mocked(prisma.processedStripeEvent.create).mockRejectedValue(uniqueError);
+
+      const res = await POST(makeWebhookRequest());
+      expect(res.status).toBe(200);
+      const data = await res.json();
+      expect(data.received).toBe(true);
+      // Should NOT have updated the user — duplicate was short-circuited
+      expect(prisma.user.updateMany).not.toHaveBeenCalled();
+    });
+
+    it("continues processing when idempotency DB write fails for non-unique reasons", async () => {
+      mockConstructEvent.mockReturnValue({
+        id: "evt_test123",
+        type: "customer.subscription.deleted",
+        data: { object: makeSubscription({ customerId: "cus_test123" }) },
+      });
+
+      // Non-unique DB error — should fail open and still process the event
+      vi.mocked(prisma.processedStripeEvent.create).mockRejectedValue(
+        new Error("Connection refused")
+      );
+
+      const res = await POST(makeWebhookRequest());
+      expect(res.status).toBe(200);
+      expect(prisma.user.updateMany).toHaveBeenCalledWith({
+        where: { stripeCustomerId: "cus_test123" },
+        data: { plan: "free", stripeSubscriptionId: null },
+      });
+    });
   });
 
   // ── customer.subscription.created ──────────────────────────────────────────
@@ -266,10 +314,37 @@ describe("POST /api/stripe/webhook", () => {
       });
     });
 
-    it("downgrades to free when the subscription becomes inactive", async () => {
+    it("keeps the user's paid plan when subscription becomes past_due (grace period)", async () => {
+      mockConstructEvent.mockReturnValue({
+        type: "customer.subscription.updated",
+        data: {
+          object: makeSubscription({ customerId: "cus_test123", priceId: "price_pro_test", status: "past_due" }),
+        },
+      });
+
+      await POST(makeWebhookRequest());
+      expect(prisma.user.updateMany).toHaveBeenCalledWith({
+        where: { stripeCustomerId: "cus_test123" },
+        data: { plan: "pro" },
+      });
+    });
+
+    it("downgrades to free when the subscription becomes canceled", async () => {
       mockConstructEvent.mockReturnValue({
         type: "customer.subscription.updated",
         data: { object: makeSubscription({ status: "canceled" }) },
+      });
+
+      await POST(makeWebhookRequest());
+      expect(prisma.user.updateMany).toHaveBeenCalledWith(
+        expect.objectContaining({ data: { plan: "free" } })
+      );
+    });
+
+    it("downgrades to free when the subscription becomes unpaid", async () => {
+      mockConstructEvent.mockReturnValue({
+        type: "customer.subscription.updated",
+        data: { object: makeSubscription({ status: "unpaid" }) },
       });
 
       await POST(makeWebhookRequest());
@@ -293,6 +368,27 @@ describe("POST /api/stripe/webhook", () => {
         where: { stripeCustomerId: "cus_test123" },
         data: { plan: "free", stripeSubscriptionId: null },
       });
+    });
+  });
+
+  // ── invoice.payment_failed ──────────────────────────────────────────────────
+
+  describe("invoice.payment_failed", () => {
+    it("returns 200 without changing the user's plan", async () => {
+      mockConstructEvent.mockReturnValue({
+        type: "invoice.payment_failed",
+        data: {
+          object: {
+            customer: "cus_test123",
+            attempt_count: 1,
+          },
+        },
+      });
+
+      const res = await POST(makeWebhookRequest());
+      expect(res.status).toBe(200);
+      expect(prisma.user.updateMany).not.toHaveBeenCalled();
+      expect(prisma.user.update).not.toHaveBeenCalled();
     });
   });
 

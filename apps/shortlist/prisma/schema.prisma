@@ -106,3 +106,11 @@ model RateLimitEntry {
   @@index([userId, action, windowKey])
   @@index([action, windowKey]) // for cleanup queries
 }
+
+// Stripe webhook idempotency — prevents double-processing on Stripe retries
+model ProcessedStripeEvent {
+  id          String   @id  // Stripe event ID (evt_xxx)
+  processedAt DateTime @default(now())
+
+  @@index([processedAt])
+}
