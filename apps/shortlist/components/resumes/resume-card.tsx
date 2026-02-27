@@ -8,6 +8,7 @@ interface ResumeCardProps {
     id: string;
     title: string;
     fileType: string | null;
+    candidateName?: string | null;
     updatedAt: Date;
   };
 }
@@ -32,7 +33,9 @@ export function ResumeCard({ resume }: ResumeCardProps) {
                 {resume.title}
               </p>
               <p className="text-xs text-[var(--muted)] mt-0.5">
-                Updated {updatedAt}
+                {resume.candidateName
+                  ? `${resume.candidateName} · Updated ${updatedAt}`
+                  : `Updated ${updatedAt}`}
               </p>
             </div>
           </div>

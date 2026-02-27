@@ -11,14 +11,17 @@ const planFeatures: {
   free: boolean | string;
   starter: boolean | string;
   pro: boolean | string;
+  agency: boolean | string;
 }[] = [
-  { label: "Tailored resume variations", free: "1", starter: "2", pro: "3" },
-  { label: "Plain text view + Copy",      free: true, starter: true, pro: true },
-  { label: "Keyword match score",          free: true, starter: true, pro: true },
-  { label: "DOCX download",               free: false, starter: true, pro: true },
-  { label: "Markdown export",             free: false, starter: true, pro: true },
-  { label: "Custom instructions",         free: false, starter: true, pro: true },
-  { label: "PDF export",                  free: false, starter: false, pro: true },
+  { label: "Tailored resume variations", free: "1", starter: "2", pro: "3", agency: "5" },
+  { label: "Monthly tailoring runs",      free: "10", starter: "100", pro: "Unlimited", agency: "Unlimited" },
+  { label: "Plain text view + Copy",      free: true, starter: true, pro: true, agency: true },
+  { label: "Keyword match score",          free: true, starter: true, pro: true, agency: true },
+  { label: "DOCX download",               free: false, starter: true, pro: true, agency: true },
+  { label: "Markdown export",             free: false, starter: true, pro: true, agency: true },
+  { label: "Custom instructions",         free: false, starter: true, pro: true, agency: true },
+  { label: "PDF export",                  free: false, starter: false, pro: true, agency: true },
+  { label: "Candidate name labeling",     free: false, starter: false, pro: false, agency: true },
 ];
 
 export default async function BillingPage({
@@ -39,7 +42,10 @@ export default async function BillingPage({
   const plan = (user?.plan ?? "free") as Plan;
   const hasSubscription = !!user?.stripeCustomerId;
 
-  const upgradeTiers: Plan[] = plan === "free" ? ["starter", "pro"] : plan === "starter" ? ["pro"] : [];
+  const allTiers: Plan[] = ["free", "starter", "pro", "agency"];
+  const upgradeTiers = allTiers.filter(
+    (t) => allTiers.indexOf(t) > allTiers.indexOf(plan)
+  );
 
   return (
     <div className="max-w-2xl space-y-8">
@@ -92,7 +98,7 @@ export default async function BillingPage({
                     <Check size={14} className="text-[var(--accent)] shrink-0" />
                     <span>
                       <span className="font-medium">{value}</span>{" "}
-                      {value === "1" ? "tailored variation" : "tailored variations"}
+                      {label.toLowerCase()}
                     </span>
                   </>
                 ) : included ? (
@@ -139,12 +145,16 @@ function UpgradeTierCard({ tier }: { tier: Plan }) {
   const priceId =
     tier === "starter"
       ? process.env.STRIPE_STARTER_PRICE_ID!
-      : process.env.STRIPE_PRO_PRICE_ID!;
+      : tier === "pro"
+      ? process.env.STRIPE_PRO_PRICE_ID!
+      : process.env.STRIPE_AGENCY_PRICE_ID!;
 
   const highlights =
     tier === "starter"
-      ? [`${variations} tailored variations`, "DOCX + Markdown export", "Custom instructions"]
-      : [`${variations} tailored variations`, "All export formats + PDF", "Custom instructions"];
+      ? [`${variations} tailored variations`, "100 tailoring runs/month", "DOCX + Markdown export", "Custom instructions"]
+      : tier === "pro"
+      ? [`${variations} tailored variations`, "Unlimited tailoring runs", "All export formats + PDF", "Custom instructions"]
+      : [`${variations} tailored variations`, "Unlimited tailoring runs", "All export formats + PDF", "Candidate name labeling"];
 
   return (
     <div className="border border-[var(--border)] rounded-xl p-5 flex flex-col gap-4 bg-[var(--surface)]">

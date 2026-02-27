@@ -68,6 +68,7 @@ model Resume {
   rawText         String           @db.Text
   s3Key           String?
   fileType        String?
+  candidateName   String?          // Agency plan: whose resume this is
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   tailoredResumes TailoredResume[]
   createdAt       DateTime         @default(now())

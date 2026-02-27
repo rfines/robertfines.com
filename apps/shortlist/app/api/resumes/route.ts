@@ -15,6 +15,7 @@ export async function GET() {
       id: true,
       title: true,
       fileType: true,
+      candidateName: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -35,6 +36,7 @@ export async function POST(req: Request) {
       userId: session.user.id,
       title: data.title,
       rawText: data.rawText,
+      candidateName: data.candidateName ?? null,
     },
   });
 

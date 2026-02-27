@@ -18,6 +18,7 @@ export default async function ResumesPage() {
       id: true,
       title: true,
       fileType: true,
+      candidateName: true,
       updatedAt: true,
     },
   });

@@ -33,7 +33,14 @@ const softwareApplicationJsonLd = {
       name: "Pro",
       price: "19.99",
       priceCurrency: "USD",
-      description: "3 variations, all exports including PDF",
+      description: "3 variations, unlimited runs, all exports including PDF",
+    },
+    {
+      "@type": "Offer",
+      name: "Agency",
+      price: "49.99",
+      priceCurrency: "USD",
+      description: "5 variations, unlimited runs, candidate name labeling — for recruiters and staffing agencies",
     },
   ],
 };
@@ -220,10 +227,11 @@ export default async function LandingPage() {
         <p className="text-sm text-[var(--muted)] text-center mb-12">
           Start free. Upgrade when you&apos;re ready.
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <PricingCard plan="free" />
           <PricingCard plan="starter" featured />
           <PricingCard plan="pro" />
+          <PricingCard plan="agency" />
         </div>
       </section>
 
@@ -259,14 +267,17 @@ const planFeatures: {
   free: boolean | string;
   starter: boolean | string;
   pro: boolean | string;
+  agency: boolean | string;
 }[] = [
-  { label: "Tailored resume variations", free: "1",   starter: "2",  pro: "3"   },
-  { label: "Plain text view + Copy",      free: true,  starter: true, pro: true  },
-  { label: "Keyword match score",          free: true,  starter: true, pro: true  },
-  { label: "DOCX download",               free: false, starter: true, pro: true  },
-  { label: "Markdown export",             free: false, starter: true, pro: true  },
-  { label: "Custom tailoring instructions", free: false, starter: true, pro: true },
-  { label: "PDF export",                  free: false, starter: false, pro: true },
+  { label: "Tailored resume variations",   free: "1",          starter: "2",   pro: "3",         agency: "5"         },
+  { label: "Monthly tailoring runs",        free: "10",         starter: "100", pro: "Unlimited", agency: "Unlimited" },
+  { label: "Plain text view + Copy",        free: true,         starter: true,  pro: true,        agency: true        },
+  { label: "Keyword match score",           free: true,         starter: true,  pro: true,        agency: true        },
+  { label: "DOCX download",                free: false,        starter: true,  pro: true,        agency: true        },
+  { label: "Markdown export",              free: false,        starter: true,  pro: true,        agency: true        },
+  { label: "Custom instructions",          free: false,        starter: true,  pro: true,        agency: true        },
+  { label: "PDF export",                   free: false,        starter: false, pro: true,        agency: true        },
+  { label: "Candidate name labeling",      free: false,        starter: false, pro: false,       agency: true        },
 ];
 
 function PricingCard({ plan, featured }: { plan: Plan; featured?: boolean }) {
@@ -307,7 +318,7 @@ function PricingCard({ plan, featured }: { plan: Plan; featured?: boolean }) {
                   <Check size={14} className="mt-0.5 text-[var(--accent)] shrink-0" />
                   <span>
                     <span className="font-medium">{value}</span>{" "}
-                    {value === "1" ? "tailored variation" : "tailored variations"}
+                    {feat.toLowerCase()}
                   </span>
                 </>
               ) : included ? (

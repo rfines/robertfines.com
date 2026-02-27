@@ -6,6 +6,7 @@ interface ResumeListProps {
     id: string;
     title: string;
     fileType: string | null;
+    candidateName?: string | null;
     updatedAt: Date;
   }[];
 }

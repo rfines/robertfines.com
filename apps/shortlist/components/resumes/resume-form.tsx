@@ -7,16 +7,41 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { FileUploadZone } from "./file-upload-zone";
+import type { Plan } from "@/lib/plan";
 
 type Mode = "text" | "file";
 
-export function ResumeForm() {
+interface Props {
+  plan?: Plan;
+}
+
+export function ResumeForm({ plan }: Props) {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("text");
   const [title, setTitle] = useState("");
+  const [candidateName, setCandidateName] = useState("");
   const [rawText, setRawText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const isAgency = plan === "agency";
+
+  async function createResume(text: string) {
+    const res = await fetch("/api/resumes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: title.trim(),
+        rawText: text,
+        ...(isAgency && candidateName.trim() ? { candidateName: candidateName.trim() } : {}),
+      }),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.error ?? "Failed to create resume");
+    }
+    return res.json();
+  }
 
   async function handleTextSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -24,16 +49,7 @@ export function ResumeForm() {
     setIsSubmitting(true);
     setError(null);
     try {
-      const res = await fetch("/api/resumes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: title.trim(), rawText: rawText.trim() }),
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? "Failed to create resume");
-      }
-      const resume = await res.json();
+      const resume = await createResume(rawText.trim());
       router.push(`/dashboard/resumes/${resume.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -50,16 +66,7 @@ export function ResumeForm() {
     setIsSubmitting(true);
     setError(null);
     try {
-      const res = await fetch("/api/resumes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: title.trim(), rawText: extractedText }),
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? "Failed to create resume");
-      }
-      const resume = await res.json();
+      const resume = await createResume(extractedText);
       router.push(`/dashboard/resumes/${resume.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -80,6 +87,21 @@ export function ResumeForm() {
           required
         />
       </div>
+
+      {isAgency && (
+        <div>
+          <Label htmlFor="candidateName">Candidate Name</Label>
+          <Input
+            id="candidateName"
+            placeholder="e.g. Jane Smith"
+            value={candidateName}
+            onChange={(e) => setCandidateName(e.target.value)}
+          />
+          <p className="text-xs text-[var(--muted)] mt-1">
+            Label whose resume this is for easy identification.
+          </p>
+        </div>
+      )}
 
       <div>
         <div className="flex gap-1 mb-4">

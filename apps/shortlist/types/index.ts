@@ -6,11 +6,13 @@ export type Intensity = (typeof INTENSITIES)[number];
 export const createResumeSchema = z.object({
   title: z.string().min(1, "Title is required").max(100),
   rawText: z.string().min(1, "Resume text is required"),
+  candidateName: z.string().max(100).optional(),
 });
 
 export const updateResumeSchema = z.object({
   title: z.string().min(1).max(100).optional(),
   rawText: z.string().min(1).optional(),
+  candidateName: z.string().max(100).nullable().optional(),
 });
 
 export const uploadResumeFileSchema = z.object({
@@ -43,7 +45,7 @@ export const extractResumeSchema = z.object({
 
 export const adminUserPatchSchema = z
   .object({
-    plan: z.enum(["free", "starter", "pro"]).optional(),
+    plan: z.enum(["free", "starter", "pro", "agency"]).optional(),
     role: z.enum(["user", "admin"]).optional(),
     // null = remove override (use plan default), number = custom limit, omit = no change
     monthlyRunLimit: z.number().int().min(0).nullable().optional(),
