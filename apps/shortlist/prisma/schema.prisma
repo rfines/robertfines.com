@@ -95,3 +95,14 @@ model TailoredResume {
   resume         Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
   createdAt      DateTime @default(now())
 }
+
+// Sliding-window rate limit counters per (userId, action, window bucket)
+model RateLimitEntry {
+  id        String @id @default(cuid())
+  userId    String
+  action    String
+  windowKey Int    // floor(unixTimeSecs / windowSecs) — identifies the bucket
+
+  @@index([userId, action, windowKey])
+  @@index([action, windowKey]) // for cleanup queries
+}

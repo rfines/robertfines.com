@@ -13,7 +13,10 @@ import { VariationTabs } from "@/components/tailoring/variation-tabs";
 import { DownloadMenu } from "@/components/tailoring/download-menu";
 import { CopyButton } from "@/components/tailoring/copy-button";
 import { KeywordMatchCard } from "@/components/tailoring/keyword-match-card";
+import { ResumeDiffView } from "@/components/tailoring/resume-diff-view";
 import { canDownload } from "@/lib/plan";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
 
 interface Props {
   params: Promise<{ tailoredId: string }>;
@@ -27,7 +30,7 @@ export default async function TailoredResumePage({ params }: Props) {
   const [tailored, plan] = await Promise.all([
     prisma.tailoredResume.findFirst({
       where: { id: tailoredId, userId: session.user.id },
-      include: { resume: { select: { title: true, id: true } } },
+      include: { resume: { select: { title: true, id: true, rawText: true } } },
     }),
     getUserPlan(session.user.id),
   ]);
@@ -83,6 +86,12 @@ export default async function TailoredResumePage({ params }: Props) {
           description={`Generated from "${tailored.resume.title}" · ${createdAt}`}
           action={
             <div className="flex items-center gap-2">
+              <Link href={`/dashboard/resumes/${tailored.resume.id}/tailor?from=${tailored.id}`}>
+                <Button size="sm" variant="outline">
+                  <RefreshCw size={13} />
+                  Re-tailor
+                </Button>
+              </Link>
               <TailoredDeleteButton tailoredId={tailored.id} />
               {!hasVariations && (
                 canDownload(plan)
@@ -112,16 +121,17 @@ export default async function TailoredResumePage({ params }: Props) {
           variations={variationData}
           activeId={tailoredId}
           plan={plan}
+          baseResumeText={tailored.resume.rawText}
         />
       ) : (
         <>
           {keywordMatch && <KeywordMatchCard keywordMatch={keywordMatch} />}
 
-          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6 mb-6">
-            <pre className="text-xs text-[var(--foreground)] whitespace-pre-wrap font-mono leading-relaxed overflow-auto max-h-[60vh]">
-              {tailored.tailoredText}
-            </pre>
-          </div>
+          <ResumeDiffView
+            baseText={tailored.resume.rawText}
+            tailoredText={tailored.tailoredText}
+            plan={plan}
+          />
 
           <details className="group">
             <summary className="cursor-pointer text-xs text-[var(--muted)] hover:text-[var(--foreground)] transition-colors select-none">
@@ -139,6 +149,7 @@ export default async function TailoredResumePage({ params }: Props) {
       <CoverLetterSection
         tailoredId={tailored.id}
         initialCoverLetterText={tailored.coverLetterText ?? null}
+        plan={plan}
       />
     </div>
   );

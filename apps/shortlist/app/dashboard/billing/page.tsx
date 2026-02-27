@@ -19,9 +19,14 @@ const planFeatures: {
   { label: "Keyword match score",          free: true, starter: true, pro: true, agency: true },
   { label: "DOCX download",               free: false, starter: true, pro: true, agency: true },
   { label: "Markdown export",             free: false, starter: true, pro: true, agency: true },
-  { label: "Custom instructions",         free: false, starter: true, pro: true, agency: true },
-  { label: "PDF export",                  free: false, starter: false, pro: true, agency: true },
-  { label: "Candidate name labeling",     free: false, starter: false, pro: false, agency: true },
+  { label: "Custom instructions",         free: false, starter: true,  pro: true, agency: true },
+  { label: "Before/after diff view",     free: false, starter: true,  pro: true, agency: true },
+  { label: "Cover letter generation",    free: false, starter: true,  pro: true, agency: true },
+  { label: "Bullet rewriter",            free: false, starter: true,  pro: true, agency: true },
+  { label: "PDF export",                 free: false, starter: false, pro: true, agency: true },
+  { label: "Fix ATS issues",             free: false, starter: false, pro: true, agency: true },
+  { label: "LinkedIn optimizer",         free: false, starter: false, pro: true, agency: true },
+  { label: "Candidate name labeling",    free: false, starter: false, pro: false, agency: true },
 ];
 
 export default async function BillingPage({

@@ -1,5 +1,6 @@
 import { anthropic } from "./anthropic";
 import type { Intensity } from "@/types";
+import type { AtsWarning } from "@/lib/ats-warnings";
 
 interface TailorInput {
   baseResume: string;
@@ -8,6 +9,7 @@ interface TailorInput {
   jobDescription: string;
   intensity?: Intensity;
   userInstructions?: string;
+  atsWarnings?: AtsWarning[];
 }
 
 interface TailorResult {
@@ -24,7 +26,27 @@ const INTENSITY_INSTRUCTIONS: Record<Intensity, string> = {
     "- Apply AGGRESSIVE changes: significantly restructure and reorder sections to maximize relevance. Rewrite bullets heavily to front-load the most relevant experience. You may consolidate or expand sections, but NEVER invent facts.",
 };
 
-function buildSystemPrompt(intensity: Intensity): string {
+const ATS_FIX_INSTRUCTIONS: Record<string, string> = {
+  "table-detected":
+    "Convert all pipe-character table layouts to plain bullet lists. Do not use | characters anywhere in the output.",
+  "fancy-bullets":
+    "Replace all decorative bullet characters (•, ▸, ▪, ★, ▶, ●, ■, etc.) with plain hyphens (-).",
+  "decorative-separators":
+    "Remove all decorative separator lines made of repeated characters (---, ===, ***, ___, etc.). Use blank lines between sections instead.",
+  "missing-sections":
+    "Ensure the resume has clearly labeled section headers for Experience, Education, and Skills. Add any that are missing.",
+  "long-lines":
+    "Break up any lines longer than 120 characters. Eliminate multi-column layouts — all content must be in a single column.",
+};
+
+function buildSystemPrompt(intensity: Intensity, atsWarnings?: AtsWarning[]): string {
+  const atsFixSection =
+    atsWarnings && atsWarnings.length > 0
+      ? `\n\nATS Formatting fixes (apply these in addition to tailoring):\n${atsWarnings
+          .map((w) => `- ${ATS_FIX_INSTRUCTIONS[w.code] ?? w.message}`)
+          .join("\n")}`
+      : "";
+
   return `You are an expert resume writer specializing in ATS optimization and job-specific tailoring.
 
 Your task: rewrite a candidate's base resume to closely match a specific job description.
@@ -35,7 +57,7 @@ Rules:
 - Write in the same voice and tense as the original
 - Output ONLY the tailored resume text — no preamble, explanation, or commentary
 - Preserve all dates, company names, job titles, and factual details exactly as written
-${INTENSITY_INSTRUCTIONS[intensity]}`;
+${INTENSITY_INSTRUCTIONS[intensity]}${atsFixSection}`;
 }
 
 export async function tailorResume({
@@ -45,6 +67,7 @@ export async function tailorResume({
   jobDescription,
   intensity = "moderate",
   userInstructions,
+  atsWarnings,
 }: TailorInput): Promise<TailorResult> {
   const roleTarget = company ? `${jobTitle} at ${company}` : jobTitle;
 
@@ -65,7 +88,7 @@ Please tailor the base resume for this specific role.${
   const response = await anthropic.messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 4096,
-    system: buildSystemPrompt(intensity),
+    system: buildSystemPrompt(intensity, atsWarnings),
     messages: [{ role: "user", content: userMessage }],
   });
 

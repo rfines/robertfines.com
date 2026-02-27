@@ -5,7 +5,8 @@ import { tailorResume } from "@/lib/tailor-resume";
 import { tailorResumeSchema } from "@/types";
 import { captureEvent } from "@/lib/posthog";
 import { getUserPlan } from "@/lib/get-user-plan";
-import { PLAN_LIMITS, canUseInstructions, getEffectiveMonthlyLimit } from "@/lib/plan";
+import { PLAN_LIMITS, canUseInstructions, canFixAtsIssues, getEffectiveMonthlyLimit } from "@/lib/plan";
+import { analyzeAtsWarnings } from "@/lib/ats-warnings";
 import { requireAuth, parseBody } from "@/lib/route-helpers";
 
 export const maxDuration = 60;
@@ -52,6 +53,14 @@ export async function POST(req: Request) {
     );
   }
 
+  // Gate ATS fix to pro/agency
+  if (data.fixAtsIssues && !canFixAtsIssues(plan)) {
+    return NextResponse.json(
+      { error: "Fixing ATS issues requires a Pro or Agency plan" },
+      { status: 403 }
+    );
+  }
+
   // Cap variations to plan limit
   const maxVariations = PLAN_LIMITS[plan].variations;
   const variationCount = Math.min(data.variations, maxVariations);
@@ -66,6 +75,11 @@ export async function POST(req: Request) {
 
   const variationGroup = variationCount > 1 ? randomUUID() : null;
 
+  const atsWarnings =
+    data.fixAtsIssues && canFixAtsIssues(plan)
+      ? analyzeAtsWarnings(resume.rawText)
+      : undefined;
+
   const tailorInput = {
     baseResume: resume.rawText,
     jobTitle: data.jobTitle,
@@ -73,6 +87,7 @@ export async function POST(req: Request) {
     jobDescription: data.jobDescription,
     intensity: data.intensity,
     userInstructions: data.userInstructions,
+    atsWarnings,
   };
 
   const results = await Promise.all(
@@ -102,6 +117,8 @@ export async function POST(req: Request) {
     hasCompany: !!data.company,
     variations: variationCount,
     hasInstructions: !!data.userInstructions,
+    fixAtsIssues: data.fixAtsIssues,
+    atsWarningCount: atsWarnings?.length ?? 0,
   });
 
   return NextResponse.json(records[0], { status: 201 });

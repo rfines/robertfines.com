@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { generateCoverLetter } from "@/lib/generate-cover-letter";
 import { captureEvent } from "@/lib/posthog";
 import { requireAuth } from "@/lib/route-helpers";
+import { getUserPlan } from "@/lib/get-user-plan";
+import { canGenerateCoverLetter } from "@/lib/plan";
 
 export const maxDuration = 60;
 
@@ -13,6 +15,14 @@ interface Params {
 export async function POST(_req: Request, { params }: Params) {
   const { session, error } = await requireAuth();
   if (error) return error;
+
+  const plan = await getUserPlan(session.user.id);
+  if (!canGenerateCoverLetter(plan)) {
+    return NextResponse.json(
+      { error: "Cover letter generation requires a paid plan" },
+      { status: 403 }
+    );
+  }
 
   const { tailoredId } = await params;
   const tailored = await prisma.tailoredResume.findFirst({

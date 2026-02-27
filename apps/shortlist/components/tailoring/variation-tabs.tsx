@@ -8,6 +8,7 @@ import { canDownload } from "@/lib/plan";
 import { DownloadMenu } from "@/components/tailoring/download-menu";
 import { CopyButton } from "@/components/tailoring/copy-button";
 import { KeywordMatchCard } from "@/components/tailoring/keyword-match-card";
+import { ResumeDiffView } from "@/components/tailoring/resume-diff-view";
 
 interface Variation {
   id: string;
@@ -20,9 +21,10 @@ interface VariationTabsProps {
   variations: Variation[];
   activeId: string;
   plan: Plan;
+  baseResumeText: string;
 }
 
-export function VariationTabs({ variations, activeId, plan }: VariationTabsProps) {
+export function VariationTabs({ variations, activeId, plan, baseResumeText }: VariationTabsProps) {
   const [activeVariationId, setActiveVariationId] = useState(activeId);
   const active = variations.find((v) => v.id === activeVariationId) ?? variations[0];
 
@@ -54,11 +56,7 @@ export function VariationTabs({ variations, activeId, plan }: VariationTabsProps
       <KeywordMatchCard keywordMatch={keywordMatch} />
 
       {/* Resume text for active variation */}
-      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6 mb-4">
-        <pre className="text-xs text-[var(--foreground)] whitespace-pre-wrap font-mono leading-relaxed overflow-auto max-h-[60vh]">
-          {active.tailoredText}
-        </pre>
-      </div>
+      <ResumeDiffView baseText={baseResumeText} tailoredText={active.tailoredText} plan={plan} />
 
       {/* Download / copy button for active variation */}
       <div className="flex justify-end">

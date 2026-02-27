@@ -21,10 +21,15 @@ vi.mock("@/lib/posthog", () => ({
   captureEvent: vi.fn(),
 }));
 
+vi.mock("@/lib/get-user-plan", () => ({
+  getUserPlan: vi.fn().mockResolvedValue("starter"),
+}));
+
 import { POST } from "@/app/api/tailored/[tailoredId]/cover-letter/route";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateCoverLetter } from "@/lib/generate-cover-letter";
+import { getUserPlan } from "@/lib/get-user-plan";
 
 const AUTHED_SESSION = {
   user: { id: "user_test123", email: "test@example.com" },
@@ -54,6 +59,7 @@ describe("POST /api/tailored/[tailoredId]/cover-letter", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(auth).mockResolvedValue(AUTHED_SESSION as never);
+    vi.mocked(getUserPlan).mockResolvedValue("starter");
     vi.mocked(prisma.tailoredResume.findFirst).mockResolvedValue(
       TAILORED_RESUME as never
     );
@@ -72,6 +78,12 @@ describe("POST /api/tailored/[tailoredId]/cover-letter", () => {
     vi.mocked(auth).mockResolvedValue(null as never);
     const res = await POST(makeRequest(), PARAMS);
     expect(res.status).toBe(401);
+  });
+
+  it("returns 403 when user is on free plan", async () => {
+    vi.mocked(getUserPlan).mockResolvedValue("free");
+    const res = await POST(makeRequest(), PARAMS);
+    expect(res.status).toBe(403);
   });
 
   it("returns 404 when tailored resume is not found", async () => {

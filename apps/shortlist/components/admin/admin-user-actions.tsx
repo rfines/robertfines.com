@@ -75,6 +75,7 @@ export function AdminUserActions({
             <option value="free">Free</option>
             <option value="starter">Starter</option>
             <option value="pro">Pro</option>
+            <option value="agency">Agency</option>
           </select>
         </div>
         <div>
@@ -101,7 +102,7 @@ export function AdminUserActions({
             className="text-xs bg-[var(--background)] border border-[var(--border)] rounded-lg px-3 py-1.5 text-[var(--foreground)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] w-32 placeholder:text-[var(--muted)]"
           />
           <p className="text-[10px] text-[var(--muted)] mt-0.5">
-            Empty = plan default · free: 10 · starter: 100 · pro: ∞
+            Empty = plan default · free: 10 · starter: 100 · pro/agency: ∞
           </p>
         </div>
         <Button size="sm" onClick={handleSave} disabled={!isDirty || saving}>

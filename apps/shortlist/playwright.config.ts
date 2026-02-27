@@ -22,5 +22,9 @@ export default defineConfig({
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
+    env: {
+      // Ensure the dev server uses the same secret as the e2e auth fixture
+      AUTH_SECRET: process.env.AUTH_SECRET ?? "test-secret-32-chars-minimum!!x",
+    },
   },
 });

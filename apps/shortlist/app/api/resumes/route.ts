@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { createResumeSchema } from "@/types";
 import { captureEvent } from "@/lib/posthog";
 import { requireAuth, parseBody } from "@/lib/route-helpers";
+import { getUserPlan } from "@/lib/get-user-plan";
+import { canLabelCandidates } from "@/lib/plan";
 
 export async function GET() {
   const { session, error } = await requireAuth();
@@ -30,6 +32,16 @@ export async function POST(req: Request) {
 
   const { data, error: parseError } = await parseBody(req, createResumeSchema);
   if (parseError) return parseError;
+
+  if (data.candidateName) {
+    const plan = await getUserPlan(session.user.id);
+    if (!canLabelCandidates(plan)) {
+      return NextResponse.json(
+        { error: "Candidate name labeling requires an Agency plan" },
+        { status: 403 }
+      );
+    }
+  }
 
   const resume = await prisma.resume.create({
     data: {

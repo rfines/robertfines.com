@@ -1,19 +1,22 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireAuth } from "@/lib/route-helpers";
+import { requireAuth, parseBody } from "@/lib/route-helpers";
+
+const consentSchema = z.object({
+  consent: z.boolean(),
+});
 
 export async function POST(req: Request) {
   const { session, error } = await requireAuth();
   if (error) return error;
 
-  const body = await req.json();
-  if (typeof body.consent !== "boolean") {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
-  }
+  const { data, error: parseError } = await parseBody(req, consentSchema);
+  if (parseError) return parseError;
 
   await prisma.user.update({
     where: { id: session.user.id },
-    data: { marketingConsent: body.consent },
+    data: { marketingConsent: data.consent },
   });
 
   return NextResponse.json({ ok: true });

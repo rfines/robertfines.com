@@ -31,11 +31,18 @@ vi.mock("@/lib/get-user-plan", () => ({
   getUserPlan: vi.fn().mockResolvedValue("free"),
 }));
 
+vi.mock("@/lib/ats-warnings", () => ({
+  analyzeAtsWarnings: vi.fn().mockReturnValue([
+    { code: "fancy-bullets", severity: "warning", message: "Non-standard bullet characters detected" },
+  ]),
+}));
+
 import { POST } from "@/app/api/tailor/route";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { tailorResume } from "@/lib/tailor-resume";
 import { getUserPlan } from "@/lib/get-user-plan";
+import { analyzeAtsWarnings } from "@/lib/ats-warnings";
 
 const AUTHED_SESSION = {
   user: { id: "user_test123", email: "test@example.com" },
@@ -172,5 +179,46 @@ describe("POST /api/tailor", () => {
     ] as never);
     await POST(makeRequest({ ...VALID_BODY, variations: 2 }));
     expect(tailorResume).toHaveBeenCalledTimes(2);
+  });
+
+  // ── ATS fix gating ────────────────────────────────────────────────────────
+
+  it("returns 403 when free user requests fixAtsIssues", async () => {
+    vi.mocked(getUserPlan).mockResolvedValue("free");
+    const res = await POST(makeRequest({ ...VALID_BODY, fixAtsIssues: true }));
+    expect(res.status).toBe(403);
+    const data = await res.json();
+    expect(data.error).toContain("Pro or Agency");
+  });
+
+  it("returns 403 when starter user requests fixAtsIssues", async () => {
+    vi.mocked(getUserPlan).mockResolvedValue("starter");
+    const res = await POST(makeRequest({ ...VALID_BODY, fixAtsIssues: true }));
+    expect(res.status).toBe(403);
+  });
+
+  it("allows fixAtsIssues for pro plan and passes atsWarnings to tailorResume", async () => {
+    vi.mocked(getUserPlan).mockResolvedValue("pro");
+    const res = await POST(makeRequest({ ...VALID_BODY, fixAtsIssues: true }));
+    expect(res.status).toBe(201);
+    expect(analyzeAtsWarnings).toHaveBeenCalledWith("Base resume content");
+    expect(tailorResume).toHaveBeenCalledWith(
+      expect.objectContaining({ atsWarnings: expect.arrayContaining([expect.objectContaining({ code: "fancy-bullets" })]) })
+    );
+  });
+
+  it("allows fixAtsIssues for agency plan", async () => {
+    vi.mocked(getUserPlan).mockResolvedValue("agency");
+    const res = await POST(makeRequest({ ...VALID_BODY, fixAtsIssues: true }));
+    expect(res.status).toBe(201);
+  });
+
+  it("does not call analyzeAtsWarnings when fixAtsIssues is false", async () => {
+    vi.mocked(getUserPlan).mockResolvedValue("pro");
+    await POST(makeRequest({ ...VALID_BODY, fixAtsIssues: false }));
+    expect(analyzeAtsWarnings).not.toHaveBeenCalled();
+    expect(tailorResume).toHaveBeenCalledWith(
+      expect.objectContaining({ atsWarnings: undefined })
+    );
   });
 });

@@ -123,4 +123,45 @@ describe("tailorResume", () => {
     const callArgs = mockCreate.mock.calls[0][0];
     expect(callArgs.system).toContain("AGGRESSIVE");
   });
+
+  // ── ATS warnings in system prompt ─────────────────────────────────────────
+
+  it("includes ATS fix instructions in system prompt when atsWarnings provided", async () => {
+    await tailorResume({
+      ...BASE_INPUT,
+      atsWarnings: [
+        { code: "fancy-bullets", severity: "warning", message: "Non-standard bullet characters detected" },
+        { code: "table-detected", severity: "error", message: "Table-like formatting detected" },
+      ],
+    });
+
+    const callArgs = mockCreate.mock.calls[0][0];
+    expect(callArgs.system).toContain("ATS Formatting fixes");
+    expect(callArgs.system).toContain("decorative bullet characters");
+    expect(callArgs.system).toContain("pipe-character table layouts");
+  });
+
+  it("does not include ATS fix section when no atsWarnings provided", async () => {
+    await tailorResume(BASE_INPUT);
+
+    const callArgs = mockCreate.mock.calls[0][0];
+    expect(callArgs.system).not.toContain("ATS Formatting fixes");
+  });
+
+  it("does not include ATS fix section when atsWarnings is empty array", async () => {
+    await tailorResume({ ...BASE_INPUT, atsWarnings: [] });
+
+    const callArgs = mockCreate.mock.calls[0][0];
+    expect(callArgs.system).not.toContain("ATS Formatting fixes");
+  });
+
+  it("uses the warning message as fallback when code is unrecognized", async () => {
+    await tailorResume({
+      ...BASE_INPUT,
+      atsWarnings: [{ code: "unknown-code", severity: "warning", message: "Some unknown issue" }],
+    });
+
+    const callArgs = mockCreate.mock.calls[0][0];
+    expect(callArgs.system).toContain("Some unknown issue");
+  });
 });

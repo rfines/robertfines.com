@@ -33,7 +33,7 @@ export async function getObjectBuffer(key: string): Promise<Buffer> {
   const response = await s3.send(command);
 
   if (!response.Body) {
-    throw new Error(`S3 object not found: ${key}`);
+    throw new Error("File not found");
   }
 
   const chunks: Uint8Array[] = [];

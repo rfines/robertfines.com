@@ -22,6 +22,7 @@ export default async function ResumePage({ params }: Props) {
     where: { id: resumeId, userId: session.user.id },
     include: {
       tailoredResumes: {
+        where: { variationIndex: 0 },
         orderBy: { createdAt: "desc" },
         select: {
           id: true,

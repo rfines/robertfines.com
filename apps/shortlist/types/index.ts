@@ -28,10 +28,20 @@ export const tailorResumeSchema = z.object({
   intensity: z.enum(["conservative", "moderate", "aggressive"]).default("moderate"),
   variations: z.number().int().min(1).max(5).default(1),
   userInstructions: z.string().max(500).optional(),
+  fixAtsIssues: z.boolean().default(false),
 });
 
 export const presignUploadSchema = z.object({
-  filename: z.string().min(1),
+  filename: z
+    .string()
+    .min(1)
+    .max(255)
+    // Only allow safe characters — prevents path traversal and injection
+    .regex(/^[a-zA-Z0-9._ -]+$/, 'Filename contains invalid characters')
+    .refine(
+      (name) => ['pdf', 'docx'].includes(name.split('.').pop()?.toLowerCase() ?? ''),
+      'Only .pdf and .docx files are allowed'
+    ),
   contentType: z.enum([
     "application/pdf",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",

@@ -53,6 +53,26 @@ export function canLabelCandidates(plan: Plan): boolean {
   return plan === "agency";
 }
 
+export function canFixAtsIssues(plan: Plan): boolean {
+  return plan === "pro" || plan === "agency";
+}
+
+export function canGenerateCoverLetter(plan: Plan): boolean {
+  return plan !== "free";
+}
+
+export function canViewDiff(plan: Plan): boolean {
+  return plan !== "free";
+}
+
+export function canUseBulletRewriter(plan: Plan): boolean {
+  return plan !== "free";
+}
+
+export function canUseLinkedInOptimizer(plan: Plan): boolean {
+  return plan === "pro" || plan === "agency";
+}
+
 export function planFromPriceId(priceId: string): Plan | null {
   if (priceId === process.env.STRIPE_STARTER_PRICE_ID) return "starter";
   if (priceId === process.env.STRIPE_PRO_PRICE_ID) return "pro";
