@@ -124,6 +124,7 @@ describe("POST /api/resumes", () => {
         userId: "user_test123",
         title: "My Resume",
         rawText: "Resume content",
+        candidateName: null,
       },
     });
   });

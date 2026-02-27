@@ -6,10 +6,14 @@ vi.mock("@/lib/auth", () => ({
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
+    user: {
+      findUnique: vi.fn().mockResolvedValue({ monthlyRunLimit: null }),
+    },
     resume: {
       findFirst: vi.fn(),
     },
     tailoredResume: {
+      count: vi.fn().mockResolvedValue(0),
       createManyAndReturn: vi.fn(),
     },
   },
