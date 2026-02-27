@@ -24,15 +24,18 @@ const mockConstructEvent = vi.fn();
 
 // Minimal Stripe subscription shape used by the handler
 function makeSubscription({
+  id = "sub_test123",
   customerId = "cus_test123",
   priceId = "price_starter_test",
   status = "active",
 }: {
+  id?: string;
   customerId?: string;
   priceId?: string;
   status?: string;
 } = {}) {
   return {
+    id,
     customer: customerId,
     status,
     items: { data: [{ price: { id: priceId } }] },
@@ -120,7 +123,7 @@ describe("POST /api/stripe/webhook", () => {
       expect(res.status).toBe(200);
       expect(prisma.user.updateMany).toHaveBeenCalledWith({
         where: { stripeCustomerId: "cus_test123" },
-        data: { plan: "starter" },
+        data: { plan: "starter", stripeSubscriptionId: expect.any(String) },
       });
     });
 
@@ -132,7 +135,7 @@ describe("POST /api/stripe/webhook", () => {
 
       await POST(makeWebhookRequest());
       expect(prisma.user.updateMany).toHaveBeenCalledWith(
-        expect.objectContaining({ data: { plan: "pro" } })
+        expect.objectContaining({ data: expect.objectContaining({ plan: "pro" }) })
       );
     });
 
@@ -144,7 +147,7 @@ describe("POST /api/stripe/webhook", () => {
 
       await POST(makeWebhookRequest());
       expect(prisma.user.updateMany).toHaveBeenCalledWith(
-        expect.objectContaining({ data: { plan: "agency" } })
+        expect.objectContaining({ data: expect.objectContaining({ plan: "agency" }) })
       );
     });
 
@@ -279,7 +282,7 @@ describe("POST /api/stripe/webhook", () => {
   // ── customer.subscription.deleted ──────────────────────────────────────────
 
   describe("customer.subscription.deleted", () => {
-    it("sets the user's plan to free when the subscription is deleted", async () => {
+    it("sets the user's plan to free and clears subscription ID when deleted", async () => {
       mockConstructEvent.mockReturnValue({
         type: "customer.subscription.deleted",
         data: { object: makeSubscription({ customerId: "cus_test123" }) },
@@ -288,7 +291,7 @@ describe("POST /api/stripe/webhook", () => {
       await POST(makeWebhookRequest());
       expect(prisma.user.updateMany).toHaveBeenCalledWith({
         where: { stripeCustomerId: "cus_test123" },
-        data: { plan: "free" },
+        data: { plan: "free", stripeSubscriptionId: null },
       });
     });
   });

@@ -60,7 +60,7 @@ export async function POST(req: Request) {
 
         await prisma.user.updateMany({
           where: { stripeCustomerId: customerId },
-          data: { plan },
+          data: { plan, stripeSubscriptionId: subscription.id },
         });
         console.log(`Webhook: subscription.created — customer ${customerId} → plan ${plan}`);
         break;
@@ -122,7 +122,7 @@ export async function POST(req: Request) {
 
         await prisma.user.updateMany({
           where: { stripeCustomerId: customerId },
-          data: { plan: "free" },
+          data: { plan: "free", stripeSubscriptionId: null },
         });
         console.log(`Webhook: subscription.deleted — customer ${customerId} → free`);
         break;

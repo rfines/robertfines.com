@@ -5,13 +5,14 @@ import { useState } from "react";
 interface UpgradeButtonProps {
   priceId: string;
   label: string;
+  isDowngrade?: boolean;
   featured?: boolean;
 }
 
-export function UpgradeButton({ priceId, label, featured }: UpgradeButtonProps) {
+export function UpgradeButton({ priceId, label, isDowngrade, featured }: UpgradeButtonProps) {
   const [loading, setLoading] = useState(false);
 
-  async function handleUpgrade() {
+  async function handleClick() {
     setLoading(true);
     try {
       const res = await fetch("/api/stripe/checkout", {
@@ -28,9 +29,11 @@ export function UpgradeButton({ priceId, label, featured }: UpgradeButtonProps) 
     }
   }
 
+  const idleLabel = isDowngrade ? `Downgrade to ${label}` : `Upgrade to ${label}`;
+
   return (
     <button
-      onClick={handleUpgrade}
+      onClick={handleClick}
       disabled={loading}
       className={`w-full text-sm font-semibold py-2.5 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
         featured
@@ -38,7 +41,7 @@ export function UpgradeButton({ priceId, label, featured }: UpgradeButtonProps) 
           : "border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)] text-[var(--foreground)]"
       }`}
     >
-      {loading ? "Redirecting…" : `Upgrade to ${label}`}
+      {loading ? "Processing…" : idleLabel}
     </button>
   );
 }

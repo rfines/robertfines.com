@@ -43,9 +43,8 @@ export default async function BillingPage({
   const hasSubscription = !!user?.stripeCustomerId;
 
   const allTiers: Plan[] = ["free", "starter", "pro", "agency"];
-  const upgradeTiers = allTiers.filter(
-    (t) => allTiers.indexOf(t) > allTiers.indexOf(plan)
-  );
+  // Show all paid tiers except the user's current plan as change options
+  const changeTiers = allTiers.filter((t) => t !== plan && t !== "free");
 
   return (
     <div className="max-w-2xl space-y-8">
@@ -124,13 +123,19 @@ export default async function BillingPage({
         )}
       </div>
 
-      {/* Upgrade options */}
-      {upgradeTiers.length > 0 && (
+      {/* Plan change options */}
+      {changeTiers.length > 0 && (
         <div className="space-y-3">
-          <p className="text-sm font-semibold text-[var(--foreground)]">Upgrade your plan</p>
+          <p className="text-sm font-semibold text-[var(--foreground)]">
+            {plan === "free" ? "Upgrade your plan" : "Change your plan"}
+          </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {upgradeTiers.map((tier) => (
-              <UpgradeTierCard key={tier} tier={tier} />
+            {changeTiers.map((tier) => (
+              <UpgradeTierCard
+                key={tier}
+                tier={tier}
+                currentPlan={plan}
+              />
             ))}
           </div>
         </div>
@@ -139,7 +144,9 @@ export default async function BillingPage({
   );
 }
 
-function UpgradeTierCard({ tier }: { tier: Plan }) {
+function UpgradeTierCard({ tier, currentPlan }: { tier: Plan; currentPlan: Plan }) {
+  const allTiers: Plan[] = ["free", "starter", "pro", "agency"];
+  const isDowngrade = allTiers.indexOf(tier) < allTiers.indexOf(currentPlan);
   const { label, price, period, description } = PLAN_PRICING[tier];
   const { variations } = PLAN_LIMITS[tier];
   const priceId =
@@ -174,7 +181,7 @@ function UpgradeTierCard({ tier }: { tier: Plan }) {
           </li>
         ))}
       </ul>
-      <UpgradeButton priceId={priceId} label={label} featured={tier === "starter"} />
+      <UpgradeButton priceId={priceId} label={label} isDowngrade={isDowngrade} featured={!isDowngrade && tier === "starter"} />
     </div>
   );
 }

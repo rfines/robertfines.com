@@ -21,8 +21,9 @@ model User {
   marketingConsent  Boolean?
   plan              String           @default("free")
   role              String           @default("user")
-  stripeCustomerId  String?          @unique
-  monthlyRunLimit   Int?
+  stripeCustomerId      String?          @unique
+  stripeSubscriptionId  String?          @unique
+  monthlyRunLimit       Int?
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
 }
