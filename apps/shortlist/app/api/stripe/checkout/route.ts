@@ -4,11 +4,6 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth, parseBody } from "@/lib/route-helpers";
 import { checkoutSessionSchema } from "@/types";
 
-const VALID_PRICE_IDS = new Set([
-  process.env.STRIPE_STARTER_PRICE_ID,
-  process.env.STRIPE_PRO_PRICE_ID,
-]);
-
 export async function POST(req: Request) {
   const { session, error: authError } = await requireAuth();
   if (authError) return authError;
@@ -16,7 +11,16 @@ export async function POST(req: Request) {
   const { data, error: parseError } = await parseBody(req, checkoutSessionSchema);
   if (parseError) return parseError;
 
-  if (!VALID_PRICE_IDS.has(data.priceId)) {
+  // Build valid set at request time so env vars are guaranteed to be loaded
+  const validPriceIds = new Set(
+    [
+      process.env.STRIPE_STARTER_PRICE_ID,
+      process.env.STRIPE_PRO_PRICE_ID,
+      process.env.STRIPE_AGENCY_PRICE_ID,
+    ].filter(Boolean)
+  );
+
+  if (!validPriceIds.has(data.priceId)) {
     return NextResponse.json({ error: "Invalid price ID" }, { status: 400 });
   }
 
