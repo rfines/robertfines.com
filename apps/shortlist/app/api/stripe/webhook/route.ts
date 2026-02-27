@@ -36,42 +36,52 @@ export async function POST(req: Request) {
 
   try {
     switch (event.type) {
+      // Plan assigned when subscription is first created — subscription data
+      // is already in the event body, no outbound API call needed.
+      case "customer.subscription.created": {
+        const subscription = event.data.object as Stripe.Subscription;
+        const customerId =
+          typeof subscription.customer === "string"
+            ? subscription.customer
+            : subscription.customer.id;
+
+        const priceId = subscription.items.data[0]?.price.id;
+        const isActive = subscription.status === "active" || subscription.status === "trialing";
+        const plan = isActive && priceId ? planFromPriceId(priceId) : null;
+        if (!plan) {
+          console.error("Webhook: unknown priceId or inactive status in customer.subscription.created", priceId, subscription.status);
+          break;
+        }
+
+        await prisma.user.updateMany({
+          where: { stripeCustomerId: customerId },
+          data: { plan },
+        });
+        console.log(`Webhook: subscription.created — customer ${customerId} → plan ${plan}`);
+        break;
+      }
+
+      // checkout.session.completed: no outbound API call — just confirm the
+      // stripeCustomerId linkage. Plan is set by customer.subscription.created.
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         if (session.mode !== "subscription") break;
 
         const userId = session.metadata?.userId;
-        if (!userId) {
-          console.error("Webhook: checkout.session.completed missing userId metadata", session.id);
-          break;
-        }
+        const customerId =
+          typeof session.customer === "string"
+            ? session.customer
+            : (session.customer as Stripe.Customer | null)?.id;
 
-        const subscriptionId =
-          typeof session.subscription === "string"
-            ? session.subscription
-            : session.subscription?.id;
-        if (!subscriptionId) {
-          console.error("Webhook: checkout.session.completed missing subscription", session.id);
-          break;
+        if (userId && customerId) {
+          await prisma.user.update({
+            where: { id: userId },
+            data: { stripeCustomerId: customerId },
+          });
+          console.log(`Webhook: checkout.session.completed — linked customer ${customerId} to user ${userId}`);
+        } else {
+          console.error("Webhook: checkout.session.completed missing userId or customerId", session.id);
         }
-
-        const subscription = await getStripe().subscriptions.retrieve(subscriptionId);
-        const priceId = subscription.items.data[0]?.price.id;
-        const plan = priceId ? planFromPriceId(priceId) : null;
-        if (!plan) {
-          console.error("Webhook: unknown priceId in checkout.session.completed", priceId);
-          break;
-        }
-
-        await prisma.user.update({
-          where: { id: userId },
-          data: {
-            plan,
-            stripeCustomerId:
-              typeof session.customer === "string" ? session.customer : undefined,
-          },
-        });
-        console.log(`Webhook: updated user ${userId} to plan ${plan}`);
         break;
       }
 
@@ -94,7 +104,7 @@ export async function POST(req: Request) {
           where: { stripeCustomerId: customerId },
           data: { plan },
         });
-        console.log(`Webhook: updated customer ${customerId} to plan ${plan}`);
+        console.log(`Webhook: subscription.updated — customer ${customerId} → plan ${plan}`);
         break;
       }
 
@@ -109,7 +119,7 @@ export async function POST(req: Request) {
           where: { stripeCustomerId: customerId },
           data: { plan: "free" },
         });
-        console.log(`Webhook: reset customer ${customerId} to free`);
+        console.log(`Webhook: subscription.deleted — customer ${customerId} → free`);
         break;
       }
     }
