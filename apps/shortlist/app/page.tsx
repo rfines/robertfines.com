@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Check, X } from "lucide-react";
 import { PLAN_PRICING, type Plan } from "@/lib/plan";
+import { PLAN_FEATURES } from "@/lib/plan-features";
 
 const softwareApplicationJsonLd = {
   "@context": "https://schema.org",
@@ -262,23 +263,6 @@ export default async function LandingPage() {
   );
 }
 
-const planFeatures: {
-  label: string;
-  free: boolean | string;
-  starter: boolean | string;
-  pro: boolean | string;
-  agency: boolean | string;
-}[] = [
-  { label: "Tailored resume variations",   free: "1",          starter: "2",   pro: "3",         agency: "5"         },
-  { label: "Monthly tailoring runs",        free: "10",         starter: "100", pro: "Unlimited", agency: "Unlimited" },
-  { label: "Plain text view + Copy",        free: true,         starter: true,  pro: true,        agency: true        },
-  { label: "Keyword match score",           free: true,         starter: true,  pro: true,        agency: true        },
-  { label: "DOCX download",                free: false,        starter: true,  pro: true,        agency: true        },
-  { label: "Markdown export",              free: false,        starter: true,  pro: true,        agency: true        },
-  { label: "Custom instructions",          free: false,        starter: true,  pro: true,        agency: true        },
-  { label: "PDF export",                   free: false,        starter: false, pro: true,        agency: true        },
-  { label: "Candidate name labeling",      free: false,        starter: false, pro: false,       agency: true        },
-];
 
 function PricingCard({ plan, featured }: { plan: Plan; featured?: boolean }) {
   const { label, price, period, description } = PLAN_PRICING[plan];
@@ -309,7 +293,7 @@ function PricingCard({ plan, featured }: { plan: Plan; featured?: boolean }) {
       </div>
 
       <ul className="space-y-2.5 flex-1 mb-6">
-        {planFeatures.map(({ label: feat, [plan]: value }) => {
+        {PLAN_FEATURES.map(({ label: feat, [plan]: value }) => {
           const included = value !== false;
           return (
             <li key={feat} className="flex items-start gap-2 text-sm">

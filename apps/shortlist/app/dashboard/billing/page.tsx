@@ -1,33 +1,11 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { PLAN_PRICING, PLAN_LIMITS, type Plan } from "@/lib/plan";
+import { PLAN_PRICING, type Plan } from "@/lib/plan";
+import { PLAN_FEATURES, PLAN_HIGHLIGHTS } from "@/lib/plan-features";
 import { Check, X, CheckCircle2 } from "lucide-react";
 import { UpgradeButton } from "@/components/billing/upgrade-button";
 import { PortalButton } from "@/components/billing/portal-button";
-
-const planFeatures: {
-  label: string;
-  free: boolean | string;
-  starter: boolean | string;
-  pro: boolean | string;
-  agency: boolean | string;
-}[] = [
-  { label: "Tailored resume variations per session", free: "1", starter: "2", pro: "3", agency: "5" },
-  { label: "Monthly tailoring runs",                 free: "10", starter: "100", pro: "Unlimited", agency: "Unlimited" },
-  { label: "Keyword match score vs. job posting",    free: true, starter: true, pro: true, agency: true },
-  { label: "Plain text view + one-click copy",       free: true, starter: true, pro: true, agency: true },
-  { label: "DOCX download",                          free: false, starter: true, pro: true, agency: true },
-  { label: "Markdown export",                        free: false, starter: true, pro: true, agency: true },
-  { label: "Custom tailoring instructions",          free: false, starter: true,  pro: true, agency: true },
-  { label: "Before/after diff view",                 free: false, starter: true,  pro: true, agency: true },
-  { label: "AI cover letter generation",             free: false, starter: true,  pro: true, agency: true },
-  { label: "Bullet point rewriter tool",             free: false, starter: true,  pro: true, agency: true },
-  { label: "PDF export",                             free: false, starter: false, pro: true, agency: true },
-  { label: "ATS issue detection + auto-fix",         free: false, starter: false, pro: true, agency: true },
-  { label: "LinkedIn headline + About generator",    free: false, starter: false, pro: true, agency: true },
-  { label: "Label resumes by candidate name",        free: false, starter: false, pro: false, agency: true },
-];
 
 export default async function BillingPage({
   searchParams,
@@ -93,7 +71,7 @@ export default async function BillingPage({
         </div>
 
         <ul className="space-y-2">
-          {planFeatures.map(({ label, [plan]: value }) => {
+          {PLAN_FEATURES.map(({ label, [plan]: value }) => {
             const included = value !== false;
             return (
               <li key={label} className="flex items-center gap-2 text-sm">
@@ -153,7 +131,6 @@ function UpgradeTierCard({ tier, currentPlan }: { tier: Plan; currentPlan: Plan 
   const allTiers: Plan[] = ["free", "starter", "pro", "agency"];
   const isDowngrade = allTiers.indexOf(tier) < allTiers.indexOf(currentPlan);
   const { label, price, period, description } = PLAN_PRICING[tier];
-  const { variations } = PLAN_LIMITS[tier];
   const priceId =
     tier === "starter"
       ? process.env.STRIPE_STARTER_PRICE_ID!
@@ -161,31 +138,7 @@ function UpgradeTierCard({ tier, currentPlan }: { tier: Plan; currentPlan: Plan 
       ? process.env.STRIPE_PRO_PRICE_ID!
       : process.env.STRIPE_AGENCY_PRICE_ID!;
 
-  const highlights =
-    tier === "starter"
-      ? [
-          `${variations} tailored variations per session`,
-          "100 tailoring runs/month",
-          "AI cover letter generation",
-          "Before/after diff view",
-          "Bullet point rewriter tool",
-          "DOCX + Markdown export",
-        ]
-      : tier === "pro"
-      ? [
-          `${variations} tailored variations per session`,
-          "Unlimited tailoring runs",
-          "ATS issue detection + auto-fix",
-          "LinkedIn headline + About generator",
-          "PDF export",
-          "Everything in Starter",
-        ]
-      : [
-          `${variations} tailored variations per session`,
-          "Unlimited tailoring runs",
-          "Label resumes by candidate name",
-          "Everything in Pro",
-        ];
+  const highlights = tier !== "free" ? PLAN_HIGHLIGHTS[tier] : [];
 
   return (
     <div className="border border-[var(--border)] rounded-xl p-5 flex flex-col gap-4 bg-[var(--surface)]">
