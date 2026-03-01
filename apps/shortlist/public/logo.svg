@@ -1,9 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
   <defs>
     <!-- Top-lit gradient: soft gold → rich amber → deep amber -->
-    <linearGradient id="rg" x1="0.35" y1="0" x2="0.65" y2="1">
+    <!-- userSpaceOnUse anchors gradient to the exact vertical span of the R -->
+    <linearGradient id="rg" x1="100" y1="52" x2="100" y2="148" gradientUnits="userSpaceOnUse">
       <stop offset="0%"   stop-color="#fde68a"/>
-      <stop offset="48%"  stop-color="#f59e0b"/>
+      <stop offset="52%"  stop-color="#f59e0b"/>
       <stop offset="100%" stop-color="#b45309"/>
     </linearGradient>
   </defs>
@@ -11,70 +12,88 @@
   <!-- ── Background ── -->
   <rect width="200" height="200" rx="44" fill="#1c1410"/>
 
-  <!-- ── Document ── -->
+  <!-- ══════════════════════════════════════
+       DOCUMENT  (unchanged from prior version)
+       ══════════════════════════════════════ -->
 
   <!-- Drop shadow -->
   <path d="M61,49 L113,49 L139,75 L139,149 Q139,153 135,153 L65,153 Q61,153 61,149 Z"
         fill="#000" fill-opacity="0.25" transform="translate(2,4)"/>
 
-  <!-- Paper body (warm off-white, significantly more visible than before) -->
+  <!-- Paper body -->
   <path d="M61,49 L113,49 L139,75 L139,149 Q139,153 135,153 L65,153 Q61,153 61,149 Z"
         fill="#f5ede0" fill-opacity="0.30"/>
 
-  <!-- Paper edge highlights (left + bottom, creates depth) -->
+  <!-- Edge highlights (left + bottom give the paper depth) -->
   <path d="M61,53 Q61,49 65,49 L113,49"
         fill="none" stroke="#f0e0cc" stroke-width="0.9" stroke-opacity="0.60"/>
   <path d="M61,53 L61,149 Q61,153 65,153 L135,153 Q139,153 139,149"
         fill="none" stroke="#f0e0cc" stroke-width="0.5" stroke-opacity="0.22"/>
 
-  <!-- Dog-ear: dark triangle showing paper folded back -->
+  <!-- Dog-ear fold triangle -->
   <path d="M113,49 L139,75 L113,75 Z" fill="#1c1410" fill-opacity="0.75"/>
 
-  <!-- Dog-ear crease line (bright edge of the fold) -->
+  <!-- Dog-ear crease line -->
   <line x1="113" y1="49" x2="139" y2="75"
         stroke="#c8a070" stroke-width="1.1" stroke-opacity="0.70"/>
 
-  <!-- Dog-ear inner fold shadow (small right-angle notch) -->
+  <!-- Dog-ear inner corner softener -->
   <path d="M113,49 L119,49 L113,55 Z" fill="#f5ede0" fill-opacity="0.12"/>
 
-  <!-- Ruled lines — tapered lengths create natural paper feel -->
+  <!-- Ruled lines — staggered lengths, warm amber-gold -->
   <line x1="71" y1="110" x2="129" y2="110" stroke="#c4a060" stroke-width="1.8" stroke-linecap="round" stroke-opacity="0.44"/>
   <line x1="71" y1="121" x2="125" y2="121" stroke="#c4a060" stroke-width="1.8" stroke-linecap="round" stroke-opacity="0.34"/>
   <line x1="71" y1="132" x2="119" y2="132" stroke="#c4a060" stroke-width="1.8" stroke-linecap="round" stroke-opacity="0.24"/>
   <line x1="71" y1="143" x2="111" y2="143" stroke="#c4a060" stroke-width="1.8" stroke-linecap="round" stroke-opacity="0.14"/>
 
-  <!-- ── R Lettermark (custom geometric paths, not a font) ── -->
+  <!-- ══════════════════════════════════════
+       R  LETTERMARK  —  new treatment
+       ══════════════════════════════════════ -->
 
-  <!-- Flourish 1: slab serif cap (top of stem) -->
-  <rect x="64" y="57" width="21" height="3.5" rx="1.75" fill="url(#rg)"/>
+  <!--
+    Design language:
+    · Classic serif R (Georgia) — the serif terminals ARE the flourishes,
+      just as Rolls-Royce, Ritz-Carlton and Rolex rely on quality letterforms
+    · Top-lit gold gradient for depth (same technique as Stripe's logomark)
+    · Partial monogram arc frames the letter without boxing it in —
+      a hallmark of medallion / seal marks (think Masters Tournament, Ritz Carlton)
+    · Arc opens at the bottom, letting the document lines "breathe" through
+    · Two small amber dots anchor the arc terminals (typographic stop marks)
+    · Thin inner highlight stroke adds the final polished edge
+  -->
 
-  <!-- Stem -->
-  <rect x="68" y="57" width="15" height="86" fill="url(#rg)"/>
+  <!-- Monogram arc: partial circle from lower-left → over the top → lower-right -->
+  <!-- Centre (100, 101), r=52 → top of arc touches y=49, matching doc top edge -->
+  <path d="M 63 138 A 52 52 0 1 1 137 138"
+        fill="none"
+        stroke="#f59e0b" stroke-width="1.4" stroke-opacity="0.26"
+        stroke-linecap="round"/>
 
-  <!-- Bowl: filled D-arc (clockwise semicircle from top to junction) -->
-  <!-- Center at (83, 79), radius 22 — rightmost point (105, 79) -->
-  <path d="M83,57 A 22 22 0 0 1 83,101 L83,57 Z" fill="url(#rg)"/>
+  <!-- Arc terminal stop-marks (anchor the open ends) -->
+  <circle cx="63"  cy="138" r="2.4" fill="#f59e0b" fill-opacity="0.32"/>
+  <circle cx="137" cy="138" r="2.4" fill="#f59e0b" fill-opacity="0.32"/>
 
-  <!-- Counter: inner D-arc filled with background to punch the bowl hole -->
-  <!-- Center at (83, 79), radius 12 — rightmost inner point (95, 79) -->
-  <path d="M83,67 A 12 12 0 0 1 83,91 Z" fill="#1c1410"/>
+  <!-- R drop shadow (offset copy, slightly blurred via opacity layering) -->
+  <text x="101" y="148"
+        font-family="Georgia, 'Palatino Linotype', Palatino, 'Book Antiqua', serif"
+        font-size="106" font-weight="bold"
+        fill="#000" fill-opacity="0.32"
+        text-anchor="middle"
+        transform="translate(2,3)">R</text>
 
-  <!-- Flourish 2: junction spur — the signature flourish of an elegant R -->
-  <!-- A gentle curved arch where the leg branches from the bowl -->
-  <path d="M83,97 Q88,91 97,91 Q100,92 100,101 L87,101 L83,101 Z"
-        fill="url(#rg)"/>
+  <!-- R — main gradient fill -->
+  <text x="100" y="148"
+        font-family="Georgia, 'Palatino Linotype', Palatino, 'Book Antiqua', serif"
+        font-size="106" font-weight="bold"
+        fill="url(#rg)"
+        text-anchor="middle">R</text>
 
-  <!-- Leg (diagonal stroke, lower-right) -->
-  <polygon points="87,101 99,101 127,143 115,143" fill="url(#rg)"/>
+  <!-- R — thin inner highlight stroke (adds crispness and definition) -->
+  <text x="100" y="148"
+        font-family="Georgia, 'Palatino Linotype', Palatino, 'Book Antiqua', serif"
+        font-size="106" font-weight="bold"
+        fill="none"
+        stroke="#fde68a" stroke-width="0.6" stroke-opacity="0.22"
+        text-anchor="middle">R</text>
 
-  <!-- Flourish 3: slab serif foot (bottom of stem) -->
-  <rect x="64" y="139.5" width="21" height="3.5" rx="1.75" fill="url(#rg)"/>
-
-  <!-- Flourish 4: slab serif terminal (bottom of leg) -->
-  <rect x="112" y="141" width="18" height="3.5" rx="1.75" fill="url(#rg)"/>
-
-  <!-- ── Finishing detail: subtle badge ring ── -->
-  <!-- Echoes the seal-quality of premium brand marks -->
-  <circle cx="100" cy="100" r="58"
-          fill="none" stroke="#f59e0b" stroke-width="1.2" stroke-opacity="0.16"/>
 </svg>
