@@ -12,12 +12,14 @@ import { matchSkillsToResume } from "@/lib/keyword-match";
 import { extractJdSkills } from "@/lib/extract-jd-skills";
 import { captureEvent } from "@/lib/posthog";
 import { CoverLetterSection } from "@/components/tailoring/cover-letter-section";
+import { GapAnalysisCard } from "@/components/tailoring/gap-analysis-card";
 import { VariationTabs } from "@/components/tailoring/variation-tabs";
 import { DownloadMenu } from "@/components/tailoring/download-menu";
 import { CopyButton } from "@/components/tailoring/copy-button";
 import { KeywordMatchCard } from "@/components/tailoring/keyword-match-card";
 import { ResumeDiffView } from "@/components/tailoring/resume-diff-view";
 import { canDownload } from "@/lib/plan";
+import type { GapAnalysisResult } from "@/lib/generate-gap-analysis";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 
@@ -78,6 +80,19 @@ export default async function TailoredResumePage({ params }: Props) {
   }
 
   const keywordMatch = !hasVariations ? computeMatch(tailored.tailoredText) : null;
+
+  // Parse cached gap analysis (null = not yet generated; GapAnalysisCard will prompt to generate)
+  const initialGapAnalysis: GapAnalysisResult | null = (() => {
+    if (!tailored.gapAnalysis) return null;
+    try {
+      return JSON.parse(tailored.gapAnalysis) as GapAnalysisResult;
+    } catch {
+      return null;
+    }
+  })();
+
+  // Only show Gap Analysis card on single (non-variation) results with a low match score
+  const showGapAnalysis = !hasVariations && keywordMatch !== null && keywordMatch.score < 50;
 
   const variationData = hasVariations
     ? siblings!.map((s) => ({
@@ -203,6 +218,14 @@ export default async function TailoredResumePage({ params }: Props) {
               keywordMatch={keywordMatch}
               tailoredResumeId={tailored.id}
               initialFlaggedTerms={initialFlaggedTerms}
+            />
+          )}
+
+          {showGapAnalysis && (
+            <GapAnalysisCard
+              tailoredId={tailored.id}
+              plan={plan}
+              initialGapAnalysis={initialGapAnalysis}
             />
           )}
 

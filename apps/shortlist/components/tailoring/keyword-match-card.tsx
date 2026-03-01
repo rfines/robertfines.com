@@ -36,7 +36,7 @@ export function KeywordMatchCard({
       ? "Strong coverage — your resume aligns well with this role."
       : keywordMatch.score >= 45
         ? "Moderate coverage — consider re-tailoring at a higher intensity."
-        : "Low coverage — try aggressive tailoring or check for missing sections.";
+        : "Low coverage — see the Gap Analysis below to find out exactly what\u2019s missing and how to fix it.";
 
   function handleFlag(term: string) {
     setFlagged((prev) => new Set([...prev, term]));

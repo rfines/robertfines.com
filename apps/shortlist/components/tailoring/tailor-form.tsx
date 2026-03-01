@@ -6,10 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Lock, Sparkles, RefreshCw } from "lucide-react";
+import { Lock, Sparkles, RefreshCw, Gauge } from "lucide-react";
 import type { Intensity } from "@/types";
 import type { Plan } from "@/lib/plan";
 import { PLAN_LIMITS, canUseInstructions, canFixAtsIssues } from "@/lib/plan";
+import { cn } from "@/lib/cn";
 import { IntensitySelector } from "@/components/tailoring/intensity-selector";
 import { VariationsSelector } from "@/components/tailoring/variations-selector";
 import { InstructionsField } from "@/components/tailoring/instructions-field";
@@ -45,6 +46,11 @@ export function TailorForm({ resumeId, resumeTitle, plan, initialValues }: Tailo
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Pre-tailor fit estimate
+  const [fitScore, setFitScore] = useState<number | null>(null);
+  const [fitStatus, setFitStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
+  const [fitError, setFitError] = useState<string | null>(null);
+
   // JD URL fetch
   const [jdUrl, setJdUrl] = useState("");
   const [jdFetchStatus, setJdFetchStatus] = useState<"idle" | "loading" | "done" | "error">(
@@ -73,6 +79,27 @@ export function TailorForm({ resumeId, resumeTitle, plan, initialValues }: Tailo
     } catch (err) {
       setJdFetchError(err instanceof Error ? err.message : "Could not fetch that URL");
       setJdFetchStatus("error");
+    }
+  }
+
+  async function handleCheckFit() {
+    if (!jobDescription.trim() || fitStatus === "loading") return;
+    setFitStatus("loading");
+    setFitError(null);
+    setFitScore(null);
+    try {
+      const res = await fetch(`/api/resumes/${resumeId}/quick-fit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobDescription: jobDescription.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Could not estimate fit");
+      setFitScore(data.score as number);
+      setFitStatus("done");
+    } catch (err) {
+      setFitError(err instanceof Error ? err.message : "Could not estimate fit");
+      setFitStatus("error");
     }
   }
 
@@ -201,10 +228,54 @@ export function TailorForm({ resumeId, resumeTitle, plan, initialValues }: Tailo
           id="jobDescription"
           placeholder="Paste the full job description here…"
           value={jobDescription}
-          onChange={(e) => setJobDescription(e.target.value)}
+          onChange={(e) => {
+            setJobDescription(e.target.value);
+            if (fitStatus !== "idle") {
+              setFitStatus("idle");
+              setFitScore(null);
+            }
+          }}
           className="min-h-[240px]"
           required
         />
+        {jobDescription.trim().length >= 50 && (
+          <div className="mt-2 flex items-center gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleCheckFit}
+              disabled={fitStatus === "loading"}
+            >
+              <Gauge size={13} />
+              {fitStatus === "loading" ? "Estimating…" : "Check Fit"}
+            </Button>
+            {fitStatus === "done" && fitScore !== null && (
+              <span
+                className={cn(
+                  "text-sm font-semibold",
+                  fitScore >= 70
+                    ? "text-green-400"
+                    : fitScore >= 45
+                      ? "text-yellow-400"
+                      : "text-[var(--destructive)]"
+                )}
+              >
+                {fitScore}% match
+                <span className="text-xs font-normal text-[var(--muted)] ml-1">
+                  {fitScore >= 70
+                    ? "— strong baseline"
+                    : fitScore >= 45
+                      ? "— moderate baseline"
+                      : "— low baseline, tailoring will help"}
+                </span>
+              </span>
+            )}
+            {fitStatus === "error" && fitError && (
+              <span className="text-xs text-[var(--destructive)]">{fitError}</span>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="flex items-start gap-3">

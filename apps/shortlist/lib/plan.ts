@@ -77,6 +77,10 @@ export function canConnectLinkedIn(plan: Plan): boolean {
   return plan === "pro" || plan === "agency";
 }
 
+export function canViewGapAnalysis(plan: Plan): boolean {
+  return plan !== "free";
+}
+
 export function planFromPriceId(priceId: string): Plan | null {
   if (priceId === process.env.STRIPE_STARTER_PRICE_ID) return "starter";
   if (priceId === process.env.STRIPE_PRO_PRICE_ID) return "pro";
