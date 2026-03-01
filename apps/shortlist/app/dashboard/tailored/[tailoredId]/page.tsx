@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { TailoredDeleteButton } from "@/components/tailoring/tailored-delete-button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { computeKeywordMatch } from "@/lib/keyword-match";
+import { computeKeywordMatch, matchSkillsToResume } from "@/lib/keyword-match";
+import { extractJdSkills } from "@/lib/extract-jd-skills";
 import { captureEvent } from "@/lib/posthog";
 import { CoverLetterSection } from "@/components/tailoring/cover-letter-section";
 import { VariationTabs } from "@/components/tailoring/variation-tabs";
@@ -29,18 +30,15 @@ export default async function TailoredResumePage({ params }: Props) {
   if (!session?.user?.id) redirect("/auth/signin");
 
   const { tailoredId } = await params;
-  const [tailored, plan, customStopWordsRaw] = await Promise.all([
+  const [tailored, plan] = await Promise.all([
     prisma.tailoredResume.findFirst({
       where: { id: tailoredId, userId: session.user.id },
       include: { resume: { select: { title: true, id: true, rawText: true } } },
     }),
     getUserPlan(session.user.id),
-    prisma.customStopWord.findMany({ select: { word: true } }),
   ]);
 
   if (!tailored) notFound();
-
-  const extraStopWords = new Set(customStopWordsRaw.map((s) => s.word));
 
   // Fetch siblings + flagged terms in parallel
   const [siblings, flaggedTermsRaw] = await Promise.all([
@@ -60,50 +58,85 @@ export default async function TailoredResumePage({ params }: Props) {
   const hasVariations = siblings && siblings.length > 1;
   const initialFlaggedTerms = flaggedTermsRaw.map((f) => f.term);
 
-  const keywordMatch = !hasVariations
-    ? computeKeywordMatch(tailored.jobDescription, tailored.tailoredText, extraStopWords)
-    : null;
+  // Parse stored skills (null for old resumes created before this feature)
+  const storedSkills: string[] | null = (() => {
+    if (!tailored.jdSkills) return null;
+    try {
+      const parsed = JSON.parse(tailored.jdSkills);
+      return Array.isArray(parsed) ? parsed : null;
+    } catch {
+      return null;
+    }
+  })();
+
+  // Compute keyword match using LLM-extracted skills when available,
+  // falling back to legacy text-based extraction for old resumes.
+  function computeMatch(resumeText: string) {
+    if (storedSkills) return matchSkillsToResume(storedSkills, resumeText);
+    return computeKeywordMatch(tailored!.jobDescription, resumeText);
+  }
+
+  const keywordMatch = !hasVariations ? computeMatch(tailored.tailoredText) : null;
 
   const variationData = hasVariations
-    ? siblings.map((s) => ({
+    ? siblings!.map((s) => ({
         id: s.id,
         variationIndex: s.variationIndex,
         tailoredText: s.tailoredText,
-        keywordMatch: computeKeywordMatch(tailored.jobDescription, s.tailoredText, extraStopWords),
+        keywordMatch: computeMatch(s.tailoredText),
       }))
     : null;
 
-  // Layer 1: log match data for analytics after response is sent
-  if (keywordMatch) {
-    const matchSnapshot = keywordMatch;
-    const userId = session.user.id;
-    const resumeId = tailored.id;
-    after(async () => {
-      await Promise.all([
+  const userId = session.user.id;
+  const resumeId = tailored.id;
+
+  after(async () => {
+    const tasks: Promise<unknown>[] = [];
+
+    // Lazy-backfill jdSkills for old resumes that don't have it yet
+    if (!storedSkills) {
+      tasks.push(
+        extractJdSkills(tailored.jobDescription).then((skills) => {
+          if (skills.length > 0) {
+            return prisma.tailoredResume.update({
+              where: { id: resumeId },
+              data: { jdSkills: JSON.stringify(skills) },
+            });
+          }
+        })
+      );
+    }
+
+    // Log match data for admin analytics
+    if (keywordMatch) {
+      tasks.push(
         prisma.keywordMatchLog.upsert({
           where: { tailoredResumeId: resumeId },
           create: {
             userId,
             tailoredResumeId: resumeId,
-            score: matchSnapshot.score,
-            total: matchSnapshot.total,
-            missingTerms: JSON.stringify(matchSnapshot.missing.slice(0, 30)),
+            score: keywordMatch.score,
+            total: keywordMatch.total,
+            missingTerms: JSON.stringify(keywordMatch.missing.slice(0, 30)),
           },
           update: {
-            score: matchSnapshot.score,
-            total: matchSnapshot.total,
-            missingTerms: JSON.stringify(matchSnapshot.missing.slice(0, 30)),
+            score: keywordMatch.score,
+            total: keywordMatch.total,
+            missingTerms: JSON.stringify(keywordMatch.missing.slice(0, 30)),
           },
         }),
         captureEvent(userId, "keyword_match_computed", {
           tailoredResumeId: resumeId,
-          score: matchSnapshot.score,
-          total: matchSnapshot.total,
-          topMissingTerms: matchSnapshot.missing.slice(0, 30),
-        }),
-      ]);
-    });
-  }
+          score: keywordMatch.score,
+          total: keywordMatch.total,
+          topMissingTerms: keywordMatch.missing.slice(0, 30),
+          usedLlmSkills: !!storedSkills,
+        })
+      );
+    }
+
+    await Promise.all(tasks);
+  });
 
   const createdAt = tailored.createdAt.toLocaleDateString("en-US", {
     month: "long",

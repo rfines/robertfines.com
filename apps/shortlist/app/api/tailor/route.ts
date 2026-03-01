@@ -8,6 +8,7 @@ import { getUserPlan } from "@/lib/get-user-plan";
 import { PLAN_LIMITS, canUseInstructions, canFixAtsIssues, getEffectiveMonthlyLimit } from "@/lib/plan";
 import { analyzeAtsWarnings } from "@/lib/ats-warnings";
 import { requireAuth, parseBody } from "@/lib/route-helpers";
+import { extractJdSkills } from "@/lib/extract-jd-skills";
 
 export const maxDuration = 60;
 
@@ -90,9 +91,13 @@ export async function POST(req: Request) {
     atsWarnings,
   };
 
-  const results = await Promise.all(
-    Array.from({ length: variationCount }, () => tailorResume(tailorInput))
-  );
+  // Run tailoring variations + JD skill extraction in parallel
+  const [results, jdSkillsArray] = await Promise.all([
+    Promise.all(Array.from({ length: variationCount }, () => tailorResume(tailorInput))),
+    extractJdSkills(data.jobDescription),
+  ]);
+
+  const jdSkills = jdSkillsArray.length > 0 ? JSON.stringify(jdSkillsArray) : null;
 
   const records = await prisma.tailoredResume.createManyAndReturn({
     data: results.map(({ tailoredText, tokensUsed }, i) => ({
@@ -107,6 +112,7 @@ export async function POST(req: Request) {
       tokensUsed,
       variationGroup,
       variationIndex: i,
+      jdSkills,
     })),
   });
 

@@ -5,6 +5,42 @@ export interface KeywordMatchResult {
   total: number;
 }
 
+/**
+ * Match a pre-extracted skills list (from LLM) against resume text using word-boundary regex.
+ * This is the preferred path for resumes tailored after the jdSkills feature was added.
+ */
+export function matchSkillsToResume(
+  skills: string[],
+  resumeText: string
+): KeywordMatchResult {
+  if (skills.length === 0) {
+    return { score: 0, matched: [], missing: [], total: 0 };
+  }
+
+  const normalized = resumeText.toLowerCase();
+  const matched: string[] = [];
+  const missing: string[] = [];
+
+  for (const skill of skills) {
+    // Build a word-boundary pattern so "Java" doesn't match "JavaScript"
+    const escaped = skill.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const pattern = new RegExp(`(?<![a-z0-9])${escaped}(?![a-z0-9])`, "i");
+    if (pattern.test(normalized)) {
+      matched.push(skill);
+    } else {
+      missing.push(skill);
+    }
+  }
+
+  matched.sort();
+  missing.sort();
+
+  const total = skills.length;
+  const score = total === 0 ? 0 : Math.round((matched.length / total) * 100);
+
+  return { score, matched, missing, total };
+}
+
 const STOP_WORDS = new Set([
   // Articles, conjunctions, prepositions
   "a", "an", "the", "and", "or", "but", "in", "on", "at", "to", "for", "of",

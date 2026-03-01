@@ -92,6 +92,7 @@ model TailoredResume {
   variationGroup        String?
   variationIndex        Int      @default(0)
   userInstructions      String?  @db.Text
+  jdSkills              String?  @db.Text  // JSON array of skills extracted from JD by Claude
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   resume         Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
   createdAt      DateTime @default(now())
