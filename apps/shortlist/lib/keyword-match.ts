@@ -36,7 +36,7 @@ const STOP_WORDS = new Set([
   "allowance", "stipend", "holidays", "coverage", "wellness", "bonus",
   "paid", "leave", "insurance", "retirement", "perks", "vacation",
 
-  // ---- Expanded stop words ----
+  // ---- Pass 1 expansion ----
 
   // Generic qualifiers / soft-skills adjectives / adverbs
   "actively", "adaptable", "actual", "better", "closely", "complex", "digital",
@@ -82,9 +82,41 @@ const STOP_WORDS = new Set([
   // Hyphenated JD boilerplate
   "candidate-specific", "company-paid", "digital-first", "fast-paced",
   "full-time", "in-depth", "values-driven",
+
+  // ---- Pass 2 expansion ----
+
+  // More missing generic qualifiers/adverbs
+  "best", "easy", "first", "further", "independent", "operational",
+  "privately", "productive", "real", "similar",
+
+  // More generic business/process nouns
+  "accounting", "addition", "concepts", "corners", "customer", "delivery",
+  "end", "issues", "life", "minimum", "offices", "pay", "people",
+  "policies", "position", "quality", "senior", "side", "skillset",
+  "skills", "sme", "square", "states", "support", "tasks", "teams",
+  "tech", "technologies", "technology", "timelines",
+
+  // More generic verbs (base forms missing from gerund-only entries)
+  "architecting", "cross", "designing", "digitizing", "ensure",
+  "front", "hands", "includes", "meets", "oriented", "owned",
+  "play", "prefer", "ranging", "remain", "san", "solving", "understand",
+
+  // Health / wellbeing noise
+  "health", "medical", "mental",
+
+  // Role descriptors (not skills)
+  "engineer", "engineers",
+
+  // Geographic additions
+  "u.s",
 ]);
 
-const MIN_TERM_LENGTH = 3;
+const MIN_UNIGRAM_LENGTH = 3;
+// Bigrams require longer words on both sides to reduce garbage pairings
+// from short tech abbreviations landing adjacent after stop-word filtering
+// (e.g. "aws container", "react css", "k8s graphql" from tech-stack lists).
+// Short tokens like "aws", "sql", "css" still appear as unigrams.
+const MIN_BIGRAM_WORD_LENGTH = 4;
 
 function extractUnigrams(text: string, stopWords: Set<string>): Set<string> {
   const terms = new Set<string>();
@@ -94,10 +126,11 @@ function extractUnigrams(text: string, stopWords: Set<string>): Set<string> {
     .split(/\s+/);
 
   for (const word of words) {
-    // Strip leading/trailing hyphens and trailing periods (preserves "node.js" but drops "applicable.")
+    // Strip leading/trailing hyphens and trailing periods
+    // (preserves "node.js" but drops sentence-final "javascript.")
     const cleaned = word.replace(/^[-]+|[-]+$|\.+$/g, "");
     if (
-      cleaned.length >= MIN_TERM_LENGTH &&
+      cleaned.length >= MIN_UNIGRAM_LENGTH &&
       !stopWords.has(cleaned) &&
       !/^\d+$/.test(cleaned)
     ) {
@@ -113,7 +146,12 @@ function extractBigrams(text: string, stopWords: Set<string>): Set<string> {
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, " ")
     .split(/\s+/)
-    .filter((w) => w.length >= MIN_TERM_LENGTH && !stopWords.has(w) && !/^\d/.test(w));
+    .filter(
+      (w) =>
+        w.length >= MIN_BIGRAM_WORD_LENGTH &&
+        !stopWords.has(w) &&
+        !/^\d/.test(w)
+    );
 
   for (let i = 0; i < words.length - 1; i++) {
     bigrams.add(`${words[i]} ${words[i + 1]}`);
