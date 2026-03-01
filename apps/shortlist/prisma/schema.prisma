@@ -19,6 +19,7 @@ model User {
   resumes           Resume[]
   tailoredResumes   TailoredResume[]
   termFeedback      TermFeedback[]
+  linkedInConnection LinkedInConnection?
   marketingConsent  Boolean?
   plan              String           @default("free")
   role              String           @default("user")
@@ -136,6 +137,29 @@ model CustomStopWord {
   word      String   @id
   addedAt   DateTime @default(now())
   addedBy   String   // userId of admin who added it
+}
+
+// Explicit LinkedIn account connection for the direct integration feature.
+// Separate from the next-auth Account model — sign-in tokens don't carry
+// w_member_social scope; users must explicitly connect for publishing.
+model LinkedInConnection {
+  id               String    @id @default(cuid())
+  userId           String    @unique           // one per user
+  linkedInId       String                      // LinkedIn person URN (sub from OIDC)
+  accessToken      String    @db.Text
+  refreshToken     String?   @db.Text
+  expiresAt        DateTime
+  // Cached profile data to avoid re-fetching on every page load
+  cachedName       String?
+  cachedHeadline   String?
+  cachedPictureUrl String?
+  lastImportedAt   DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 // Layer 3: user-flagged terms that are not relevant skills

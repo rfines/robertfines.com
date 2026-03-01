@@ -34,7 +34,7 @@ test.describe("Resumes (authenticated)", () => {
 
   test("navigating to new resume page shows the form", async ({ page }) => {
     await page.goto("/dashboard/resumes/new");
-    await expect(page.getByLabelText(/resume title/i)).toBeVisible();
+    await expect(page.getByLabel(/resume title/i)).toBeVisible();
     await expect(
       page.getByRole("button", { name: /paste text/i }).or(
         page.getByRole("button", { name: /upload file/i })
@@ -82,8 +82,8 @@ test.describe("Resumes (authenticated)", () => {
     });
 
     await page.goto("/dashboard/resumes/new");
-    await page.getByLabelText(/resume title/i).fill("E2E Test Resume");
-    await page.getByLabelText(/resume content/i).fill("Test resume content");
+    await page.getByLabel(/resume title/i).fill("E2E Test Resume");
+    await page.getByLabel(/resume content/i).fill("Test resume content");
     await page.getByRole("button", { name: /save resume/i }).click();
 
     await expect(page).toHaveURL(`/dashboard/resumes/${createdId}`);
