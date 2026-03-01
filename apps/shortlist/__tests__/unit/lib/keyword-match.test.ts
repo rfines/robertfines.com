@@ -71,4 +71,54 @@ describe("computeKeywordMatch", () => {
     expect(result.matched.length).toBeGreaterThan(0);
     expect(result.missing.length).toBeGreaterThan(0);
   });
+
+  it("does not create bigrams from salary numbers", () => {
+    const jd = "Salary range $150,000–$215,000. React TypeScript experience required.";
+    const tailored = "React TypeScript engineer";
+    const result = computeKeywordMatch(jd, tailored);
+    // Number-containing tokens must not appear as bigrams
+    const allTerms = [...result.matched, ...result.missing];
+    const numberBigrams = allTerms.filter((t) => /\d/.test(t) && t.includes(" "));
+    expect(numberBigrams).toHaveLength(0);
+    // Technical terms still extracted
+    expect(allTerms).toContain("react");
+    expect(allTerms).toContain("typescript");
+  });
+
+  it("filters HR and benefits vocabulary from the JD", () => {
+    const jd =
+      "We offer competitive salary, dental and vision benefits, paid leave, " +
+      "retirement plans, and a wellness allowance. React TypeScript required.";
+    const tailored = "React TypeScript developer";
+    const result = computeKeywordMatch(jd, tailored);
+    const allTerms = [...result.matched, ...result.missing];
+    // HR terms must not appear as extracted keywords
+    expect(allTerms).not.toContain("salary");
+    expect(allTerms).not.toContain("dental");
+    expect(allTerms).not.toContain("benefits");
+    expect(allTerms).not.toContain("paid");
+    expect(allTerms).not.toContain("leave");
+    expect(allTerms).not.toContain("retirement");
+    expect(allTerms).not.toContain("wellness");
+    expect(allTerms).not.toContain("allowance");
+    // Technical terms still extracted
+    expect(allTerms).toContain("react");
+    expect(allTerms).toContain("typescript");
+  });
+
+  it("filters generic filler verbs that are not skills", () => {
+    const jd =
+      "Achieving objectives by fostering collaboration, upholding quality " +
+      "standards, and executing development tasks. Python GraphQL required.";
+    const tailored = "Python GraphQL engineer";
+    const result = computeKeywordMatch(jd, tailored);
+    const allTerms = [...result.matched, ...result.missing];
+    expect(allTerms).not.toContain("achieving");
+    expect(allTerms).not.toContain("fostering");
+    expect(allTerms).not.toContain("upholding");
+    expect(allTerms).not.toContain("executing");
+    // Technical terms still extracted
+    expect(allTerms).toContain("python");
+    expect(allTerms).toContain("graphql");
+  });
 });

@@ -6,6 +6,7 @@ export interface KeywordMatchResult {
 }
 
 const STOP_WORDS = new Set([
+  // Articles, conjunctions, prepositions
   "a", "an", "the", "and", "or", "but", "in", "on", "at", "to", "for", "of",
   "with", "by", "from", "is", "are", "was", "were", "be", "been", "being",
   "have", "has", "had", "do", "does", "did", "will", "would", "could",
@@ -23,6 +24,17 @@ const STOP_WORDS = new Set([
   "job", "role", "team", "company", "looking", "seeking", "required", "ability",
   "strong", "good", "well", "able", "must", "need", "needs", "including",
   "related", "relevant", "various", "etc", "per", "via", "i.e", "e.g",
+  // Generic JD boilerplate qualifiers
+  "nice", "preferred", "applicable", "candidate", "based", "additional",
+  "given", "like", "offers", "want", "hear",
+  // Generic action verbs that appear in JDs but are not skills
+  "achieving", "advancing", "allowing", "applying", "bringing", "executing",
+  "fostering", "involving", "participating", "remaining", "upholding",
+  "accomplishing", "ensuring", "coordinating",
+  // HR / compensation / benefits vocabulary
+  "salary", "compensation", "benefits", "dental", "bereavement", "fertility",
+  "allowance", "stipend", "holidays", "coverage", "wellness", "bonus",
+  "paid", "leave", "insurance", "retirement", "perks", "vacation",
 ]);
 
 const MIN_TERM_LENGTH = 3;
@@ -53,7 +65,7 @@ function extractBigrams(text: string): Set<string> {
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, " ")
     .split(/\s+/)
-    .filter((w) => w.length >= MIN_TERM_LENGTH && !STOP_WORDS.has(w));
+    .filter((w) => w.length >= MIN_TERM_LENGTH && !STOP_WORDS.has(w) && !/^\d/.test(w));
 
   for (let i = 0; i < words.length - 1; i++) {
     bigrams.add(`${words[i]} ${words[i + 1]}`);
