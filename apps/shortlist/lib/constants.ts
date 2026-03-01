@@ -10,9 +10,12 @@ export const LINKEDIN_UGC_POSTS_URL = "https://api.linkedin.com/v2/ugcPosts";
 /**
  * Scopes requested during LinkedIn account connection.
  * - openid / profile / email: OIDC — gives name, picture, email, sub (person URN)
- * - w_member_social: allows creating posts/shares on behalf of the member
+ *
+ * Note: w_member_social (feed posting) is intentionally excluded until direct
+ * profile-field updates are available via LinkedIn's Partner Program. At that
+ * point, add "w_member_social" here and prompt existing users to reconnect.
  */
-export const LINKEDIN_CONNECT_SCOPES = "openid profile email w_member_social";
+export const LINKEDIN_CONNECT_SCOPES = "openid profile email";
 
 /** Days after which an imported LinkedIn profile is considered stale */
 export const LINKEDIN_STALENESS_DAYS = 30;

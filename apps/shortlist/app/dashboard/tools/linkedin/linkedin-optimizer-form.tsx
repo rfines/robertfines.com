@@ -36,8 +36,6 @@ interface LinkedInOptimizerFormProps {
   flashError: boolean;
 }
 
-type PublishState = "idle" | "loading" | "done" | "error";
-
 export function LinkedInOptimizerForm({
   resumes,
   plan,
@@ -54,8 +52,6 @@ export function LinkedInOptimizerForm({
   const [isGenerating, setIsGenerating] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
-  const [publishHeadline, setPublishHeadline] = useState<PublishState>("idle");
-  const [publishAbout, setPublishAbout] = useState<PublishState>("idle");
   const [generateError, setGenerateError] = useState<string | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
 
@@ -97,8 +93,6 @@ export function LinkedInOptimizerForm({
     setIsGenerating(true);
     setGenerateError(null);
     setResult(null);
-    setPublishHeadline("idle");
-    setPublishAbout("idle");
     try {
       const res = await fetch("/api/tools/linkedin", {
         method: "POST",
@@ -115,25 +109,6 @@ export function LinkedInOptimizerForm({
       setGenerateError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setIsGenerating(false);
-    }
-  }
-
-  async function handlePublish(type: "headline" | "about") {
-    if (!result) return;
-    const text = type === "headline" ? result.headline : result.summary;
-    const setters = { headline: setPublishHeadline, about: setPublishAbout };
-    setters[type]("loading");
-    try {
-      const res = await fetch("/api/integrations/linkedin/publish", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, text }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Publish failed");
-      setters[type]("done");
-    } catch {
-      setters[type]("error");
     }
   }
 
@@ -236,7 +211,7 @@ export function LinkedInOptimizerForm({
           <div>
             <p className="text-xs text-[var(--muted)] mb-3">
               {linkedInStatus.canConnect
-                ? "Connect your LinkedIn account to post generated content to your feed and import your profile as a resume base."
+                ? "Connect your LinkedIn account to import your profile as a resume base."
                 : "LinkedIn account connection is available on Pro and Agency plans."}
             </p>
             {linkedInStatus.canConnect ? (
@@ -300,26 +275,17 @@ export function LinkedInOptimizerForm({
 
       {result && (
         <div className="space-y-4">
-          {/* Headline */}
           <ResultCard
             label="Headline"
             content={result.headline}
             charLimit={220}
-            connected={linkedInStatus.connected}
-            publishState={publishHeadline}
-            onPublish={() => handlePublish("headline")}
             editHref="https://www.linkedin.com/in/edit/intro/"
             multiline={false}
           />
-
-          {/* About section */}
           <ResultCard
             label="About Section"
             content={result.summary}
             charLimit={2600}
-            connected={linkedInStatus.connected}
-            publishState={publishAbout}
-            onPublish={() => handlePublish("about")}
             editHref="https://www.linkedin.com/in/edit/about/"
             multiline
           />
@@ -333,18 +299,12 @@ function ResultCard({
   label,
   content,
   charLimit,
-  connected,
-  publishState,
-  onPublish,
   editHref,
   multiline,
 }: {
   label: string;
   content: string;
   charLimit: number;
-  connected: boolean;
-  publishState: PublishState;
-  onPublish: () => void;
   editHref: string;
   multiline: boolean;
 }) {
@@ -368,58 +328,15 @@ function ResultCard({
         <p className="text-sm text-[var(--foreground)] mb-4">{content}</p>
       )}
 
-      <div className="flex items-center gap-3 flex-wrap">
-        {connected && <PublishButton state={publishState} onClick={onPublish} />}
-        <a
-          href={editHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 text-xs text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
-        >
-          <ExternalLink size={12} />
-          Edit on LinkedIn
-        </a>
-      </div>
-    </div>
-  );
-}
-
-function PublishButton({
-  state,
-  onClick,
-}: {
-  state: PublishState;
-  onClick: () => void;
-}) {
-  if (state === "done") {
-    return (
-      <span className="inline-flex items-center gap-1.5 text-xs text-green-700">
-        <CheckCircle2 size={12} />
-        Posted to LinkedIn
-      </span>
-    );
-  }
-  if (state === "error") {
-    return (
-      <button
-        onClick={onClick}
-        className="inline-flex items-center gap-1.5 text-xs text-[var(--destructive)] hover:underline"
+      <a
+        href={editHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1.5 text-xs text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
       >
-        <AlertTriangle size={12} />
-        Post failed — retry
-      </button>
-    );
-  }
-  return (
-    <Button
-      size="sm"
-      variant="outline"
-      onClick={onClick}
-      disabled={state === "loading"}
-      className="gap-1.5 border-[#0077B5] text-[#0077B5] hover:bg-[#0077B5]/5"
-    >
-      <Linkedin size={13} />
-      {state === "loading" ? "Posting…" : "Post to LinkedIn"}
-    </Button>
+        <ExternalLink size={12} />
+        Edit on LinkedIn
+      </a>
+    </div>
   );
 }
