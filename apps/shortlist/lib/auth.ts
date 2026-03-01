@@ -1,8 +1,11 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
+import GitHub from "next-auth/providers/github";
+import LinkedIn from "next-auth/providers/linkedin";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./prisma";
 import { captureEvent } from "./posthog";
+import { isEmailAllowed } from "./auth-helpers";
 
 const allowedEmails = process.env.ALLOWED_EMAILS
   ? process.env.ALLOWED_EMAILS.split(",").map((e) => e.trim()).filter(Boolean)
@@ -16,12 +19,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
+    GitHub({
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+    }),
+    LinkedIn({
+      clientId: process.env.LINKEDIN_CLIENT_ID!,
+      clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
+    }),
   ],
   callbacks: {
     signIn({ user }) {
       if (!user.email) return false;
-      if (allowedEmails.length === 0) return false;
-      return allowedEmails.includes(user.email);
+      return isEmailAllowed(user.email, allowedEmails);
     },
     async jwt({ token, user }) {
       if (user?.id) {

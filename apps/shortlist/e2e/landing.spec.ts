@@ -20,12 +20,10 @@ test.describe("Landing page (unauthenticated)", () => {
     await expect(page).toHaveURL(/\/auth\/signin/);
   });
 
-  test("/auth/signin shows Google sign-in option", async ({ page }) => {
+  test("/auth/signin shows all sign-in provider buttons", async ({ page }) => {
     await page.goto("/auth/signin");
-    await expect(
-      page.getByRole("button", { name: /google/i }).or(
-        page.getByText(/continue with google/i)
-      )
-    ).toBeVisible();
+    await expect(page.getByRole("button", { name: /continue with google/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /continue with github/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /continue with linkedin/i })).toBeVisible();
   });
 });
