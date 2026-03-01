@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/prisma";
-import { generateDocx } from "@/lib/generate-docx";
+import { generateDocx, generateCoverLetterDocx } from "@/lib/generate-docx";
 import { generateMarkdown } from "@/lib/generate-markdown";
-import { generatePdf } from "@/lib/generate-pdf";
+import { generatePdf, generateCoverLetterPdf } from "@/lib/generate-pdf";
 import { NextResponse } from "next/server";
 import { captureEvent } from "@/lib/posthog";
 import { getUserPlan } from "@/lib/get-user-plan";
-import { canDownload, canExportMarkdown, canExportPdf } from "@/lib/plan";
+import { canDownload, canExportMarkdown, canExportPdf, canGenerateCoverLetter } from "@/lib/plan";
 import { requireAuth } from "@/lib/route-helpers";
 
 interface Params {
@@ -19,7 +19,7 @@ export async function GET(req: Request, { params }: Params) {
   const { searchParams } = new URL(req.url);
   const format = searchParams.get("format") ?? "docx";
 
-  if (!["docx", "md", "pdf"].includes(format)) {
+  if (!["docx", "md", "pdf", "cover-letter-docx", "cover-letter-pdf"].includes(format)) {
     return NextResponse.json({ error: "Invalid format" }, { status: 400 });
   }
 
@@ -44,6 +44,18 @@ export async function GET(req: Request, { params }: Params) {
       { status: 403 }
     );
   }
+  if (format === "cover-letter-docx" && !canGenerateCoverLetter(plan)) {
+    return NextResponse.json(
+      { error: "Cover letter download requires a Starter plan" },
+      { status: 403 }
+    );
+  }
+  if (format === "cover-letter-pdf" && !canExportPdf(plan)) {
+    return NextResponse.json(
+      { error: "Cover letter PDF export requires a Pro plan" },
+      { status: 403 }
+    );
+  }
 
   const { tailoredId } = await params;
   const tailoredResume = await prisma.tailoredResume.findFirst({
@@ -61,6 +73,39 @@ export async function GET(req: Request, { params }: Params) {
     .slice(0, 80);
 
   await captureEvent(session.user.id, "resume_downloaded", { format });
+
+  if (format === "cover-letter-docx" || format === "cover-letter-pdf") {
+    if (!tailoredResume.coverLetterText) {
+      return NextResponse.json(
+        { error: "No cover letter has been generated for this resume" },
+        { status: 404 }
+      );
+    }
+
+    if (format === "cover-letter-pdf") {
+      const pdfBuffer = await generateCoverLetterPdf(tailoredResume.coverLetterText);
+      return new Response(new Uint8Array(pdfBuffer), {
+        headers: {
+          "Content-Type": "application/pdf",
+          "Content-Disposition": `attachment; filename="${slug}_Cover_Letter.pdf"`,
+        },
+      });
+    }
+
+    // cover-letter-docx
+    const docxBuffer = await generateCoverLetterDocx(
+      tailoredResume.coverLetterText,
+      tailoredResume.jobTitle,
+      tailoredResume.company
+    );
+    return new Response(new Uint8Array(docxBuffer), {
+      headers: {
+        "Content-Type":
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "Content-Disposition": `attachment; filename="${slug}_Cover_Letter.docx"`,
+      },
+    });
+  }
 
   if (format === "md") {
     const md = generateMarkdown(

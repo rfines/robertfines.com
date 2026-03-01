@@ -90,6 +90,45 @@ function ResumePdf({ text }: { text: string }) {
   );
 }
 
+const clStyles = StyleSheet.create({
+  page: {
+    paddingTop: 72,
+    paddingBottom: 72,
+    paddingHorizontal: 72, // 1" margins
+    fontFamily: "Helvetica",
+    fontSize: 11,
+    color: "#1a1a1a",
+    lineHeight: 1.6,
+  },
+  paragraph: {
+    marginBottom: 12,
+  },
+});
+
+function CoverLetterPdf({ text }: { text: string }) {
+  const paragraphs = text
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  return React.createElement(
+    Document,
+    null,
+    React.createElement(
+      Page,
+      { size: "LETTER", style: clStyles.page },
+      ...paragraphs.map((para, i) =>
+        React.createElement(Text, { key: i, style: clStyles.paragraph }, para)
+      )
+    )
+  );
+}
+
+export async function generateCoverLetterPdf(coverLetterText: string): Promise<Buffer> {
+  const element = React.createElement(CoverLetterPdf, { text: coverLetterText });
+  return renderToBuffer(element as Parameters<typeof renderToBuffer>[0]);
+}
+
 export async function generatePdf(tailoredText: string): Promise<Buffer> {
   const element = React.createElement(ResumePdf, { text: tailoredText });
   // @react-pdf/renderer uses its own React renderer; cast to satisfy its renderToBuffer types

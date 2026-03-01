@@ -42,6 +42,47 @@ function toParagraphs(text: string): Paragraph[] {
   });
 }
 
+export async function generateCoverLetterDocx(
+  coverLetterText: string,
+  jobTitle: string,
+  company?: string | null
+): Promise<Buffer> {
+  const title = company
+    ? `${jobTitle} — ${company} Cover Letter`
+    : `${jobTitle} Cover Letter`;
+
+  // Cover letters are plain prose — split on blank lines into paragraphs
+  const paragraphs = coverLetterText
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .map(
+      (para) =>
+        new Paragraph({
+          children: [new TextRun({ text: para, size: 22 })], // 11pt
+          spacing: { before: 0, after: 200 },
+        })
+    );
+
+  const doc = new Document({
+    creator: "Shortlist",
+    title,
+    sections: [
+      {
+        properties: {
+          page: {
+            // 1" margins — standard for cover letters
+            margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 },
+          },
+        },
+        children: paragraphs,
+      },
+    ],
+  });
+
+  return Packer.toBuffer(doc);
+}
+
 export async function generateDocx(
   tailoredText: string,
   jobTitle: string,

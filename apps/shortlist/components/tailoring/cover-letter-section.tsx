@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { FileText, Lock } from "lucide-react";
+import { FileText, Lock, Download } from "lucide-react";
 import type { Plan } from "@/lib/plan";
-import { canGenerateCoverLetter } from "@/lib/plan";
+import { canGenerateCoverLetter, canExportPdf } from "@/lib/plan";
+import { CopyButton } from "@/components/tailoring/copy-button";
 import Link from "next/link";
 
 interface CoverLetterSectionProps {
@@ -23,8 +24,10 @@ export function CoverLetterSection({
   );
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [downloadingFormat, setDownloadingFormat] = useState<string | null>(null);
 
   const locked = !canGenerateCoverLetter(plan);
+  const canPdf = canExportPdf(plan);
 
   async function handleGenerate() {
     setIsGenerating(true);
@@ -46,6 +49,31 @@ export function CoverLetterSection({
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setIsGenerating(false);
+    }
+  }
+
+  async function handleDownload(format: "cover-letter-docx" | "cover-letter-pdf") {
+    setDownloadingFormat(format);
+    try {
+      const res = await fetch(
+        `/api/tailored/${tailoredId}/download?format=${format}`
+      );
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error ?? "Download failed");
+      }
+      const blob = await res.blob();
+      const ext = format === "cover-letter-pdf" ? "pdf" : "docx";
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `cover_letter.${ext}`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Download failed");
+    } finally {
+      setDownloadingFormat(null);
     }
   }
 
@@ -93,10 +121,41 @@ export function CoverLetterSection({
       )}
 
       {!locked && coverLetterText && (
-        <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6">
+        <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6 space-y-4">
           <pre className="text-xs text-[var(--foreground)] whitespace-pre-wrap font-mono leading-relaxed overflow-auto max-h-[40vh]">
             {coverLetterText}
           </pre>
+          <div className="flex items-center gap-2 pt-2 border-t border-[var(--border)]">
+            <CopyButton text={coverLetterText} label="Copy" />
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleDownload("cover-letter-docx")}
+              disabled={downloadingFormat !== null}
+            >
+              <Download size={14} />
+              {downloadingFormat === "cover-letter-docx" ? "Downloading…" : "DOCX"}
+            </Button>
+            {canPdf ? (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleDownload("cover-letter-pdf")}
+                disabled={downloadingFormat !== null}
+              >
+                <Download size={14} />
+                {downloadingFormat === "cover-letter-pdf" ? "Downloading…" : "PDF"}
+              </Button>
+            ) : (
+              <span className="text-xs text-[var(--muted)] flex items-center gap-1.5">
+                <Lock size={12} />
+                PDF —{" "}
+                <Link href="/dashboard/billing" className="text-[var(--accent)] hover:underline">
+                  Pro
+                </Link>
+              </span>
+            )}
+          </div>
         </div>
       )}
     </div>
