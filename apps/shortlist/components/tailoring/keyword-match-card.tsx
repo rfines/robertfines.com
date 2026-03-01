@@ -1,11 +1,22 @@
+"use client";
+
+import { useState } from "react";
 import { cn } from "@/lib/cn";
 import type { KeywordMatchResult } from "@/lib/keyword-match";
 
 interface KeywordMatchCardProps {
   keywordMatch: KeywordMatchResult;
+  tailoredResumeId?: string;
+  initialFlaggedTerms?: string[];
 }
 
-export function KeywordMatchCard({ keywordMatch }: KeywordMatchCardProps) {
+export function KeywordMatchCard({
+  keywordMatch,
+  tailoredResumeId,
+  initialFlaggedTerms = [],
+}: KeywordMatchCardProps) {
+  const [flagged, setFlagged] = useState<Set<string>>(new Set(initialFlaggedTerms));
+
   const scoreColor =
     keywordMatch.score >= 70
       ? "text-green-400"
@@ -26,6 +37,28 @@ export function KeywordMatchCard({ keywordMatch }: KeywordMatchCardProps) {
       : keywordMatch.score >= 45
         ? "Moderate coverage — consider re-tailoring at a higher intensity."
         : "Low coverage — try aggressive tailoring or check for missing sections.";
+
+  function handleFlag(term: string) {
+    setFlagged((prev) => new Set([...prev, term]));
+    if (tailoredResumeId) {
+      fetch("/api/keyword-feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tailoredResumeId, term }),
+      }).catch(() => {
+        // fire-and-forget; revert on error
+        setFlagged((prev) => {
+          const next = new Set(prev);
+          next.delete(term);
+          return next;
+        });
+      });
+    }
+  }
+
+  const visibleMissing = keywordMatch.missing.filter((t) => !flagged.has(t));
+  const dismissedMissing = keywordMatch.missing.filter((t) => flagged.has(t));
+  const canFlag = Boolean(tailoredResumeId);
 
   return (
     <div className="mb-6">
@@ -71,20 +104,40 @@ export function KeywordMatchCard({ keywordMatch }: KeywordMatchCardProps) {
               </div>
             </div>
           )}
-          {keywordMatch.missing.length > 0 && (
+          {(visibleMissing.length > 0 || dismissedMissing.length > 0) && (
             <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4">
               <p className="text-xs font-medium text-[var(--destructive)] mb-2">
-                Missing ({keywordMatch.missing.length})
+                Missing ({visibleMissing.length})
+                {canFlag && (
+                  <span className="text-[var(--muted)] font-normal ml-1">
+                    — click × to dismiss irrelevant terms
+                  </span>
+                )}
               </p>
               <div className="flex flex-wrap gap-1">
-                {keywordMatch.missing.map((term) => (
+                {visibleMissing.map((term) => (
                   <span
                     key={term}
-                    className="text-xs px-2 py-0.5 rounded-full bg-[var(--destructive)]/10 text-[var(--destructive)]"
+                    className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-[var(--destructive)]/10 text-[var(--destructive)]"
                   >
                     {term}
+                    {canFlag && (
+                      <button
+                        type="button"
+                        onClick={() => handleFlag(term)}
+                        className="opacity-50 hover:opacity-100 transition-opacity leading-none"
+                        aria-label={`Dismiss "${term}" as not relevant`}
+                      >
+                        ×
+                      </button>
+                    )}
                   </span>
                 ))}
+                {dismissedMissing.length > 0 && (
+                  <span className="text-xs text-[var(--muted)] self-center">
+                    +{dismissedMissing.length} dismissed
+                  </span>
+                )}
               </div>
             </div>
           )}

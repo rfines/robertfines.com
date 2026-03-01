@@ -39,7 +39,7 @@ const STOP_WORDS = new Set([
 
 const MIN_TERM_LENGTH = 3;
 
-function extractUnigrams(text: string): Set<string> {
+function extractUnigrams(text: string, stopWords: Set<string>): Set<string> {
   const terms = new Set<string>();
   const words = text
     .toLowerCase()
@@ -50,7 +50,7 @@ function extractUnigrams(text: string): Set<string> {
     const cleaned = word.replace(/^[-]+|[-]+$/g, "");
     if (
       cleaned.length >= MIN_TERM_LENGTH &&
-      !STOP_WORDS.has(cleaned) &&
+      !stopWords.has(cleaned) &&
       !/^\d+$/.test(cleaned)
     ) {
       terms.add(cleaned);
@@ -59,13 +59,13 @@ function extractUnigrams(text: string): Set<string> {
   return terms;
 }
 
-function extractBigrams(text: string): Set<string> {
+function extractBigrams(text: string, stopWords: Set<string>): Set<string> {
   const bigrams = new Set<string>();
   const words = text
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, " ")
     .split(/\s+/)
-    .filter((w) => w.length >= MIN_TERM_LENGTH && !STOP_WORDS.has(w) && !/^\d/.test(w));
+    .filter((w) => w.length >= MIN_TERM_LENGTH && !stopWords.has(w) && !/^\d/.test(w));
 
   for (let i = 0; i < words.length - 1; i++) {
     bigrams.add(`${words[i]} ${words[i + 1]}`);
@@ -75,14 +75,20 @@ function extractBigrams(text: string): Set<string> {
 
 export function computeKeywordMatch(
   jobDescription: string,
-  tailoredText: string
+  tailoredText: string,
+  extraStopWords?: Set<string>
 ): KeywordMatchResult {
   if (!jobDescription.trim()) {
     return { score: 0, matched: [], missing: [], total: 0 };
   }
 
-  const jdUnigrams = extractUnigrams(jobDescription);
-  const jdBigrams = extractBigrams(jobDescription);
+  const stopWords =
+    extraStopWords && extraStopWords.size > 0
+      ? new Set([...STOP_WORDS, ...extraStopWords])
+      : STOP_WORDS;
+
+  const jdUnigrams = extractUnigrams(jobDescription, stopWords);
+  const jdBigrams = extractBigrams(jobDescription, stopWords);
   const jdTerms = new Set<string>([...jdUnigrams, ...jdBigrams]);
 
   const tailoredNormalized = tailoredText

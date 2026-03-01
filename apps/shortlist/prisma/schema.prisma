@@ -18,6 +18,7 @@ model User {
   sessions        Session[]
   resumes           Resume[]
   tailoredResumes   TailoredResume[]
+  termFeedback      TermFeedback[]
   marketingConsent  Boolean?
   plan              String           @default("free")
   role              String           @default("user")
@@ -113,4 +114,39 @@ model ProcessedStripeEvent {
   processedAt DateTime @default(now())
 
   @@index([processedAt])
+}
+
+// Layer 1: logs keyword match results for analytics (one entry per tailored resume, upserted on view)
+model KeywordMatchLog {
+  id               String   @id @default(cuid())
+  userId           String
+  tailoredResumeId String   @unique
+  score            Int
+  total            Int
+  missingTerms     String   @db.Text  // JSON array of up to 30 missing terms
+
+  createdAt        DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+// Layer 2: admin-curated additions to the global stop word list
+model CustomStopWord {
+  word      String   @id
+  addedAt   DateTime @default(now())
+  addedBy   String   // userId of admin who added it
+}
+
+// Layer 3: user-flagged terms that are not relevant skills
+model TermFeedback {
+  id               String   @id @default(cuid())
+  userId           String
+  tailoredResumeId String
+  term             String
+  createdAt        DateTime @default(now())
+
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tailoredResumeId, term])
+  @@index([term])
 }

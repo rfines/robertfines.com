@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { auth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -8,6 +9,7 @@ import { TailoredDeleteButton } from "@/components/tailoring/tailored-delete-but
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { computeKeywordMatch } from "@/lib/keyword-match";
+import { captureEvent } from "@/lib/posthog";
 import { CoverLetterSection } from "@/components/tailoring/cover-letter-section";
 import { VariationTabs } from "@/components/tailoring/variation-tabs";
 import { DownloadMenu } from "@/components/tailoring/download-menu";
@@ -27,29 +29,39 @@ export default async function TailoredResumePage({ params }: Props) {
   if (!session?.user?.id) redirect("/auth/signin");
 
   const { tailoredId } = await params;
-  const [tailored, plan] = await Promise.all([
+  const [tailored, plan, customStopWordsRaw] = await Promise.all([
     prisma.tailoredResume.findFirst({
       where: { id: tailoredId, userId: session.user.id },
       include: { resume: { select: { title: true, id: true, rawText: true } } },
     }),
     getUserPlan(session.user.id),
+    prisma.customStopWord.findMany({ select: { word: true } }),
   ]);
 
   if (!tailored) notFound();
 
-  // Fetch siblings if this belongs to a variation group
-  const siblings = tailored.variationGroup
-    ? await prisma.tailoredResume.findMany({
-        where: { variationGroup: tailored.variationGroup, userId: session.user.id },
-        orderBy: { variationIndex: "asc" },
-        select: { id: true, variationIndex: true, tailoredText: true },
-      })
-    : null;
+  const extraStopWords = new Set(customStopWordsRaw.map((s) => s.word));
+
+  // Fetch siblings + flagged terms in parallel
+  const [siblings, flaggedTermsRaw] = await Promise.all([
+    tailored.variationGroup
+      ? prisma.tailoredResume.findMany({
+          where: { variationGroup: tailored.variationGroup, userId: session.user.id },
+          orderBy: { variationIndex: "asc" },
+          select: { id: true, variationIndex: true, tailoredText: true },
+        })
+      : Promise.resolve(null),
+    prisma.termFeedback.findMany({
+      where: { userId: session.user.id, tailoredResumeId: tailored.id },
+      select: { term: true },
+    }),
+  ]);
 
   const hasVariations = siblings && siblings.length > 1;
+  const initialFlaggedTerms = flaggedTermsRaw.map((f) => f.term);
 
   const keywordMatch = !hasVariations
-    ? computeKeywordMatch(tailored.jobDescription, tailored.tailoredText)
+    ? computeKeywordMatch(tailored.jobDescription, tailored.tailoredText, extraStopWords)
     : null;
 
   const variationData = hasVariations
@@ -57,9 +69,41 @@ export default async function TailoredResumePage({ params }: Props) {
         id: s.id,
         variationIndex: s.variationIndex,
         tailoredText: s.tailoredText,
-        keywordMatch: computeKeywordMatch(tailored.jobDescription, s.tailoredText),
+        keywordMatch: computeKeywordMatch(tailored.jobDescription, s.tailoredText, extraStopWords),
       }))
     : null;
+
+  // Layer 1: log match data for analytics after response is sent
+  if (keywordMatch) {
+    const matchSnapshot = keywordMatch;
+    const userId = session.user.id;
+    const resumeId = tailored.id;
+    after(async () => {
+      await Promise.all([
+        prisma.keywordMatchLog.upsert({
+          where: { tailoredResumeId: resumeId },
+          create: {
+            userId,
+            tailoredResumeId: resumeId,
+            score: matchSnapshot.score,
+            total: matchSnapshot.total,
+            missingTerms: JSON.stringify(matchSnapshot.missing.slice(0, 30)),
+          },
+          update: {
+            score: matchSnapshot.score,
+            total: matchSnapshot.total,
+            missingTerms: JSON.stringify(matchSnapshot.missing.slice(0, 30)),
+          },
+        }),
+        captureEvent(userId, "keyword_match_computed", {
+          tailoredResumeId: resumeId,
+          score: matchSnapshot.score,
+          total: matchSnapshot.total,
+          topMissingTerms: matchSnapshot.missing.slice(0, 30),
+        }),
+      ]);
+    });
+  }
 
   const createdAt = tailored.createdAt.toLocaleDateString("en-US", {
     month: "long",
@@ -125,7 +169,13 @@ export default async function TailoredResumePage({ params }: Props) {
         />
       ) : (
         <>
-          {keywordMatch && <KeywordMatchCard keywordMatch={keywordMatch} />}
+          {keywordMatch && (
+            <KeywordMatchCard
+              keywordMatch={keywordMatch}
+              tailoredResumeId={tailored.id}
+              initialFlaggedTerms={initialFlaggedTerms}
+            />
+          )}
 
           <ResumeDiffView
             baseText={tailored.resume.rawText}

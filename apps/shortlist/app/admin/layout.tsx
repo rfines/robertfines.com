@@ -27,6 +27,9 @@ export default async function AdminLayout({
           <Link href="/admin/users" className="hover:text-[var(--foreground)] transition-colors">
             Users
           </Link>
+          <Link href="/admin/keyword-noise" className="hover:text-[var(--foreground)] transition-colors">
+            Keyword Noise
+          </Link>
           <Link href="/dashboard" className="hover:text-[var(--foreground)] transition-colors">
             ← Dashboard
           </Link>
