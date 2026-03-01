@@ -18,7 +18,7 @@ export async function extractJdSkills(jobDescription: string): Promise<string[]>
 
   try {
     const response = await anthropic.messages.create({
-      model: "claude-haiku-4-5-20251001",
+      model: "claude-haiku-3-5-20241022",
       max_tokens: 512,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: jobDescription.slice(0, 8000) }],
