@@ -22,7 +22,7 @@ const STOP_WORDS = new Set([
   "down", "off", "above", "below", "new", "use", "work", "using", "working",
   "help", "make", "take", "get", "set", "one", "two", "three", "four", "five",
   "job", "role", "team", "company", "looking", "seeking", "required", "ability",
-  "strong", "good", "well", "able", "must", "need", "needs", "including",
+  "strong", "good", "well", "able", "need", "needs", "including",
   "related", "relevant", "various", "etc", "per", "via", "i.e", "e.g",
   // Generic JD boilerplate qualifiers
   "nice", "preferred", "applicable", "candidate", "based", "additional",
@@ -35,6 +35,53 @@ const STOP_WORDS = new Set([
   "salary", "compensation", "benefits", "dental", "bereavement", "fertility",
   "allowance", "stipend", "holidays", "coverage", "wellness", "bonus",
   "paid", "leave", "insurance", "retirement", "perks", "vacation",
+
+  // ---- Expanded stop words ----
+
+  // Generic qualifiers / soft-skills adjectives / adverbs
+  "actively", "adaptable", "actual", "better", "closely", "complex", "digital",
+  "driven", "effectively", "fast", "flexible", "fully", "heavily",
+  "instrumental", "most", "pivotal", "proven", "quickly", "robust", "scalable",
+
+  // Generic business / process nouns (not measurable skills)
+  "access", "assets", "bar", "capabilities", "capital", "challenges",
+  "collaboration", "commercial", "completion", "contributions", "deliverables",
+  "details", "direction", "domain", "ecosystem", "efficiency", "execution",
+  "experience", "expertise", "expansion", "factors", "family", "financial",
+  "flexibility", "growth", "half", "independence", "industry", "knowledge",
+  "markets", "member", "members", "metrics", "mission", "objectives",
+  "operations", "organization", "ownership", "place", "plans", "potential",
+  "practices", "professional", "qualifications", "record", "recruiter",
+  "requirements", "result", "results", "setup", "solutions", "stakeholder",
+  "stakeholders", "strategy", "track", "transparency", "understanding",
+  "value", "values", "variety", "venture", "ways", "world", "years",
+
+  // More generic action verbs
+  "align", "assessing", "assist", "care", "collaborate", "contribute",
+  "customize", "deliver", "drive", "estate", "grow", "invest", "involves",
+  "making", "operating", "provide", "solve", "unlock",
+
+  // Employment / compensation
+  "annual", "base", "equity", "flex", "home", "hybrid", "office", "physical",
+  "private", "range", "remote", "salaries", "saving",
+
+  // Education requirements
+  "bachelor", "degree", "master",
+
+  // Currency codes
+  "cad", "usd",
+
+  // Geographic / location noise
+  "bangalore", "canada", "canadian", "city", "england", "francisco", "india",
+  "local", "luxembourg", "mumbai", "provinces", "startup", "york",
+
+  // Org-structure boilerplate
+  "contributor", "contributors", "employees", "group", "groups",
+  "leader", "leaders", "partner", "partners", "paced",
+
+  // Hyphenated JD boilerplate
+  "candidate-specific", "company-paid", "digital-first", "fast-paced",
+  "full-time", "in-depth", "values-driven",
 ]);
 
 const MIN_TERM_LENGTH = 3;
@@ -47,7 +94,8 @@ function extractUnigrams(text: string, stopWords: Set<string>): Set<string> {
     .split(/\s+/);
 
   for (const word of words) {
-    const cleaned = word.replace(/^[-]+|[-]+$/g, "");
+    // Strip leading/trailing hyphens and trailing periods (preserves "node.js" but drops "applicable.")
+    const cleaned = word.replace(/^[-]+|[-]+$|\.+$/g, "");
     if (
       cleaned.length >= MIN_TERM_LENGTH &&
       !stopWords.has(cleaned) &&
