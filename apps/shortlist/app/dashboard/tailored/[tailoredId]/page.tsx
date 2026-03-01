@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { TailoredDeleteButton } from "@/components/tailoring/tailored-delete-button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { computeKeywordMatch, matchSkillsToResume } from "@/lib/keyword-match";
+import { matchSkillsToResume } from "@/lib/keyword-match";
 import { extractJdSkills } from "@/lib/extract-jd-skills";
 import { captureEvent } from "@/lib/posthog";
 import { CoverLetterSection } from "@/components/tailoring/cover-letter-section";
@@ -58,7 +58,7 @@ export default async function TailoredResumePage({ params }: Props) {
   const hasVariations = siblings && siblings.length > 1;
   const initialFlaggedTerms = flaggedTermsRaw.map((f) => f.term);
 
-  // Parse stored skills (null for old resumes created before this feature)
+  // Parse stored skills — or extract them now if this is an old resume without jdSkills
   const storedSkills: string[] | null = (() => {
     if (!tailored.jdSkills) return null;
     try {
@@ -69,11 +69,12 @@ export default async function TailoredResumePage({ params }: Props) {
     }
   })();
 
-  // Compute keyword match using LLM-extracted skills when available,
-  // falling back to legacy text-based extraction for old resumes.
+  // Inline backfill: if jdSkills is missing, extract now so this request gets clean skills.
+  // The result is saved to DB in after() to avoid blocking the response.
+  const skills: string[] = storedSkills ?? await extractJdSkills(tailored.jobDescription);
+
   function computeMatch(resumeText: string) {
-    if (storedSkills) return matchSkillsToResume(storedSkills, resumeText);
-    return computeKeywordMatch(tailored!.jobDescription, resumeText);
+    return matchSkillsToResume(skills, resumeText);
   }
 
   const keywordMatch = !hasVariations ? computeMatch(tailored.tailoredText) : null;
@@ -93,16 +94,12 @@ export default async function TailoredResumePage({ params }: Props) {
   after(async () => {
     const tasks: Promise<unknown>[] = [];
 
-    // Lazy-backfill jdSkills for old resumes that don't have it yet
-    if (!storedSkills) {
+    // Persist backfilled skills so the next visit reads from DB instead of calling Claude
+    if (!storedSkills && skills.length > 0) {
       tasks.push(
-        extractJdSkills(tailored.jobDescription).then((skills) => {
-          if (skills.length > 0) {
-            return prisma.tailoredResume.update({
-              where: { id: resumeId },
-              data: { jdSkills: JSON.stringify(skills) },
-            });
-          }
+        prisma.tailoredResume.update({
+          where: { id: resumeId },
+          data: { jdSkills: JSON.stringify(skills) },
         })
       );
     }
@@ -130,7 +127,6 @@ export default async function TailoredResumePage({ params }: Props) {
           score: keywordMatch.score,
           total: keywordMatch.total,
           topMissingTerms: keywordMatch.missing.slice(0, 30),
-          usedLlmSkills: !!storedSkills,
         })
       );
     }
