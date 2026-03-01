@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 const EFFECTIVE_DATE = "March 1, 2026";
 const CONTACT_EMAIL = "privacy@retold.dev";
-const SITE_URL = "https://retold.dev";
+const SITE_URL = "https://www.retold.dev";
 
 export default function PrivacyPage() {
   return (
