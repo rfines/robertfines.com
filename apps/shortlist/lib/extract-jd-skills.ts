@@ -18,7 +18,7 @@ export async function extractJdSkills(jobDescription: string): Promise<string[]>
 
   try {
     const response = await anthropic.messages.create({
-      model: "claude-3-5-haiku-20241022",
+      model: "claude-sonnet-4-6",
       max_tokens: 512,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: jobDescription.slice(0, 8000) }],
@@ -27,7 +27,12 @@ export async function extractJdSkills(jobDescription: string): Promise<string[]>
     const content = response.content[0];
     if (content.type !== "text") return [];
 
-    const parsed = JSON.parse(content.text.trim());
+    // Extract the JSON array even if the model wraps it in prose
+    const text = content.text.trim();
+    const match = text.match(/\[[\s\S]*\]/);
+    if (!match) return [];
+
+    const parsed = JSON.parse(match[0]);
     if (!Array.isArray(parsed)) return [];
 
     return parsed.filter((s): s is string => typeof s === "string" && s.trim().length > 0);
