@@ -36,7 +36,10 @@ export function FileUploadZone({ onExtracted, disabled }: FileUploadZoneProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ filename: file.name, contentType }),
       });
-      if (!presignRes.ok) throw new Error("Failed to get upload URL");
+      if (!presignRes.ok) {
+        const detail = await presignRes.text().catch(() => "");
+        throw new Error(`Presign failed (${presignRes.status})${detail ? `: ${detail}` : ""}`);
+      }
       const { presignedUrl, s3Key } = await presignRes.json();
 
       // 2. Upload to S3
@@ -49,9 +52,10 @@ export function FileUploadZone({ onExtracted, disabled }: FileUploadZoneProps) {
         };
         xhr.onload = () => {
           if (xhr.status >= 200 && xhr.status < 300) resolve();
-          else reject(new Error("Upload failed"));
+          else reject(new Error(`S3 upload failed (${xhr.status})`));
         };
-        xhr.onerror = () => reject(new Error("Upload failed"));
+        xhr.onerror = () =>
+          reject(new Error("Upload blocked — possible CORS issue"));
         xhr.open("PUT", presignedUrl);
         xhr.setRequestHeader("Content-Type", contentType);
         xhr.send(file);
@@ -65,7 +69,10 @@ export function FileUploadZone({ onExtracted, disabled }: FileUploadZoneProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ s3Key, fileType }),
       });
-      if (!extractRes.ok) throw new Error("Failed to extract text from file");
+      if (!extractRes.ok) {
+        const detail = await extractRes.text().catch(() => "");
+        throw new Error(`Text extraction failed (${extractRes.status})${detail ? `: ${detail}` : ""}`);
+      }
       const { text } = await extractRes.json();
 
       setProgress(100);

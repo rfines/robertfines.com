@@ -14,6 +14,7 @@ import { cn } from "@/lib/cn";
 import { IntensitySelector } from "@/components/tailoring/intensity-selector";
 import { VariationsSelector } from "@/components/tailoring/variations-selector";
 import { InstructionsField } from "@/components/tailoring/instructions-field";
+import { useUpgradeModal } from "@/components/shared/upgrade-modal";
 
 interface InitialValues {
   jobTitle: string;
@@ -32,6 +33,7 @@ interface TailorFormProps {
 
 export function TailorForm({ resumeId, resumeTitle, plan, initialValues }: TailorFormProps) {
   const router = useRouter();
+  const { openUpgrade } = useUpgradeModal();
   const [jobTitle, setJobTitle] = useState(initialValues?.jobTitle ?? "");
   const [company, setCompany] = useState(initialValues?.company ?? "");
   const [jobDescription, setJobDescription] = useState(initialValues?.jobDescription ?? "");
@@ -133,7 +135,12 @@ export function TailorForm({ resumeId, resumeTitle, plan, initialValues }: Tailo
       const tailored = await res.json();
       router.push(`/dashboard/tailored/${tailored.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      if (message.toLowerCase().includes("monthly tailoring limit")) {
+        openUpgrade("monthly-limit");
+      } else {
+        setError(message);
+      }
       setIsSubmitting(false);
     }
   }
@@ -278,42 +285,51 @@ export function TailorForm({ resumeId, resumeTitle, plan, initialValues }: Tailo
         )}
       </div>
 
-      <div className="flex items-start gap-3">
-        <input
-          type="checkbox"
-          id="fixAtsIssues"
-          checked={fixAtsIssues && !atsLocked}
-          onChange={(e) => !atsLocked && setFixAtsIssues(e.target.checked)}
-          disabled={atsLocked}
-          className="mt-0.5 h-4 w-4 rounded border-border accent-accent disabled:cursor-not-allowed"
-        />
-        <div>
-          <div className="flex items-center gap-2">
-            <label
-              htmlFor="fixAtsIssues"
-              className={`text-sm font-medium ${atsLocked ? "text-muted cursor-not-allowed" : "cursor-pointer"}`}
-            >
-              Fix ATS issues
-            </label>
-            {atsLocked && (
-              <span className="text-[10px] bg-surface text-muted border border-border rounded px-1.5 py-0.5 flex items-center gap-1">
+      {atsLocked ? (
+        <button
+          type="button"
+          onClick={() => openUpgrade("fix-ats-issues")}
+          className="flex items-start gap-3 w-full text-left rounded-lg p-3 -m-3 hover:bg-accent/5 transition-colors"
+        >
+          <div className="mt-0.5 h-4 w-4 rounded border border-border shrink-0" />
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-muted">Fix ATS issues</span>
+              <span className="text-[10px] bg-surface text-accent border border-accent/30 rounded px-1.5 py-0.5 flex items-center gap-1">
                 <Lock size={9} />
                 Pro
               </span>
-            )}
+            </div>
+            <p className="text-xs text-muted mt-0.5">
+              Automatically fix formatting issues that ATS systems struggle to parse
+            </p>
           </div>
-          <p className="text-xs text-muted mt-0.5">
-            {atsLocked
-              ? "Upgrade to Pro to automatically fix ATS formatting issues"
-              : "Automatically fix formatting issues (tables, fancy bullets, separators) that ATS systems struggle to parse"}
-          </p>
+        </button>
+      ) : (
+        <div className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            id="fixAtsIssues"
+            checked={fixAtsIssues}
+            onChange={(e) => setFixAtsIssues(e.target.checked)}
+            className="mt-0.5 h-4 w-4 rounded border-border accent-accent"
+          />
+          <div>
+            <label htmlFor="fixAtsIssues" className="text-sm font-medium cursor-pointer">
+              Fix ATS issues
+            </label>
+            <p className="text-xs text-muted mt-0.5">
+              Automatically fix formatting issues (tables, fancy bullets, separators) that ATS systems struggle to parse
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       <InstructionsField
         value={userInstructions}
         onChange={setUserInstructions}
         locked={instructionsLocked}
+        onLockedClick={() => openUpgrade("custom-instructions")}
       />
 
       {error && <p className="text-sm text-destructive">{error}</p>}

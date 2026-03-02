@@ -31,8 +31,8 @@ describe("isEmailAllowed", () => {
       expect(isEmailAllowed("admin", allowed)).toBe(false);
     });
 
-    it("is case-sensitive — upper-cased email is rejected", () => {
-      expect(isEmailAllowed("Admin@example.com", allowed)).toBe(false);
+    it("is case-insensitive — upper-cased email is allowed", () => {
+      expect(isEmailAllowed("Admin@example.com", allowed)).toBe(true);
     });
   });
 

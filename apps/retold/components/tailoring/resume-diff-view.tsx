@@ -5,7 +5,7 @@ import { GitCompare, FileText, Lock } from "lucide-react";
 import { diffWords } from "diff";
 import type { Plan } from "@/lib/plan";
 import { canViewDiff } from "@/lib/plan";
-import Link from "next/link";
+import { useUpgradeModal } from "@/components/shared/upgrade-modal";
 
 interface ResumeDiffViewProps {
   baseText: string;
@@ -16,11 +16,15 @@ interface ResumeDiffViewProps {
 export function ResumeDiffView({ baseText, tailoredText, plan }: ResumeDiffViewProps) {
   const [showDiff, setShowDiff] = useState(false);
   const diffLocked = !canViewDiff(plan);
+  const { openUpgrade } = useUpgradeModal();
 
   const changes = showDiff && !diffLocked ? diffWords(baseText, tailoredText) : null;
 
   function handleToggle() {
-    if (diffLocked) return;
+    if (diffLocked) {
+      openUpgrade("view-diff");
+      return;
+    }
     setShowDiff((v) => !v);
   }
 
@@ -49,18 +53,13 @@ export function ResumeDiffView({ baseText, tailoredText, plan }: ResumeDiffViewP
             </>
           ) : (
             <>
+              {diffLocked && <Lock size={10} />}
               <GitCompare size={12} />
               View Changes
             </>
           )}
         </button>
       </div>
-
-      {diffLocked && showDiff === false && (
-        // Show upgrade nudge when free user clicks the button via handleToggle → blocked,
-        // so we render a persistent teaser below the toggle instead.
-        null
-      )}
 
       <pre className="text-xs text-foreground whitespace-pre-wrap font-mono leading-relaxed overflow-auto max-h-[60vh]">
         {showDiff && !diffLocked && changes
@@ -86,19 +85,6 @@ export function ResumeDiffView({ baseText, tailoredText, plan }: ResumeDiffViewP
             })
           : tailoredText}
       </pre>
-
-      {diffLocked && (
-        <div className="mt-4 flex items-center gap-2 text-xs text-muted border-t border-border pt-3">
-          <Lock size={11} className="shrink-0" />
-          <span>
-            Before/after diff view is available on{" "}
-            <Link href="/dashboard/billing" className="text-accent hover:underline">
-              Starter and above
-            </Link>
-            .
-          </span>
-        </div>
-      )}
     </div>
   );
 }

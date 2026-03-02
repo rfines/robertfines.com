@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TailorForm } from "@/components/tailoring/tailor-form";
+import { UpgradeModalProvider } from "@/components/shared/upgrade-modal";
 import { useRouter } from "next/navigation";
 import { http, HttpResponse } from "msw";
 import { server } from "../../mocks/server";
@@ -26,7 +27,9 @@ describe("TailorForm", () => {
 
   function renderForm() {
     return render(
-      <TailorForm resumeId="clxxxxxxxxxxxxxxxxxxxxxx" resumeTitle="My Resume" plan="free" />
+      <UpgradeModalProvider>
+        <TailorForm resumeId="clxxxxxxxxxxxxxxxxxxxxxx" resumeTitle="My Resume" plan="free" />
+      </UpgradeModalProvider>
     );
   }
 
