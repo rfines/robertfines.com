@@ -52,12 +52,22 @@ let listeners: Array<() => void> = [];
 let currentTheme: Theme = "system";
 let currentResolved: ResolvedTheme = "light";
 
-function getThemeSnapshot() {
-  return { theme: currentTheme, resolved: currentResolved };
+// Return primitives so Object.is comparison works correctly.
+// Returning objects would create new references each call → infinite re-renders.
+function getThemeValue() {
+  return currentTheme;
 }
 
-function getServerSnapshot() {
-  return { theme: "system" as Theme, resolved: "light" as ResolvedTheme };
+function getResolvedValue() {
+  return currentResolved;
+}
+
+function getServerTheme(): Theme {
+  return "system";
+}
+
+function getServerResolved(): ResolvedTheme {
+  return "light";
 }
 
 function subscribe(listener: () => void) {
@@ -87,10 +97,11 @@ if (typeof window !== "undefined") {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const { theme, resolved: resolvedTheme } = useSyncExternalStore(
+  const theme = useSyncExternalStore(subscribe, getThemeValue, getServerTheme);
+  const resolvedTheme = useSyncExternalStore(
     subscribe,
-    getThemeSnapshot,
-    getServerSnapshot
+    getResolvedValue,
+    getServerResolved
   );
 
   // Listen for OS theme changes when in "system" mode
