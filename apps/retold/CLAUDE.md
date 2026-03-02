@@ -60,11 +60,11 @@ pnpm is installed via corepack and is NOT in the default PATH. Always activate n
 
 ```sh
 source ~/.nvm/nvm.sh && nvm use  # activates node v22 (see .nvmrc) + pnpm shim
-pnpm --filter shortlist test        # run tests (should be 209 passing)
-pnpm --filter shortlist test:watch  # watch mode
-pnpm --filter shortlist build       # TypeScript check + build
+pnpm --filter retold test        # run tests (should be 209 passing)
+pnpm --filter retold test:watch  # watch mode
+pnpm --filter retold build       # TypeScript check + build
 ```
 
 ## DB (Production)
-Use `/set-shortlist-role` skill to update user roles in production.
+Use `/set-retold-role` skill to update user roles in production.
 Requires public Railway DATABASE_URL (internal hostname unreachable locally).

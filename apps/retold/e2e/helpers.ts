@@ -4,7 +4,7 @@ import { PrismaClient } from "@prisma/client";
 
 // Load .env.local so DATABASE_URL and other vars are available in the test process.
 // Vars already set in the process environment (e.g. via Railway CLI) take precedence.
-// process.cwd() is apps/shortlist when Playwright runs from the package root.
+// process.cwd() is apps/retold when Playwright runs from the package root.
 const envPath = resolve(process.cwd(), ".env.local");
 if (existsSync(envPath)) {
   for (const line of readFileSync(envPath, "utf-8").split("\n")) {

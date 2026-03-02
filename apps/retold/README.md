@@ -1,16 +1,16 @@
-# Shortlist
+# Retold
 
 > **Work in progress** — core features are live, more on the way.
 
-Stop sending the same résumé to every job. Shortlist tailors your résumé to each role in seconds using Claude AI — rewriting, reordering, and reframing your experience to match the job description without fabricating a single fact.
+Stop sending the same résumé to every job. Retold tailors your résumé to each role in seconds using Claude AI — rewriting, reordering, and reframing your experience to match the job description without fabricating a single fact.
 
-Live at **[shortlist.robertfines.me](https://shortlist.robertfines.me)**
+Live at **[www.retold.dev](https://www.retold.dev)**
 
 ---
 
 ## What It Does
 
-**Upload your résumé once.** Paste it as plain text or upload a PDF or DOCX. Shortlist stores it as your base — the source of truth you'll tailor from every time.
+**Upload your résumé once.** Paste it as plain text or upload a PDF or DOCX. Retold stores it as your base — the source of truth you'll tailor from every time.
 
 **Paste a job description.** Drop in the full JD from any job posting. Add the job title and company if you want them in the output.
 
@@ -52,7 +52,7 @@ Requires Node 22+, pnpm 10+, and a `.env.local` with the variables listed in [`.
 pnpm install
 
 # Run just this app
-pnpm --filter shortlist dev
+pnpm --filter retold dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
@@ -65,13 +65,13 @@ You'll need a PostgreSQL database URL, Google OAuth credentials, an AWS S3 bucke
 
 ```bash
 # Unit, API integration, and component tests (no external services needed)
-pnpm --filter shortlist test
+pnpm --filter retold test
 
 # With coverage report
-pnpm --filter shortlist test:coverage
+pnpm --filter retold test:coverage
 
 # E2E tests (requires dev server running)
-pnpm --filter shortlist test:e2e
+pnpm --filter retold test:e2e
 ```
 
 ---

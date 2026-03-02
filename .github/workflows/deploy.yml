@@ -34,7 +34,7 @@ jobs:
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
-      - name: Deploy shortlist
-        run: railway up --service ${{ vars.RAILWAY_SHORTLIST_SERVICE }} --detach
+      - name: Deploy retold
+        run: railway up --service ${{ vars.RAILWAY_RETOLD_SERVICE }} --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}

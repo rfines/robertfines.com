@@ -84,7 +84,7 @@ The cheapest output for the application is plain text — no file generation, no
 | Output | DOCX download + any future formats |
 | Base résumé storage | Unlimited |
 
-**Target user:** Power users running aggressive campaigns (20+ applications/month), people using Shortlist professionally (career coaches, recruiters tailoring on behalf of clients).
+**Target user:** Power users running aggressive campaigns (20+ applications/month), people using Retold professionally (career coaches, recruiters tailoring on behalf of clients).
 
 **COGS estimate:** ~$8/month at heavy usage (200 requests). Margin ~79% at heavy use, higher for typical use.
 
@@ -92,7 +92,7 @@ The cheapest output for the application is plain text — no file generation, no
 
 ## Pricing Rationale
 
-The competitive set — Jobscan ($30–50/month), Resume.io ($25–50/month), Kickresume ($20–30/month) — targets broader resume building. Shortlist is more focused, so positioning slightly below makes sense while offering a meaningfully different value prop (AI tailoring vs. templates).
+The competitive set — Jobscan ($30–50/month), Resume.io ($25–50/month), Kickresume ($20–30/month) — targets broader resume building. Retold is more focused, so positioning slightly below makes sense while offering a meaningfully different value prop (AI tailoring vs. templates).
 
 The $9 → $19 → $39 ladder follows a roughly 2x step pattern. Each step should feel justified:
 - **Free → Starter:** Credit card commitment, more requests, Sonnet quality

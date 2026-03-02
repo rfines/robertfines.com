@@ -27,9 +27,9 @@
 
 ---
 
-## Shortlist's Current Positioning
+## Retold's Current Positioning
 
-Shortlist occupies a defensible niche: **tailoring-first, ATS-optimized, plain-text AI output from a master resume**. The workflow (one base résumé → many tailored versions) is cleaner than template-focused competitors. Claude Sonnet quality is meaningfully better than GPT-3.5-era models most competitors use. DOCX download is a real differentiator — most competitors are PDF-only or web-only.
+Retold occupies a defensible niche: **tailoring-first, ATS-optimized, plain-text AI output from a master resume**. The workflow (one base résumé → many tailored versions) is cleaner than template-focused competitors. Claude Sonnet quality is meaningfully better than GPT-3.5-era models most competitors use. DOCX download is a real differentiator — most competitors are PDF-only or web-only.
 
 **Gap vs. competitors:** No keyword scoring/gap analysis, no cover letter generation, no version history, no JD URL import, no ATS formatting checker.
 
@@ -67,10 +67,10 @@ Version history is the stickiest feature that requires zero AI usage. Once a use
 Most competitors output PDFs or web previews. DOCX lets users refine in Word, which is what recruiters and career coaches actually use. Keeping DOCX as a Pro+ unlock is correct; it's the tangible deliverable that justifies the upgrade.
 
 ### LazyApply gap
-LazyApply's 1.9/5 reputation reflects a real user sentiment: spray-and-pray is harmful to a job search. Shortlist's explicit positioning ("tailored, not spammed") is a meaningful counter-narrative. Lean into this in marketing copy.
+LazyApply's 1.9/5 reputation reflects a real user sentiment: spray-and-pray is harmful to a job search. Retold's explicit positioning ("tailored, not spammed") is a meaningful counter-narrative. Lean into this in marketing copy.
 
 ### Pricing positioning
-Current competitive set clusters at $25–50/month. Shortlist's $9/$19/$39 ladder sits below the main players while delivering better AI quality. This is a strong launch position — room to raise prices once there's a user base and testimonials. Don't compete on price forever; compete on tailoring quality.
+Current competitive set clusters at $25–50/month. Retold's $9/$19/$39 ladder sits below the main players while delivering better AI quality. This is a strong launch position — room to raise prices once there's a user base and testimonials. Don't compete on price forever; compete on tailoring quality.
 
 ---
 

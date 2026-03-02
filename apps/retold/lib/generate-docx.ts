@@ -65,7 +65,7 @@ export async function generateCoverLetterDocx(
     );
 
   const doc = new Document({
-    creator: "Shortlist",
+    creator: "Retold",
     title,
     sections: [
       {
@@ -91,7 +91,7 @@ export async function generateDocx(
   const title = company ? `${jobTitle} — ${company}` : jobTitle;
 
   const doc = new Document({
-    creator: "Shortlist",
+    creator: "Retold",
     title,
     sections: [
       {

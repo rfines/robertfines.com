@@ -3,7 +3,7 @@
 ## Directory Structure
 
 ```
-apps/shortlist/
+apps/retold/
 ├── app/                          # Next.js App Router
 │   ├── page.tsx                  # Marketing landing page (public)
 │   ├── layout.tsx                # Root layout
@@ -238,8 +238,8 @@ Variations: when `variations > 1`, all records share the same `variationGroup` U
 **Vitest** — unit tests and API route handler tests in `__tests__/`
 
 ```sh
-pnpm --filter shortlist test          # run all (should be 209 passing)
-pnpm --filter shortlist test:watch    # watch mode
+pnpm --filter retold test          # run all (should be 209 passing)
+pnpm --filter retold test:watch    # watch mode
 ```
 
 API tests mock `auth`, `prisma`, and `getUserPlan` with `vi.mock()`. Each test file covers one route file. Auth is mocked to return a test session; DB calls use `mockResolvedValue`.
