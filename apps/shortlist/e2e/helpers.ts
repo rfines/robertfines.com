@@ -1,13 +1,11 @@
 import { readFileSync, existsSync } from "fs";
-import { resolve, dirname } from "path";
-import { fileURLToPath } from "url";
+import { resolve } from "path";
 import { PrismaClient } from "@prisma/client";
 
 // Load .env.local so DATABASE_URL and other vars are available in the test process.
 // Vars already set in the process environment (e.g. via Railway CLI) take precedence.
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const envPath = resolve(__dirname, "../.env.local");
+// process.cwd() is apps/shortlist when Playwright runs from the package root.
+const envPath = resolve(process.cwd(), ".env.local");
 if (existsSync(envPath)) {
   for (const line of readFileSync(envPath, "utf-8").split("\n")) {
     const trimmed = line.trim();
@@ -18,6 +16,13 @@ if (existsSync(envPath)) {
     const value = trimmed.slice(idx + 1).trim();
     if (key && value && !(key in process.env)) process.env[key] = value;
   }
+}
+
+// Allow overriding the DB URL for local e2e runs (railway.internal is not
+// reachable from localhost; set DATABASE_URL_E2E to the public TCP proxy URL
+// or a local Postgres URL obtained via `railway connect Postgres`).
+if (process.env.DATABASE_URL_E2E) {
+  process.env.DATABASE_URL = process.env.DATABASE_URL_E2E;
 }
 
 const prisma = new PrismaClient();

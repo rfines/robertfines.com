@@ -2,6 +2,9 @@ import { type Page } from "@playwright/test";
 import { test, expect } from "./fixtures";
 import { resetTestUser, setTestUserPlan } from "./helpers";
 
+// All billing tests mutate the same test user row — run serially to avoid races
+test.describe.configure({ mode: "serial" });
+
 const STARTER_PRICE_ID = process.env.STRIPE_STARTER_PRICE_ID ?? "price_starter_test";
 const PRO_PRICE_ID = process.env.STRIPE_PRO_PRICE_ID ?? "price_pro_test";
 const AGENCY_PRICE_ID = process.env.STRIPE_AGENCY_PRICE_ID ?? "price_agency_test";

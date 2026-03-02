@@ -1,9 +1,9 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Landing page (unauthenticated)", () => {
-  test("renders the Shortlist heading", async ({ page }) => {
+  test("renders the landing page heading", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { name: /shortlist/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Your Resume, Retold." })).toBeVisible();
   });
 
   test("shows a sign-in link or button on the landing page", async ({ page }) => {

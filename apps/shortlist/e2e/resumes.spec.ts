@@ -24,22 +24,14 @@ test.describe("Resumes (authenticated)", () => {
 
   test("resumes list page shows empty state when no resumes", async ({ page }) => {
     await page.goto("/dashboard/resumes");
-    // Empty state should have a link to create a new resume
-    await expect(
-      page.getByRole("link", { name: /add resume|new resume/i }).or(
-        page.getByText(/no resumes/i)
-      )
-    ).toBeVisible();
+    // Empty state renders a "No resumes yet" heading
+    await expect(page.getByRole("heading", { name: /no resumes yet/i })).toBeVisible();
   });
 
   test("navigating to new resume page shows the form", async ({ page }) => {
     await page.goto("/dashboard/resumes/new");
     await expect(page.getByLabel(/resume title/i)).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: /paste text/i }).or(
-        page.getByRole("button", { name: /upload file/i })
-      )
-    ).toBeVisible();
+    await expect(page.getByRole("button", { name: /paste text/i })).toBeVisible();
   });
 
   test("submitting the text form creates a resume and navigates to detail page", async ({
