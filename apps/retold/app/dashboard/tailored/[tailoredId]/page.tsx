@@ -13,6 +13,7 @@ import { extractJdSkills } from "@/lib/extract-jd-skills";
 import { captureEvent } from "@/lib/posthog";
 import { CoverLetterSection } from "@/components/tailoring/cover-letter-section";
 import { GapAnalysisCard } from "@/components/tailoring/gap-analysis-card";
+import { LowMatchBanner } from "@/components/tailoring/low-match-banner";
 import { VariationTabs } from "@/components/tailoring/variation-tabs";
 import { DownloadMenu } from "@/components/tailoring/download-menu";
 import { CopyButton } from "@/components/tailoring/copy-button";
@@ -222,11 +223,20 @@ export default async function TailoredResumePage({ params }: Props) {
           )}
 
           {showGapAnalysis && (
-            <GapAnalysisCard
-              tailoredId={tailored.id}
-              plan={plan}
-              initialGapAnalysis={initialGapAnalysis}
-            />
+            <>
+              <LowMatchBanner
+                score={keywordMatch!.score}
+                resumeId={tailored.resume.id}
+                tailoredId={tailored.id}
+              />
+              <div id="gap-analysis">
+                <GapAnalysisCard
+                  tailoredId={tailored.id}
+                  plan={plan}
+                  initialGapAnalysis={initialGapAnalysis}
+                />
+              </div>
+            </>
           )}
 
           <ResumeDiffView

@@ -6,11 +6,11 @@ import { getRunUsage } from "@/lib/get-run-usage";
 import { PageHeader } from "@/components/shared/page-header";
 import { RunUsageBanner } from "@/components/shared/run-usage-banner";
 import { TailorForm } from "@/components/tailoring/tailor-form";
-import type { Intensity } from "@/types";
+import { INTENSITIES, type Intensity } from "@/types";
 
 interface Props {
   params: Promise<{ resumeId: string }>;
-  searchParams: Promise<{ from?: string }>;
+  searchParams: Promise<{ from?: string; intensity?: string }>;
 }
 
 export default async function TailorPage({ params, searchParams }: Props) {
@@ -18,7 +18,7 @@ export default async function TailorPage({ params, searchParams }: Props) {
   if (!session?.user?.id) redirect("/auth/signin");
 
   const { resumeId } = await params;
-  const { from } = await searchParams;
+  const { from, intensity: intensityParam } = await searchParams;
 
   const [resume, plan, usage] = await Promise.all([
     prisma.resume.findFirst({
@@ -62,6 +62,14 @@ export default async function TailorPage({ params, searchParams }: Props) {
         userInstructions: prior.userInstructions ?? undefined,
       };
     }
+  }
+
+  // Override intensity from query param (e.g. from low-match banner CTA)
+  const validIntensity = INTENSITIES.includes(intensityParam as Intensity)
+    ? (intensityParam as Intensity)
+    : null;
+  if (validIntensity && initialValues) {
+    initialValues.intensity = validIntensity;
   }
 
   return (
