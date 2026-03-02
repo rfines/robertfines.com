@@ -59,12 +59,12 @@ export function DownloadMenu({ tailoredId, plan, label = "Download" }: DownloadM
       </Button>
 
       {open && (
-        <div className="absolute right-0 mt-1 w-48 bg-[var(--background)] border border-[var(--border)] rounded-lg shadow-lg z-10 overflow-hidden">
+        <div className="absolute right-0 mt-1 w-48 bg-background border border-border rounded-lg shadow-lg z-10 overflow-hidden">
           {options.map(({ format, label: optLabel, locked, badge }) =>
             locked ? (
               <div
                 key={format}
-                className="flex items-center justify-between px-3 py-2 text-xs text-[var(--muted)] cursor-not-allowed opacity-60"
+                className="flex items-center justify-between px-3 py-2 text-xs text-muted cursor-not-allowed opacity-60"
                 title={`Upgrade to ${badge} to unlock`}
               >
                 <span className="flex items-center gap-1.5">
@@ -72,7 +72,7 @@ export function DownloadMenu({ tailoredId, plan, label = "Download" }: DownloadM
                   {optLabel}
                 </span>
                 {badge && (
-                  <span className="text-[10px] border border-[var(--border)] rounded px-1">
+                  <span className="text-[10px] border border-border rounded px-1">
                     {badge}
                   </span>
                 )}
@@ -82,7 +82,7 @@ export function DownloadMenu({ tailoredId, plan, label = "Download" }: DownloadM
                 key={format}
                 href={`/api/tailored/${tailoredId}/download${format !== "docx" ? `?format=${format}` : ""}`}
                 download
-                className="flex items-center px-3 py-2 text-xs text-[var(--foreground)] hover:bg-[var(--surface)] transition-colors"
+                className="flex items-center px-3 py-2 text-xs text-foreground hover:bg-surface transition-colors"
                 onClick={() => setOpen(false)}
               >
                 {optLabel}

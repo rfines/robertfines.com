@@ -18,7 +18,7 @@ interface VariationsSelectorProps {
 
 export function VariationsSelector({ value, max, onChange }: VariationsSelectorProps) {
   return (
-    <div className="flex rounded-lg border border-[var(--border)] overflow-hidden w-fit">
+    <div className="flex rounded-lg border border-border overflow-hidden w-fit">
       {VARIATION_OPTIONS.map((n) => {
         const locked = n > max;
         const upgradeLabel = VARIATION_UPGRADE_LABEL[n];
@@ -31,16 +31,16 @@ export function VariationsSelector({ value, max, onChange }: VariationsSelectorP
             className={cn(
               "flex items-center gap-1 px-4 py-1.5 text-xs font-medium transition-colors",
               value === n && !locked
-                ? "bg-[var(--accent)] text-white"
+                ? "bg-accent text-white"
                 : locked
-                ? "text-[var(--muted)] opacity-50 cursor-not-allowed"
-                : "text-[var(--muted)] hover:text-[var(--foreground)]"
+                ? "text-muted opacity-50 cursor-not-allowed"
+                : "text-muted hover:text-foreground"
             )}
           >
             {locked && <Lock size={10} />}
             {n}
             {locked && upgradeLabel && (
-              <span className="ml-1 text-[10px] bg-[var(--surface)] text-[var(--muted)] border border-[var(--border)] rounded px-1">
+              <span className="ml-1 text-[10px] bg-surface text-muted border border-border rounded px-1">
                 {upgradeLabel}
               </span>
             )}

@@ -3,7 +3,17 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { FileText, Sparkles, LayoutDashboard, CreditCard, Pencil, Linkedin } from "lucide-react";
+import { useSidebar } from "@/components/layout/sidebar-context";
+import {
+  FileText,
+  Sparkles,
+  LayoutDashboard,
+  CreditCard,
+  Pencil,
+  Linkedin,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -19,16 +29,32 @@ const toolItems = [
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const { collapsed, toggle } = useSidebar();
 
   return (
-    <aside className="w-56 shrink-0 border-r border-[var(--border)] flex flex-col min-h-screen">
-      <div className="p-5 border-b border-[var(--border)]">
-        <Link href="/dashboard" className="text-lg font-bold text-[var(--foreground)]">
-          Retold
+    <aside
+      className={cn(
+        "hidden lg:flex shrink-0 border-r border-border flex-col min-h-screen bg-surface transition-all duration-200",
+        collapsed ? "w-[60px]" : "w-[240px]"
+      )}
+    >
+      {/* Logo */}
+      <div
+        className={cn(
+          "border-b border-border flex items-center",
+          collapsed ? "justify-center h-14" : "px-5 h-14"
+        )}
+      >
+        <Link
+          href="/dashboard"
+          className="text-lg font-bold text-foreground"
+        >
+          {collapsed ? "R" : "Retold"}
         </Link>
       </div>
 
-      <nav className="flex-1 p-3 space-y-0.5">
+      {/* Nav items */}
+      <nav className="flex-1 p-2 space-y-0.5">
         {navItems.map(({ href, label, icon: Icon }) => {
           const isActive =
             href === "/dashboard"
@@ -38,24 +64,30 @@ export function AppSidebar() {
             <Link
               key={href}
               href={href}
+              title={collapsed ? label : undefined}
               className={cn(
-                "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
+                "flex items-center gap-3 rounded-lg text-sm transition-colors",
+                collapsed ? "justify-center px-2 py-2" : "px-3 py-2",
                 isActive
-                  ? "bg-[var(--accent)]/10 text-[var(--accent)]"
-                  : "text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--surface)]"
+                  ? "bg-accent/10 text-accent"
+                  : "text-muted hover:text-foreground hover:bg-background"
               )}
             >
-              <Icon size={16} />
-              {label}
+              <Icon size={18} className="shrink-0" />
+              {!collapsed && <span>{label}</span>}
             </Link>
           );
         })}
 
-        <div className="pt-4 pb-1 px-3">
-          <p className="text-[10px] font-semibold text-[var(--muted)] uppercase tracking-widest">
-            Tools
-          </p>
-        </div>
+        {/* Tools section */}
+        {!collapsed && (
+          <div className="pt-4 pb-1 px-3">
+            <p className="text-[10px] font-semibold text-muted uppercase tracking-widest">
+              Tools
+            </p>
+          </div>
+        )}
+        {collapsed && <div className="my-2 mx-2 border-t border-border" />}
 
         {toolItems.map(({ href, label, icon: Icon }) => {
           const isActive = pathname.startsWith(href);
@@ -63,19 +95,42 @@ export function AppSidebar() {
             <Link
               key={href}
               href={href}
+              title={collapsed ? label : undefined}
               className={cn(
-                "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
+                "flex items-center gap-3 rounded-lg text-sm transition-colors",
+                collapsed ? "justify-center px-2 py-2" : "px-3 py-2",
                 isActive
-                  ? "bg-[var(--accent)]/10 text-[var(--accent)]"
-                  : "text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--surface)]"
+                  ? "bg-accent/10 text-accent"
+                  : "text-muted hover:text-foreground hover:bg-background"
               )}
             >
-              <Icon size={16} />
-              {label}
+              <Icon size={18} className="shrink-0" />
+              {!collapsed && <span>{label}</span>}
             </Link>
           );
         })}
       </nav>
+
+      {/* Collapse toggle */}
+      <div className="border-t border-border p-2">
+        <button
+          onClick={toggle}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          className={cn(
+            "flex items-center gap-3 rounded-lg text-sm text-muted hover:text-foreground hover:bg-background transition-colors w-full",
+            collapsed ? "justify-center px-2 py-2" : "px-3 py-2"
+          )}
+        >
+          {collapsed ? (
+            <ChevronsRight size={18} />
+          ) : (
+            <>
+              <ChevronsLeft size={18} className="shrink-0" />
+              <span>Collapse</span>
+            </>
+          )}
+        </button>
+      </div>
     </aside>
   );
 }

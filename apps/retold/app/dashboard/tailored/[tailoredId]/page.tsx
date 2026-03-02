@@ -165,7 +165,7 @@ export default async function TailoredResumePage({ params }: Props) {
       <div className="mb-6">
         <Link
           href="/dashboard/tailored"
-          className="inline-flex items-center gap-1.5 text-xs text-[var(--muted)] hover:text-[var(--foreground)] transition-colors mb-4"
+          className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-foreground transition-colors mb-4"
         >
           <ArrowLeft size={12} />
           All tailored resumes
@@ -246,11 +246,11 @@ export default async function TailoredResumePage({ params }: Props) {
           />
 
           <details className="group">
-            <summary className="cursor-pointer text-xs text-[var(--muted)] hover:text-[var(--foreground)] transition-colors select-none">
+            <summary className="cursor-pointer text-xs text-muted hover:text-foreground transition-colors select-none">
               View original job description
             </summary>
-            <div className="mt-3 bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5">
-              <pre className="text-xs text-[var(--muted)] whitespace-pre-wrap leading-relaxed overflow-auto max-h-[30vh]">
+            <div className="mt-3 bg-surface border border-border rounded-xl p-5">
+              <pre className="text-xs text-muted whitespace-pre-wrap leading-relaxed overflow-auto max-h-[30vh]">
                 {tailored.jobDescription}
               </pre>
             </div>

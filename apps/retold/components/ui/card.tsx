@@ -1,12 +1,18 @@
 import { cn } from "@/lib/cn";
 import { type HTMLAttributes, forwardRef } from "react";
 
-export const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
+interface CardProps extends HTMLAttributes<HTMLDivElement> {
+  interactive?: boolean;
+}
+
+export const Card = forwardRef<HTMLDivElement, CardProps>(
+  ({ className, interactive = false, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
-        "bg-[var(--surface)] border border-[var(--border)] rounded-xl",
+        "bg-surface border border-border rounded-xl shadow-[var(--shadow-sm)]",
+        interactive &&
+          "hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5 transition-all cursor-pointer",
         className
       )}
       {...props}
@@ -29,10 +35,7 @@ export const CardTitle = forwardRef<
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn(
-      "text-base font-semibold text-[var(--foreground)]",
-      className
-    )}
+    className={cn("text-base font-semibold text-foreground", className)}
     {...props}
   />
 ));

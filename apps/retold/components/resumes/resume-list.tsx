@@ -1,5 +1,9 @@
+"use client";
+
 import { ResumeCard } from "./resume-card";
 import { EmptyState } from "@/components/shared/empty-state";
+import { AnimatedList } from "@/components/shared/animated-list";
+import { AnimatedItem } from "@/components/shared/animated-item";
 
 interface ResumeListProps {
   resumes: {
@@ -23,10 +27,12 @@ export function ResumeList({ resumes }: ResumeListProps) {
   }
 
   return (
-    <div className="space-y-3">
+    <AnimatedList>
       {resumes.map((resume) => (
-        <ResumeCard key={resume.id} resume={resume} />
+        <AnimatedItem key={resume.id}>
+          <ResumeCard resume={resume} />
+        </AnimatedItem>
       ))}
-    </div>
+    </AnimatedList>
   );
 }

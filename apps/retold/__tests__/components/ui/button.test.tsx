@@ -36,12 +36,12 @@ describe("Button", () => {
 
   it("applies default variant classes", () => {
     render(<Button>Default</Button>);
-    expect(screen.getByRole("button")).toHaveClass("bg-[var(--accent)]");
+    expect(screen.getByRole("button")).toHaveClass("bg-accent");
   });
 
   it("applies destructive variant classes", () => {
     render(<Button variant="destructive">Delete</Button>);
-    expect(screen.getByRole("button")).toHaveClass("bg-[var(--destructive)]");
+    expect(screen.getByRole("button")).toHaveClass("bg-destructive");
   });
 
   it("applies ghost variant classes", () => {

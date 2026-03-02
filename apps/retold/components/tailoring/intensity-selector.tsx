@@ -19,7 +19,7 @@ export function IntensitySelector({ value, onChange }: IntensitySelectorProps) {
 
   return (
     <div className="mt-1.5">
-      <div className="flex rounded-lg border border-[var(--border)] overflow-hidden">
+      <div className="flex rounded-lg border border-border overflow-hidden">
         {INTENSITY_OPTIONS.map(({ value: v, label }) => (
           <button
             key={v}
@@ -28,8 +28,8 @@ export function IntensitySelector({ value, onChange }: IntensitySelectorProps) {
             className={cn(
               "flex-1 px-3 py-1.5 text-xs font-medium capitalize transition-colors",
               value === v
-                ? "bg-[var(--accent)] text-white"
-                : "text-[var(--muted)] hover:text-[var(--foreground)]"
+                ? "bg-accent text-white"
+                : "text-muted hover:text-foreground"
             )}
           >
             {label}
@@ -37,7 +37,7 @@ export function IntensitySelector({ value, onChange }: IntensitySelectorProps) {
         ))}
       </div>
       {selected && (
-        <p className="text-xs text-[var(--muted)] mt-1.5">{selected.description}</p>
+        <p className="text-xs text-muted mt-1.5">{selected.description}</p>
       )}
     </div>
   );

@@ -36,20 +36,20 @@ export function TailoredPagination({ page, pageSize, total }: TailoredPagination
 
   return (
     <div className="flex items-center justify-between mt-4">
-      <p className="text-xs text-[var(--muted)]">
+      <p className="text-xs text-muted">
         {from}–{to} of {total}
       </p>
 
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1.5">
-          <label htmlFor="page-size" className="text-xs text-[var(--muted)]">
+          <label htmlFor="page-size" className="text-xs text-muted">
             Per page
           </label>
           <select
             id="page-size"
             value={pageSize}
             onChange={handlePageSizeChange}
-            className="text-xs px-2 py-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]"
+            className="text-xs px-2 py-1 rounded-lg border border-border bg-surface text-foreground focus:outline-none focus:border-accent"
           >
             {PAGE_SIZE_OPTIONS.map((size) => (
               <option key={size} value={size}>
@@ -64,28 +64,30 @@ export function TailoredPagination({ page, pageSize, total }: TailoredPagination
             href={page > 1 ? buildHref(page - 1) : undefined}
             aria-disabled={page <= 1}
             className={cn(
-              "inline-flex items-center justify-center w-7 h-7 rounded-lg border border-[var(--border)] text-[var(--muted)] transition-colors",
+              "inline-flex items-center justify-center w-7 h-7 rounded-lg border border-border text-muted transition-colors",
               page > 1
-                ? "hover:border-[var(--accent)] hover:text-[var(--accent)]"
+                ? "hover:border-accent hover:text-accent"
                 : "opacity-40 pointer-events-none"
             )}
           >
             <ChevronLeft size={14} />
+            <span className="sr-only">Previous page</span>
           </a>
-          <span className="text-xs text-[var(--muted)] px-1 tabular-nums">
+          <span className="text-xs text-muted px-1 tabular-nums">
             {page} / {totalPages}
           </span>
           <a
             href={page < totalPages ? buildHref(page + 1) : undefined}
             aria-disabled={page >= totalPages}
             className={cn(
-              "inline-flex items-center justify-center w-7 h-7 rounded-lg border border-[var(--border)] text-[var(--muted)] transition-colors",
+              "inline-flex items-center justify-center w-7 h-7 rounded-lg border border-border text-muted transition-colors",
               page < totalPages
-                ? "hover:border-[var(--accent)] hover:text-[var(--accent)]"
+                ? "hover:border-accent hover:text-accent"
                 : "opacity-40 pointer-events-none"
             )}
           >
             <ChevronRight size={14} />
+            <span className="sr-only">Next page</span>
           </a>
         </div>
       </div>

@@ -80,7 +80,7 @@ export function CoverLetterSection({
   return (
     <div className="mt-8">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm font-semibold text-[var(--foreground)]">
+        <h2 className="text-sm font-semibold text-foreground">
           Cover Letter
         </h2>
         {!locked && !coverLetterText && !isGenerating && (
@@ -92,17 +92,17 @@ export function CoverLetterSection({
       </div>
 
       {locked && (
-        <div className="flex items-start gap-3 bg-[var(--surface)] border border-[var(--border)] rounded-xl px-4 py-3">
-          <Lock size={14} className="text-[var(--muted)] mt-0.5 shrink-0" />
+        <div className="flex items-start gap-3 bg-surface border border-border rounded-xl px-4 py-3">
+          <Lock size={14} className="text-muted mt-0.5 shrink-0" />
           <div>
-            <p className="text-sm text-[var(--foreground)]">
+            <p className="text-sm text-foreground">
               Cover letter generation is available on{" "}
-              <Link href="/dashboard/billing" className="text-[var(--accent)] hover:underline">
+              <Link href="/dashboard/billing" className="text-accent hover:underline">
                 Starter and above
               </Link>
               .
             </p>
-            <p className="text-xs text-[var(--muted)] mt-0.5">
+            <p className="text-xs text-muted mt-0.5">
               Upgrade to generate a tailored cover letter matched to this job.
             </p>
           </div>
@@ -110,22 +110,22 @@ export function CoverLetterSection({
       )}
 
       {!locked && isGenerating && (
-        <div className="flex items-center gap-3 text-sm text-[var(--muted)]">
-          <div className="w-4 h-4 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
+        <div className="flex items-center gap-3 text-sm text-muted">
+          <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
           Generating cover letter with Claude… this may take 10–20 seconds
         </div>
       )}
 
       {!locked && error && (
-        <p className="text-sm text-[var(--destructive)]">{error}</p>
+        <p className="text-sm text-destructive">{error}</p>
       )}
 
       {!locked && coverLetterText && (
-        <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6 space-y-4">
-          <pre className="text-xs text-[var(--foreground)] whitespace-pre-wrap font-mono leading-relaxed overflow-auto max-h-[40vh]">
+        <div className="bg-surface border border-border rounded-xl p-6 space-y-4">
+          <pre className="text-xs text-foreground whitespace-pre-wrap font-mono leading-relaxed overflow-auto max-h-[40vh]">
             {coverLetterText}
           </pre>
-          <div className="flex items-center gap-2 pt-2 border-t border-[var(--border)]">
+          <div className="flex items-center gap-2 pt-2 border-t border-border">
             <CopyButton text={coverLetterText} label="Copy" />
             <Button
               size="sm"
@@ -147,10 +147,10 @@ export function CoverLetterSection({
                 {downloadingFormat === "cover-letter-pdf" ? "Downloading…" : "PDF"}
               </Button>
             ) : (
-              <span className="text-xs text-[var(--muted)] flex items-center gap-1.5">
+              <span className="text-xs text-muted flex items-center gap-1.5">
                 <Lock size={12} />
                 PDF —{" "}
-                <Link href="/dashboard/billing" className="text-[var(--accent)] hover:underline">
+                <Link href="/dashboard/billing" className="text-accent hover:underline">
                   Pro
                 </Link>
               </span>

@@ -38,7 +38,7 @@ export default async function AdminUserDetailPage({ params }: Props) {
       <div>
         <Link
           href="/admin/users"
-          className="inline-flex items-center gap-1.5 text-xs text-[var(--muted)] hover:text-[var(--foreground)] transition-colors mb-4"
+          className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-foreground transition-colors mb-4"
         >
           <ArrowLeft size={12} />
           All users
@@ -57,7 +57,7 @@ export default async function AdminUserDetailPage({ params }: Props) {
           )}
           <div className="min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <h1 className="text-xl font-semibold text-[var(--foreground)] truncate">
+              <h1 className="text-xl font-semibold text-foreground truncate">
                 {user.name ?? user.email ?? user.id}
               </h1>
               <Badge variant="muted" className="capitalize shrink-0">
@@ -70,9 +70,9 @@ export default async function AdminUserDetailPage({ params }: Props) {
               )}
             </div>
             {user.name && (
-              <p className="text-sm text-[var(--muted)]">{user.email}</p>
+              <p className="text-sm text-muted">{user.email}</p>
             )}
-            <p className="text-xs text-[var(--muted)] mt-1">
+            <p className="text-xs text-muted mt-1">
               Joined{" "}
               {user.createdAt.toLocaleDateString("en-US", {
                 month: "long",
@@ -101,22 +101,22 @@ export default async function AdminUserDetailPage({ params }: Props) {
       {/* Resumes */}
       {user.resumes.length > 0 && (
         <div>
-          <h2 className="text-sm font-medium text-[var(--foreground)] mb-3">
+          <h2 className="text-sm font-medium text-foreground mb-3">
             Resumes ({user.resumes.length})
           </h2>
-          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden">
+          <div className="bg-surface border border-border rounded-xl overflow-hidden">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-[var(--border)]">
-                  <th className="text-left px-4 py-2.5 text-[var(--muted)] font-medium">Title</th>
-                  <th className="text-left px-4 py-2.5 text-[var(--muted)] font-medium">Updated</th>
+                <tr className="border-b border-border">
+                  <th className="text-left px-4 py-2.5 text-muted font-medium">Title</th>
+                  <th className="text-left px-4 py-2.5 text-muted font-medium">Updated</th>
                 </tr>
               </thead>
               <tbody>
                 {user.resumes.map((resume) => (
-                  <tr key={resume.id} className="border-b border-[var(--border)] last:border-0">
-                    <td className="px-4 py-2.5 text-[var(--foreground)]">{resume.title}</td>
-                    <td className="px-4 py-2.5 text-[var(--muted)]">
+                  <tr key={resume.id} className="border-b border-border last:border-0">
+                    <td className="px-4 py-2.5 text-foreground">{resume.title}</td>
+                    <td className="px-4 py-2.5 text-muted">
                       {resume.updatedAt.toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
@@ -134,27 +134,27 @@ export default async function AdminUserDetailPage({ params }: Props) {
       {/* Tailored resumes */}
       {user.tailoredResumes.length > 0 && (
         <div>
-          <h2 className="text-sm font-medium text-[var(--foreground)] mb-3">
+          <h2 className="text-sm font-medium text-foreground mb-3">
             Tailored Resumes ({user.tailoredResumes.length})
           </h2>
-          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden">
+          <div className="bg-surface border border-border rounded-xl overflow-hidden">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-[var(--border)]">
-                  <th className="text-left px-4 py-2.5 text-[var(--muted)] font-medium">Job</th>
-                  <th className="text-left px-4 py-2.5 text-[var(--muted)] font-medium">Intensity</th>
-                  <th className="text-right px-4 py-2.5 text-[var(--muted)] font-medium">Tokens</th>
-                  <th className="text-left px-4 py-2.5 text-[var(--muted)] font-medium">Date</th>
+                <tr className="border-b border-border">
+                  <th className="text-left px-4 py-2.5 text-muted font-medium">Job</th>
+                  <th className="text-left px-4 py-2.5 text-muted font-medium">Intensity</th>
+                  <th className="text-right px-4 py-2.5 text-muted font-medium">Tokens</th>
+                  <th className="text-left px-4 py-2.5 text-muted font-medium">Date</th>
                   <th className="px-4 py-2.5" />
                 </tr>
               </thead>
               <tbody>
                 {user.tailoredResumes.map((t) => (
-                  <tr key={t.id} className="border-b border-[var(--border)] last:border-0">
-                    <td className="px-4 py-2.5 text-[var(--foreground)]">
+                  <tr key={t.id} className="border-b border-border last:border-0">
+                    <td className="px-4 py-2.5 text-foreground">
                       {t.jobTitle}
                       {t.company && (
-                        <span className="text-[var(--muted)]"> — {t.company}</span>
+                        <span className="text-muted"> — {t.company}</span>
                       )}
                     </td>
                     <td className="px-4 py-2.5">
@@ -164,10 +164,10 @@ export default async function AdminUserDetailPage({ params }: Props) {
                         </Badge>
                       )}
                     </td>
-                    <td className="px-4 py-2.5 text-right text-[var(--muted)]">
+                    <td className="px-4 py-2.5 text-right text-muted">
                       {t.tokensUsed?.toLocaleString() ?? "—"}
                     </td>
-                    <td className="px-4 py-2.5 text-[var(--muted)]">
+                    <td className="px-4 py-2.5 text-muted">
                       {t.createdAt.toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",

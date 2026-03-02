@@ -16,10 +16,10 @@ export function RunUsageBanner({ usage }: Props) {
     <div
       className={`rounded-lg border px-4 py-3 text-sm ${
         isAtLimit
-          ? "border-red-500/30 bg-red-500/5 text-red-400"
+          ? "border-destructive/30 bg-destructive/5 text-destructive"
           : isNearLimit
-          ? "border-amber-500/30 bg-amber-500/5 text-amber-400"
-          : "border-[var(--border)] bg-[var(--card)] text-[var(--muted)]"
+          ? "border-warning/30 bg-warning/5 text-warning"
+          : "border-border bg-surface text-muted"
       }`}
     >
       <div className="flex items-center justify-between mb-2">
@@ -28,7 +28,7 @@ export function RunUsageBanner({ usage }: Props) {
             "Monthly tailoring limit reached"
           ) : (
             <>
-              <span className={isNearLimit ? "" : "text-[var(--foreground)] font-medium"}>
+              <span className={isNearLimit ? "" : "text-foreground font-medium"}>
                 {usage.remaining}
               </span>{" "}
               run{usage.remaining !== 1 ? "s" : ""} left this month
@@ -37,15 +37,15 @@ export function RunUsageBanner({ usage }: Props) {
         </span>
         <Link
           href="/dashboard/billing"
-          className="text-[var(--accent)] hover:underline text-xs font-medium"
+          className="text-accent hover:underline text-xs font-medium"
         >
           Upgrade
         </Link>
       </div>
-      <div className="h-1 rounded-full bg-[var(--border)]">
+      <div className="h-1 rounded-full bg-border">
         <div
           className={`h-1 rounded-full transition-all ${
-            isAtLimit ? "bg-red-500" : isNearLimit ? "bg-amber-500" : "bg-[var(--accent)]"
+            isAtLimit ? "bg-destructive" : isNearLimit ? "bg-warning" : "bg-accent"
           }`}
           style={{ width: `${pct}%` }}
         />

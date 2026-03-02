@@ -16,22 +16,22 @@ interface TutorialStep {
 
 const STEPS: TutorialStep[] = [
   {
-    icon: <Sparkles size={20} className="text-[var(--accent)]" />,
+    icon: <Sparkles size={20} className="text-accent" />,
     title: "Welcome to Retold",
     body: "AI-powered resume tailoring that helps you land more interviews. Here's how it works — takes 30 seconds to read.",
   },
   {
-    icon: <FileText size={20} className="text-[var(--accent)]" />,
+    icon: <FileText size={20} className="text-accent" />,
     title: "Add your base resume",
     body: "Paste your resume text or upload a PDF/DOCX file. This becomes your master resume — you'll tailor it fresh for each job you apply to.",
   },
   {
-    icon: <Target size={20} className="text-[var(--accent)]" />,
+    icon: <Target size={20} className="text-accent" />,
     title: "Tailor to any job in seconds",
     body: "Paste a job description, pick your tailoring intensity, and Claude AI rewrites your resume to match — mirroring the job's language and surfacing your most relevant experience.",
   },
   {
-    icon: <BarChart2 size={20} className="text-[var(--accent)]" />,
+    icon: <BarChart2 size={20} className="text-accent" />,
     title: "See exactly what changed",
     body: "A keyword match score shows how well your resume covers the role. The diff view highlights every edit the AI made. Download or copy when you're happy.",
   },
@@ -64,20 +64,20 @@ export function WelcomeTutorial() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-[var(--background)] border border-[var(--border)] rounded-xl shadow-xl p-8 max-w-md w-full mx-4">
+      <div className="bg-background border border-border rounded-xl shadow-xl p-8 max-w-md w-full mx-4">
 
         {/* Icon */}
         {current.icon && (
-          <div className="w-10 h-10 rounded-lg bg-[var(--accent)]/10 flex items-center justify-center mb-4">
+          <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center mb-4">
             {current.icon}
           </div>
         )}
 
         {/* Text */}
-        <h2 className="text-lg font-semibold text-[var(--foreground)] mb-2">
+        <h2 className="text-lg font-semibold text-foreground mb-2">
           {current.title}
         </h2>
-        <p className="text-sm text-[var(--muted)] mb-6 min-h-[3.5rem]">
+        <p className="text-sm text-muted mb-6 min-h-[3.5rem]">
           {current.body}
         </p>
 
@@ -88,7 +88,7 @@ export function WelcomeTutorial() {
               key={i}
               className={cn(
                 "w-1.5 h-1.5 rounded-full transition-colors",
-                i < step ? "bg-[var(--accent)]" : "bg-[var(--border)]"
+                i < step ? "bg-accent" : "bg-border"
               )}
             />
           ))}
@@ -117,7 +117,7 @@ export function WelcomeTutorial() {
             <button
               type="button"
               onClick={() => setStep((s) => s - 1)}
-              className="text-xs text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
+              className="text-xs text-muted hover:text-foreground transition-colors"
             >
               ← Back
             </button>

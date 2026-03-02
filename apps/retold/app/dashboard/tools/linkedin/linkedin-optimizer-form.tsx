@@ -57,13 +57,13 @@ export function LinkedInOptimizerForm({
 
   if (locked) {
     return (
-      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6 flex items-start gap-4">
-        <Lock size={16} className="text-[var(--muted)] mt-0.5 shrink-0" />
+      <div className="bg-surface border border-border rounded-xl p-6 flex items-start gap-4">
+        <Lock size={16} className="text-muted mt-0.5 shrink-0" />
         <div>
-          <p className="text-sm text-[var(--foreground)] font-medium mb-1">
+          <p className="text-sm text-foreground font-medium mb-1">
             LinkedIn Optimizer is available on Pro and Agency
           </p>
-          <p className="text-xs text-[var(--muted)] mb-3">
+          <p className="text-xs text-muted mb-3">
             Upgrade to generate a compelling LinkedIn headline and About section tailored to your
             resume and target role.
           </p>
@@ -77,9 +77,9 @@ export function LinkedInOptimizerForm({
 
   if (resumes.length === 0) {
     return (
-      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6 text-sm text-[var(--muted)]">
+      <div className="bg-surface border border-border rounded-xl p-6 text-sm text-muted">
         No resumes found.{" "}
-        <Link href="/dashboard/resumes" className="text-[var(--accent)] hover:underline">
+        <Link href="/dashboard/resumes" className="text-accent hover:underline">
           Upload a resume
         </Link>{" "}
         to get started.
@@ -140,20 +140,20 @@ export function LinkedInOptimizerForm({
     <div className="space-y-6">
       {/* Flash notifications */}
       {flashConnected && (
-        <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-3">
+        <div className="flex items-center gap-2 text-sm text-success bg-success/10 border border-success/20 rounded-lg px-4 py-3">
           <CheckCircle2 size={14} className="shrink-0" />
           LinkedIn connected successfully.
         </div>
       )}
       {flashError && (
-        <div className="flex items-center gap-2 text-sm text-[var(--destructive)] bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+        <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-lg px-4 py-3">
           <AlertTriangle size={14} className="shrink-0" />
           Could not connect to LinkedIn. Please try again.
         </div>
       )}
 
       {/* LinkedIn connection panel */}
-      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5">
+      <div className="bg-surface border border-border rounded-xl p-5">
         <div className="flex items-center gap-2 mb-3">
           <Linkedin size={16} className="text-[#0077B5]" />
           <p className="text-sm font-semibold">LinkedIn Account</p>
@@ -173,7 +173,7 @@ export function LinkedInOptimizerForm({
               <div>
                 <p className="text-sm font-medium">{linkedInStatus.name ?? "Connected"}</p>
                 {linkedInStatus.headline && (
-                  <p className="text-xs text-[var(--muted)] truncate max-w-xs">
+                  <p className="text-xs text-muted truncate max-w-xs">
                     {linkedInStatus.headline}
                   </p>
                 )}
@@ -200,16 +200,16 @@ export function LinkedInOptimizerForm({
               <button
                 onClick={handleDisconnect}
                 disabled={isDisconnecting}
-                className="text-xs text-[var(--muted)] hover:text-[var(--destructive)] transition-colors"
+                className="text-xs text-muted hover:text-destructive transition-colors"
               >
                 {isDisconnecting ? "Disconnecting…" : "Disconnect"}
               </button>
             </div>
-            {importError && <p className="text-xs text-[var(--destructive)]">{importError}</p>}
+            {importError && <p className="text-xs text-destructive">{importError}</p>}
           </div>
         ) : (
           <div>
-            <p className="text-xs text-[var(--muted)] mb-3">
+            <p className="text-xs text-muted mb-3">
               {linkedInStatus.canConnect
                 ? "Connect your LinkedIn account to import your profile as a resume base."
                 : "LinkedIn account connection is available on Pro and Agency plans."}
@@ -239,7 +239,7 @@ export function LinkedInOptimizerForm({
           id="resumeSelect"
           value={selectedResumeId}
           onChange={(e) => setSelectedResumeId(e.target.value)}
-          className="mt-1.5 w-full text-sm bg-[var(--background)] border border-[var(--border)] rounded-lg px-3 py-2 text-[var(--foreground)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+          className="mt-1.5 w-full text-sm bg-background border border-border rounded-lg px-3 py-2 text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
         >
           {resumes.map((r) => (
             <option key={r.id} value={r.id}>
@@ -261,8 +261,8 @@ export function LinkedInOptimizerForm({
       </div>
 
       {isGenerating ? (
-        <div className="flex items-center gap-3 text-sm text-[var(--muted)]">
-          <div className="w-4 h-4 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
+        <div className="flex items-center gap-3 text-sm text-muted">
+          <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
           Generating with Claude… (~10 seconds)
         </div>
       ) : (
@@ -271,7 +271,7 @@ export function LinkedInOptimizerForm({
         </Button>
       )}
 
-      {generateError && <p className="text-sm text-[var(--destructive)]">{generateError}</p>}
+      {generateError && <p className="text-sm text-destructive">{generateError}</p>}
 
       {result && (
         <div className="space-y-4">
@@ -309,11 +309,11 @@ function ResultCard({
   multiline: boolean;
 }) {
   return (
-    <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5">
+    <div className="bg-surface border border-border rounded-xl p-5">
       <div className="flex items-center justify-between mb-3">
-        <p className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wide">{label}</p>
+        <p className="text-xs font-semibold text-muted uppercase tracking-wide">{label}</p>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-[var(--muted)]">
+          <span className="text-xs text-muted">
             {content.length}/{charLimit} chars
           </span>
           <CopyButton text={content} />
@@ -321,18 +321,18 @@ function ResultCard({
       </div>
 
       {multiline ? (
-        <pre className="text-sm text-[var(--foreground)] whitespace-pre-wrap font-sans leading-relaxed overflow-auto max-h-[40vh] mb-4">
+        <pre className="text-sm text-foreground whitespace-pre-wrap font-sans leading-relaxed overflow-auto max-h-[40vh] mb-4">
           {content}
         </pre>
       ) : (
-        <p className="text-sm text-[var(--foreground)] mb-4">{content}</p>
+        <p className="text-sm text-foreground mb-4">{content}</p>
       )}
 
       <a
         href={editHref}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 text-xs text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
+        className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-foreground transition-colors"
       >
         <ExternalLink size={12} />
         Edit on LinkedIn

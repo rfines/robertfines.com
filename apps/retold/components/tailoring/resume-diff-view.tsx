@@ -25,14 +25,14 @@ export function ResumeDiffView({ baseText, tailoredText, plan }: ResumeDiffViewP
   }
 
   return (
-    <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6 mb-6">
+    <div className="bg-surface border border-border rounded-xl p-6 mb-6">
       <div className="flex items-center justify-between mb-4">
-        <span className="text-xs text-[var(--muted)]">
+        <span className="text-xs text-muted">
           {showDiff && !diffLocked ? (
             <>
-              <span className="inline-block w-2.5 h-2.5 rounded-sm bg-green-400/20 border border-green-400/40 mr-1 align-middle" />
+              <span className="inline-block w-2.5 h-2.5 rounded-sm bg-success/20 border border-green-400/40 mr-1 align-middle" />
               Added
-              <span className="inline-block w-2.5 h-2.5 rounded-sm bg-red-400/10 border border-red-400/30 ml-3 mr-1 align-middle" />
+              <span className="inline-block w-2.5 h-2.5 rounded-sm bg-destructive/10 border border-red-400/30 ml-3 mr-1 align-middle" />
               Removed
             </>
           ) : null}
@@ -40,7 +40,7 @@ export function ResumeDiffView({ baseText, tailoredText, plan }: ResumeDiffViewP
         <button
           type="button"
           onClick={handleToggle}
-          className="flex items-center gap-1.5 text-xs text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
+          className="flex items-center gap-1.5 text-xs text-muted hover:text-foreground transition-colors"
         >
           {showDiff && !diffLocked ? (
             <>
@@ -62,14 +62,14 @@ export function ResumeDiffView({ baseText, tailoredText, plan }: ResumeDiffViewP
         null
       )}
 
-      <pre className="text-xs text-[var(--foreground)] whitespace-pre-wrap font-mono leading-relaxed overflow-auto max-h-[60vh]">
+      <pre className="text-xs text-foreground whitespace-pre-wrap font-mono leading-relaxed overflow-auto max-h-[60vh]">
         {showDiff && !diffLocked && changes
           ? changes.map((part, i) => {
               if (part.added) {
                 return (
                   <mark
                     key={i}
-                    className="bg-green-400/20 text-green-300 not-italic rounded-sm"
+                    className="bg-success/20 text-success not-italic rounded-sm"
                   >
                     {part.value}
                   </mark>
@@ -77,7 +77,7 @@ export function ResumeDiffView({ baseText, tailoredText, plan }: ResumeDiffViewP
               }
               if (part.removed) {
                 return (
-                  <span key={i} className="line-through opacity-50 text-red-400">
+                  <span key={i} className="line-through opacity-50 text-destructive">
                     {part.value}
                   </span>
                 );
@@ -88,11 +88,11 @@ export function ResumeDiffView({ baseText, tailoredText, plan }: ResumeDiffViewP
       </pre>
 
       {diffLocked && (
-        <div className="mt-4 flex items-center gap-2 text-xs text-[var(--muted)] border-t border-[var(--border)] pt-3">
+        <div className="mt-4 flex items-center gap-2 text-xs text-muted border-t border-border pt-3">
           <Lock size={11} className="shrink-0" />
           <span>
             Before/after diff view is available on{" "}
-            <Link href="/dashboard/billing" className="text-[var(--accent)] hover:underline">
+            <Link href="/dashboard/billing" className="text-accent hover:underline">
               Starter and above
             </Link>
             .

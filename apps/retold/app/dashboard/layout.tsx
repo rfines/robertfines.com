@@ -2,6 +2,10 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { Header } from "@/components/layout/header";
+import { MobileNav } from "@/components/layout/mobile-nav";
+import { SidebarProvider } from "@/components/layout/sidebar-context";
+import { CommandPalette } from "@/components/layout/command-palette";
+import { PageTransition } from "@/components/layout/page-transition";
 import { WelcomeTutorial } from "@/components/shared/consent-modal";
 import { prisma } from "@/lib/prisma";
 
@@ -22,13 +26,19 @@ export default async function DashboardLayout({
   const showConsentModal = user?.marketingConsent === null || user?.marketingConsent === undefined;
 
   return (
-    <div className="flex min-h-screen">
-      {showConsentModal && <WelcomeTutorial />}
-      <AppSidebar />
-      <div className="flex-1 flex flex-col min-w-0">
-        <Header />
-        <main className="flex-1 p-8">{children}</main>
+    <SidebarProvider>
+      <div className="flex min-h-screen">
+        {showConsentModal && <WelcomeTutorial />}
+        <AppSidebar />
+        <div className="flex-1 flex flex-col min-w-0">
+          <Header />
+          <main id="main-content" className="flex-1 p-6 lg:p-8 pb-20 lg:pb-8">
+            <PageTransition>{children}</PageTransition>
+          </main>
+          <CommandPalette />
+        </div>
+        <MobileNav />
       </div>
-    </div>
+    </SidebarProvider>
   );
 }

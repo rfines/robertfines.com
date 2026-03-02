@@ -22,17 +22,17 @@ export function ResumeCard({ resume }: ResumeCardProps) {
 
   return (
     <Link href={`/dashboard/resumes/${resume.id}`}>
-      <Card className="hover:border-[var(--accent)]/50 transition-colors cursor-pointer">
+      <Card className="hover:border-accent/50 transition-colors cursor-pointer">
         <CardContent className="p-5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="shrink-0 w-9 h-9 rounded-lg bg-[var(--accent)]/10 flex items-center justify-center">
-              <FileText size={16} className="text-[var(--accent)]" />
+            <div className="shrink-0 w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center">
+              <FileText size={16} className="text-accent" />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium text-[var(--foreground)] truncate">
+              <p className="text-sm font-medium text-foreground truncate">
                 {resume.title}
               </p>
-              <p className="text-xs text-[var(--muted)] mt-0.5">
+              <p className="text-xs text-muted mt-0.5">
                 {resume.candidateName
                   ? `${resume.candidateName} · Updated ${updatedAt}`
                   : `Updated ${updatedAt}`}

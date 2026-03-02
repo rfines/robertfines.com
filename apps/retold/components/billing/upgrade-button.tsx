@@ -37,8 +37,8 @@ export function UpgradeButton({ priceId, label, isDowngrade, featured }: Upgrade
       disabled={loading}
       className={`w-full text-sm font-semibold py-2.5 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
         featured
-          ? "bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white"
-          : "border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)] text-[var(--foreground)]"
+          ? "bg-accent hover:bg-accent-hover text-white"
+          : "border border-border hover:border-accent hover:text-accent text-foreground"
       }`}
     >
       {loading ? "Processing…" : idleLabel}

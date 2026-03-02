@@ -145,14 +145,14 @@ describe("TailorForm", () => {
   it("moderate intensity button is active by default", () => {
     renderForm();
     const moderateBtn = screen.getByRole("button", { name: "Moderate" });
-    expect(moderateBtn.className).toContain("bg-[var(--accent)]");
+    expect(moderateBtn.className).toContain("bg-accent");
   });
 
   it("clicking aggressive switches the active intensity button", async () => {
     renderForm();
     await userEvent.click(screen.getByRole("button", { name: "Aggressive" }));
-    expect(screen.getByRole("button", { name: "Aggressive" }).className).toContain("bg-[var(--accent)]");
-    expect(screen.getByRole("button", { name: "Moderate" }).className).not.toContain("bg-[var(--accent)]");
+    expect(screen.getByRole("button", { name: "Aggressive" }).className).toContain("bg-accent");
+    expect(screen.getByRole("button", { name: "Moderate" }).className).not.toContain("bg-accent");
   });
 
   it("includes selected intensity in the API request body", async () => {

@@ -32,14 +32,14 @@ export default async function BillingPage({
   return (
     <div className="max-w-2xl space-y-8">
       <div>
-        <h1 className="text-xl font-bold text-[var(--foreground)]">Billing</h1>
-        <p className="text-sm text-[var(--muted)] mt-1">
+        <h1 className="text-xl font-bold text-foreground">Billing</h1>
+        <p className="text-sm text-muted mt-1">
           Manage your plan and subscription.
         </p>
       </div>
 
       {success === "true" && (
-        <div className="flex items-center gap-3 bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400 rounded-lg px-4 py-3 text-sm">
+        <div className="flex items-center gap-3 bg-success/10 border border-success/20 text-success rounded-lg px-4 py-3 text-sm">
           <CheckCircle2 size={16} className="shrink-0" />
           <span>
             You&apos;re now on the{" "}
@@ -50,22 +50,22 @@ export default async function BillingPage({
       )}
 
       {/* Current plan */}
-      <div className="border border-[var(--border)] rounded-xl p-6 space-y-4">
+      <div className="border border-border rounded-xl p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wide mb-1">
+            <p className="text-xs font-semibold text-muted uppercase tracking-wide mb-1">
               Current plan
             </p>
             <div className="flex items-baseline gap-1.5">
               <span className="text-2xl font-bold">{PLAN_PRICING[plan].label}</span>
               {PLAN_PRICING[plan].period && (
-                <span className="text-sm text-[var(--muted)]">
+                <span className="text-sm text-muted">
                   {PLAN_PRICING[plan].price}{PLAN_PRICING[plan].period}
                 </span>
               )}
             </div>
           </div>
-          <span className="text-xs font-semibold bg-[var(--accent)]/10 text-[var(--accent)] px-3 py-1 rounded-full">
+          <span className="text-xs font-semibold bg-accent/10 text-accent px-3 py-1 rounded-full">
             Active
           </span>
         </div>
@@ -77,7 +77,7 @@ export default async function BillingPage({
               <li key={label} className="flex items-center gap-2 text-sm">
                 {typeof value === "string" ? (
                   <>
-                    <Check size={14} className="text-[var(--accent)] shrink-0" />
+                    <Check size={14} className="text-accent shrink-0" />
                     <span>
                       <span className="font-medium">{value}</span>{" "}
                       {label.toLowerCase()}
@@ -85,13 +85,13 @@ export default async function BillingPage({
                   </>
                 ) : included ? (
                   <>
-                    <Check size={14} className="text-[var(--accent)] shrink-0" />
+                    <Check size={14} className="text-accent shrink-0" />
                     <span>{label}</span>
                   </>
                 ) : (
                   <>
-                    <X size={14} className="text-[var(--border)] shrink-0" />
-                    <span className="text-[var(--muted)]">{label}</span>
+                    <X size={14} className="text-border shrink-0" />
+                    <span className="text-muted">{label}</span>
                   </>
                 )}
               </li>
@@ -100,7 +100,7 @@ export default async function BillingPage({
         </ul>
 
         {hasSubscription && (
-          <div className="pt-2 border-t border-[var(--border)]">
+          <div className="pt-2 border-t border-border">
             <PortalButton />
           </div>
         )}
@@ -109,7 +109,7 @@ export default async function BillingPage({
       {/* Plan change options */}
       {changeTiers.length > 0 && (
         <div className="space-y-3">
-          <p className="text-sm font-semibold text-[var(--foreground)]">
+          <p className="text-sm font-semibold text-foreground">
             {plan === "free" ? "Upgrade your plan" : "Change your plan"}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -141,19 +141,19 @@ function UpgradeTierCard({ tier, currentPlan }: { tier: Plan; currentPlan: Plan 
   const highlights = tier !== "free" ? PLAN_HIGHLIGHTS[tier] : [];
 
   return (
-    <div className="border border-[var(--border)] rounded-xl p-5 flex flex-col gap-4 bg-[var(--surface)]">
+    <div className="border border-border rounded-xl p-5 flex flex-col gap-4 bg-surface">
       <div>
-        <p className="text-sm font-semibold text-[var(--muted)] mb-0.5">{label}</p>
+        <p className="text-sm font-semibold text-muted mb-0.5">{label}</p>
         <div className="flex items-baseline gap-0.5">
           <span className="text-2xl font-bold">{price}</span>
-          <span className="text-sm text-[var(--muted)]">{period}</span>
+          <span className="text-sm text-muted">{period}</span>
         </div>
-        <p className="text-xs text-[var(--muted)] mt-1">{description}</p>
+        <p className="text-xs text-muted mt-1">{description}</p>
       </div>
       <ul className="space-y-1.5 flex-1">
         {highlights.map((h) => (
           <li key={h} className="flex items-center gap-2 text-sm">
-            <Check size={13} className="text-[var(--accent)] shrink-0" />
+            <Check size={13} className="text-accent shrink-0" />
             <span>{h}</span>
           </li>
         ))}

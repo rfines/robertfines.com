@@ -4,23 +4,36 @@ import { type ButtonHTMLAttributes, forwardRef } from "react";
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "default" | "outline" | "ghost" | "destructive";
   size?: "sm" | "md" | "lg";
+  loading?: boolean;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "default", size = "md", ...props }, ref) => {
+  (
+    {
+      className,
+      variant = "default",
+      size = "md",
+      loading = false,
+      disabled,
+      children,
+      ...props
+    },
+    ref
+  ) => {
     return (
       <button
         ref={ref}
+        disabled={disabled || loading}
         className={cn(
-          "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none",
+          "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none",
           {
-            "bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white":
+            "bg-accent hover:bg-accent-hover hover:shadow-[var(--accent-glow)] text-white":
               variant === "default",
-            "border border-[var(--border)] text-[var(--foreground)] hover:border-[var(--accent)] hover:text-[var(--accent)] bg-transparent":
+            "border border-border text-foreground hover:border-accent hover:text-accent bg-transparent":
               variant === "outline",
-            "text-[var(--muted)] hover:text-[var(--foreground)] bg-transparent":
+            "text-muted hover:text-foreground bg-transparent":
               variant === "ghost",
-            "bg-[var(--destructive)] hover:bg-red-600 text-white":
+            "bg-destructive hover:bg-destructive/90 text-white":
               variant === "destructive",
           },
           {
@@ -31,7 +44,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           className
         )}
         {...props}
-      />
+      >
+        {loading && (
+          <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin shrink-0" />
+        )}
+        {children}
+      </button>
     );
   }
 );

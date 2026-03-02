@@ -22,7 +22,7 @@ export function PortalButton() {
     <button
       onClick={handlePortal}
       disabled={loading}
-      className="text-sm font-medium text-[var(--muted)] hover:text-[var(--foreground)] underline underline-offset-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+      className="text-sm font-medium text-muted hover:text-foreground underline underline-offset-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
     >
       {loading ? "Opening portal…" : "Manage subscription"}
     </button>

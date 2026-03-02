@@ -62,15 +62,15 @@ export function AdminUserActions({
   }
 
   return (
-    <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5">
-      <h2 className="text-sm font-medium text-[var(--foreground)] mb-4">Account Settings</h2>
+    <div className="bg-surface border border-border rounded-xl p-5">
+      <h2 className="text-sm font-medium text-foreground mb-4">Account Settings</h2>
       <div className="flex items-end gap-4 flex-wrap">
         <div>
-          <label className="block text-xs text-[var(--muted)] mb-1">Plan</label>
+          <label className="block text-xs text-muted mb-1">Plan</label>
           <select
             value={planValue}
             onChange={(e) => setPlanValue(e.target.value)}
-            className="text-xs bg-[var(--background)] border border-[var(--border)] rounded-lg px-3 py-1.5 text-[var(--foreground)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+            className="text-xs bg-background border border-border rounded-lg px-3 py-1.5 text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
           >
             <option value="free">Free</option>
             <option value="starter">Starter</option>
@@ -79,18 +79,18 @@ export function AdminUserActions({
           </select>
         </div>
         <div>
-          <label className="block text-xs text-[var(--muted)] mb-1">Role</label>
+          <label className="block text-xs text-muted mb-1">Role</label>
           <select
             value={roleValue}
             onChange={(e) => setRoleValue(e.target.value)}
-            className="text-xs bg-[var(--background)] border border-[var(--border)] rounded-lg px-3 py-1.5 text-[var(--foreground)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+            className="text-xs bg-background border border-border rounded-lg px-3 py-1.5 text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
           >
             <option value="user">User</option>
             <option value="admin">Admin</option>
           </select>
         </div>
         <div>
-          <label className="block text-xs text-[var(--muted)] mb-1">
+          <label className="block text-xs text-muted mb-1">
             Monthly run limit
           </label>
           <input
@@ -99,9 +99,9 @@ export function AdminUserActions({
             placeholder="Plan default"
             value={runLimitValue}
             onChange={(e) => setRunLimitValue(e.target.value)}
-            className="text-xs bg-[var(--background)] border border-[var(--border)] rounded-lg px-3 py-1.5 text-[var(--foreground)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] w-32 placeholder:text-[var(--muted)]"
+            className="text-xs bg-background border border-border rounded-lg px-3 py-1.5 text-foreground focus:outline-none focus:ring-1 focus:ring-accent w-32 placeholder:text-muted"
           />
-          <p className="text-[10px] text-[var(--muted)] mt-0.5">
+          <p className="text-[10px] text-muted mt-0.5">
             Empty = plan default · free: 10 · starter: 100 · pro/agency: ∞
           </p>
         </div>
@@ -110,10 +110,10 @@ export function AdminUserActions({
         </Button>
       </div>
       {saveError && (
-        <p className="text-xs text-[var(--destructive)] mt-2">{saveError}</p>
+        <p className="text-xs text-destructive mt-2">{saveError}</p>
       )}
       {roleValue === "admin" && roleValue !== role && (
-        <p className="text-xs text-yellow-400 mt-2">
+        <p className="text-xs text-warning mt-2">
           Role change takes effect on the user&apos;s next sign-in.
         </p>
       )}
@@ -154,10 +154,10 @@ export function ReprocessButton({ userId, tailoredId }: ReprocessButtonProps) {
       className={cn(
         "inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded border transition-colors",
         state === "success"
-          ? "border-green-400/30 text-green-400 bg-green-400/10"
+          ? "border-green-400/30 text-success bg-success/10"
           : state === "error"
-          ? "border-[var(--destructive)]/30 text-[var(--destructive)] bg-[var(--destructive)]/10"
-          : "border-[var(--border)] text-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--accent)]"
+          ? "border-destructive/30 text-destructive bg-destructive/10"
+          : "border-border text-muted hover:text-foreground hover:border-accent"
       )}
     >
       {state === "loading" ? (

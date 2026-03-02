@@ -19,17 +19,17 @@ export function KeywordMatchCard({
 
   const scoreColor =
     keywordMatch.score >= 70
-      ? "text-green-400"
+      ? "text-success"
       : keywordMatch.score >= 45
-        ? "text-yellow-400"
-        : "text-[var(--destructive)]";
+        ? "text-warning"
+        : "text-destructive";
 
   const barColor =
     keywordMatch.score >= 70
-      ? "bg-green-400"
+      ? "bg-success"
       : keywordMatch.score >= 45
-        ? "bg-yellow-400"
-        : "bg-[var(--destructive)]";
+        ? "bg-warning"
+        : "bg-destructive";
 
   const hint =
     keywordMatch.score >= 70
@@ -63,19 +63,19 @@ export function KeywordMatchCard({
   return (
     <div className="mb-6">
       <div className="flex items-center gap-3 mb-1">
-        <span className="text-sm font-medium text-[var(--foreground)]">Keyword Match</span>
+        <span className="text-sm font-medium text-foreground">Keyword Match</span>
         <span className={cn("text-sm font-bold", scoreColor)}>
           {keywordMatch.score}%
         </span>
-        <span className="text-xs text-[var(--muted)]">
+        <span className="text-xs text-muted">
           {keywordMatch.matched.length} / {keywordMatch.total} terms matched
         </span>
       </div>
-      <p className="text-xs text-[var(--muted)] mb-2">
+      <p className="text-xs text-muted mb-2">
         Measures how many key terms from the job description appear in your tailored resume.
         ATS systems use these terms to filter candidates.
       </p>
-      <div className="w-full h-1.5 bg-[var(--border)] rounded-full">
+      <div className="w-full h-1.5 bg-border rounded-full">
         <div
           className={cn("h-1.5 rounded-full transition-all", barColor)}
           style={{ width: `${keywordMatch.score}%` }}
@@ -83,20 +83,20 @@ export function KeywordMatchCard({
       </div>
       <p className={cn("text-xs mt-2 mb-3", scoreColor)}>{hint}</p>
       <details>
-        <summary className="cursor-pointer text-xs text-[var(--muted)] hover:text-[var(--foreground)] transition-colors select-none">
+        <summary className="cursor-pointer text-xs text-muted hover:text-foreground transition-colors select-none">
           View matched &amp; missing terms
         </summary>
         <div className="mt-3 grid grid-cols-2 gap-4">
           {keywordMatch.matched.length > 0 && (
-            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4">
-              <p className="text-xs font-medium text-green-400 mb-2">
+            <div className="bg-surface border border-border rounded-xl p-4">
+              <p className="text-xs font-medium text-success mb-2">
                 Matched ({keywordMatch.matched.length})
               </p>
               <div className="flex flex-wrap gap-1">
                 {keywordMatch.matched.map((term) => (
                   <span
                     key={term}
-                    className="text-xs px-2 py-0.5 rounded-full bg-green-400/10 text-green-400"
+                    className="text-xs px-2 py-0.5 rounded-full bg-success/10 text-success"
                   >
                     {term}
                   </span>
@@ -105,11 +105,11 @@ export function KeywordMatchCard({
             </div>
           )}
           {(visibleMissing.length > 0 || dismissedMissing.length > 0) && (
-            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4">
-              <p className="text-xs font-medium text-[var(--destructive)] mb-2">
+            <div className="bg-surface border border-border rounded-xl p-4">
+              <p className="text-xs font-medium text-destructive mb-2">
                 Missing ({visibleMissing.length})
                 {canFlag && (
-                  <span className="text-[var(--muted)] font-normal ml-1">
+                  <span className="text-muted font-normal ml-1">
                     — click × to dismiss irrelevant terms
                   </span>
                 )}
@@ -118,7 +118,7 @@ export function KeywordMatchCard({
                 {visibleMissing.map((term) => (
                   <span
                     key={term}
-                    className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-[var(--destructive)]/10 text-[var(--destructive)]"
+                    className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-destructive/10 text-destructive"
                   >
                     {term}
                     {canFlag && (
@@ -134,7 +134,7 @@ export function KeywordMatchCard({
                   </span>
                 ))}
                 {dismissedMissing.length > 0 && (
-                  <span className="text-xs text-[var(--muted)] self-center">
+                  <span className="text-xs text-muted self-center">
                     +{dismissedMissing.length} dismissed
                   </span>
                 )}

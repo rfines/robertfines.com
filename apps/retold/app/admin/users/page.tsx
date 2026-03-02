@@ -51,9 +51,9 @@ export default async function AdminUsersPage({ searchParams }: Props) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-[var(--foreground)]">
+        <h1 className="text-xl font-semibold text-foreground">
           Users
-          <span className="ml-2 text-sm font-normal text-[var(--muted)]">
+          <span className="ml-2 text-sm font-normal text-muted">
             {total.toLocaleString()} total
           </span>
         </h1>
@@ -64,7 +64,7 @@ export default async function AdminUsersPage({ searchParams }: Props) {
         <div className="relative flex-1">
           <Search
             size={14}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
           />
           <Input
             name="q"
@@ -86,32 +86,32 @@ export default async function AdminUsersPage({ searchParams }: Props) {
       </form>
 
       {/* Users table */}
-      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden">
+      <div className="bg-surface border border-border rounded-xl overflow-hidden">
         <table className="w-full text-xs">
           <thead>
-            <tr className="border-b border-[var(--border)]">
-              <th className="text-left px-4 py-2.5 text-[var(--muted)] font-medium">User</th>
-              <th className="text-left px-4 py-2.5 text-[var(--muted)] font-medium">Plan</th>
-              <th className="text-left px-4 py-2.5 text-[var(--muted)] font-medium">Resumes</th>
-              <th className="text-left px-4 py-2.5 text-[var(--muted)] font-medium">Tailored</th>
-              <th className="text-left px-4 py-2.5 text-[var(--muted)] font-medium">Joined</th>
+            <tr className="border-b border-border">
+              <th className="text-left px-4 py-2.5 text-muted font-medium">User</th>
+              <th className="text-left px-4 py-2.5 text-muted font-medium">Plan</th>
+              <th className="text-left px-4 py-2.5 text-muted font-medium">Resumes</th>
+              <th className="text-left px-4 py-2.5 text-muted font-medium">Tailored</th>
+              <th className="text-left px-4 py-2.5 text-muted font-medium">Joined</th>
             </tr>
           </thead>
           <tbody>
             {users.map((user) => (
               <tr
                 key={user.id}
-                className="border-b border-[var(--border)] last:border-0 hover:bg-[var(--background)] transition-colors"
+                className="border-b border-border last:border-0 hover:bg-background transition-colors"
               >
                 <td className="px-4 py-2.5">
                   <Link
                     href={`/admin/users/${user.id}`}
-                    className="text-[var(--foreground)] hover:text-[var(--accent)] transition-colors font-medium"
+                    className="text-foreground hover:text-accent transition-colors font-medium"
                   >
                     {user.name ?? user.email ?? user.id}
                   </Link>
                   {user.name && (
-                    <p className="text-[var(--muted)]">{user.email}</p>
+                    <p className="text-muted">{user.email}</p>
                   )}
                 </td>
                 <td className="px-4 py-2.5">
@@ -126,13 +126,13 @@ export default async function AdminUsersPage({ searchParams }: Props) {
                     )}
                   </div>
                 </td>
-                <td className="px-4 py-2.5 text-[var(--muted)]">
+                <td className="px-4 py-2.5 text-muted">
                   {user._count.resumes}
                 </td>
-                <td className="px-4 py-2.5 text-[var(--muted)]">
+                <td className="px-4 py-2.5 text-muted">
                   {user._count.tailoredResumes}
                 </td>
-                <td className="px-4 py-2.5 text-[var(--muted)]">
+                <td className="px-4 py-2.5 text-muted">
                   {user.createdAt.toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
@@ -145,7 +145,7 @@ export default async function AdminUsersPage({ searchParams }: Props) {
               <tr>
                 <td
                   colSpan={5}
-                  className="px-4 py-10 text-center text-[var(--muted)]"
+                  className="px-4 py-10 text-center text-muted"
                 >
                   {q ? `No users matching "${q}"` : "No users yet"}
                 </td>
@@ -167,7 +167,7 @@ export default async function AdminUsersPage({ searchParams }: Props) {
               </Button>
             </Link>
           )}
-          <span className="text-[var(--muted)]">
+          <span className="text-muted">
             Page {page} of {totalPages}
           </span>
           {page < totalPages && (

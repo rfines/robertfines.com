@@ -140,16 +140,16 @@ export function TailorForm({ resumeId, resumeTitle, plan, initialValues }: Tailo
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-lg px-4 py-3 text-sm text-[var(--muted)]">
-        Base resume: <span className="text-[var(--foreground)] font-medium">{resumeTitle}</span>
+      <div className="bg-surface border border-border rounded-lg px-4 py-3 text-sm text-muted">
+        Base resume: <span className="text-foreground font-medium">{resumeTitle}</span>
       </div>
 
       {initialValues && (
-        <div className="flex items-center gap-2 bg-[var(--accent)]/5 border border-[var(--accent)]/20 rounded-lg px-4 py-2.5 text-sm">
-          <RefreshCw size={13} className="text-[var(--accent)] shrink-0" />
-          <span className="text-[var(--muted)]">
+        <div className="flex items-center gap-2 bg-accent/5 border border-accent/20 rounded-lg px-4 py-2.5 text-sm">
+          <RefreshCw size={13} className="text-accent shrink-0" />
+          <span className="text-muted">
             Re-tailoring:{" "}
-            <span className="text-[var(--foreground)] font-medium">
+            <span className="text-foreground font-medium">
               {initialValues.jobTitle}
               {initialValues.company ? ` at ${initialValues.company}` : ""}
             </span>
@@ -186,7 +186,7 @@ export function TailorForm({ resumeId, resumeTitle, plan, initialValues }: Tailo
 
       <div>
         <Label>Variations</Label>
-        <p className="text-xs text-[var(--muted)] mb-1.5">
+        <p className="text-xs text-muted mb-1.5">
           Generate multiple tailored versions to choose from
         </p>
         <VariationsSelector value={variations} max={maxVariations} onChange={setVariations} />
@@ -222,7 +222,7 @@ export function TailorForm({ resumeId, resumeTitle, plan, initialValues }: Tailo
           </Button>
         </div>
         {jdFetchError && (
-          <p className="text-xs text-[var(--destructive)] mb-1">{jdFetchError}</p>
+          <p className="text-xs text-destructive mb-1">{jdFetchError}</p>
         )}
         <Textarea
           id="jobDescription"
@@ -255,14 +255,14 @@ export function TailorForm({ resumeId, resumeTitle, plan, initialValues }: Tailo
                 className={cn(
                   "text-sm font-semibold",
                   fitScore >= 70
-                    ? "text-green-400"
+                    ? "text-success"
                     : fitScore >= 45
-                      ? "text-yellow-400"
-                      : "text-[var(--destructive)]"
+                      ? "text-warning"
+                      : "text-destructive"
                 )}
               >
                 {fitScore}% match
-                <span className="text-xs font-normal text-[var(--muted)] ml-1">
+                <span className="text-xs font-normal text-muted ml-1">
                   {fitScore >= 70
                     ? "— strong baseline"
                     : fitScore >= 45
@@ -272,7 +272,7 @@ export function TailorForm({ resumeId, resumeTitle, plan, initialValues }: Tailo
               </span>
             )}
             {fitStatus === "error" && fitError && (
-              <span className="text-xs text-[var(--destructive)]">{fitError}</span>
+              <span className="text-xs text-destructive">{fitError}</span>
             )}
           </div>
         )}
@@ -285,24 +285,24 @@ export function TailorForm({ resumeId, resumeTitle, plan, initialValues }: Tailo
           checked={fixAtsIssues && !atsLocked}
           onChange={(e) => !atsLocked && setFixAtsIssues(e.target.checked)}
           disabled={atsLocked}
-          className="mt-0.5 h-4 w-4 rounded border-[var(--border)] accent-[var(--accent)] disabled:cursor-not-allowed"
+          className="mt-0.5 h-4 w-4 rounded border-border accent-accent disabled:cursor-not-allowed"
         />
         <div>
           <div className="flex items-center gap-2">
             <label
               htmlFor="fixAtsIssues"
-              className={`text-sm font-medium ${atsLocked ? "text-[var(--muted)] cursor-not-allowed" : "cursor-pointer"}`}
+              className={`text-sm font-medium ${atsLocked ? "text-muted cursor-not-allowed" : "cursor-pointer"}`}
             >
               Fix ATS issues
             </label>
             {atsLocked && (
-              <span className="text-[10px] bg-[var(--surface)] text-[var(--muted)] border border-[var(--border)] rounded px-1.5 py-0.5 flex items-center gap-1">
+              <span className="text-[10px] bg-surface text-muted border border-border rounded px-1.5 py-0.5 flex items-center gap-1">
                 <Lock size={9} />
                 Pro
               </span>
             )}
           </div>
-          <p className="text-xs text-[var(--muted)] mt-0.5">
+          <p className="text-xs text-muted mt-0.5">
             {atsLocked
               ? "Upgrade to Pro to automatically fix ATS formatting issues"
               : "Automatically fix formatting issues (tables, fancy bullets, separators) that ATS systems struggle to parse"}
@@ -316,11 +316,11 @@ export function TailorForm({ resumeId, resumeTitle, plan, initialValues }: Tailo
         locked={instructionsLocked}
       />
 
-      {error && <p className="text-sm text-[var(--destructive)]">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
 
       {isSubmitting ? (
-        <div className="flex items-center gap-3 text-sm text-[var(--muted)]">
-          <div className="w-4 h-4 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
+        <div className="flex items-center gap-3 text-sm text-muted">
+          <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
           {variations > 1
             ? `Generating ${variations} variations with Claude… this may take 30–60 seconds`
             : "Generating tailored resume with Claude… this may take 15–30 seconds"}

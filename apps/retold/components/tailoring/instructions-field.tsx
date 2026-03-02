@@ -18,7 +18,7 @@ export function InstructionsField({ value, onChange, locked }: InstructionsField
       <div className="flex items-center gap-2 mb-1">
         <Label htmlFor="userInstructions">Custom instructions (optional)</Label>
         {locked && (
-          <span className="text-[10px] bg-[var(--surface)] text-[var(--muted)] border border-[var(--border)] rounded px-1.5 py-0.5 flex items-center gap-1">
+          <span className="text-[10px] bg-surface text-muted border border-border rounded px-1.5 py-0.5 flex items-center gap-1">
             <Lock size={9} />
             Starter
           </span>
@@ -38,7 +38,7 @@ export function InstructionsField({ value, onChange, locked }: InstructionsField
         className="min-h-[80px]"
       />
       {!locked && (
-        <p className="text-xs text-[var(--muted)] mt-1">{value.length}/{MAX_LENGTH}</p>
+        <p className="text-xs text-muted mt-1">{value.length}/{MAX_LENGTH}</p>
       )}
     </div>
   );

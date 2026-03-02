@@ -11,26 +11,26 @@ export default async function AdminLayout({
   await requireAdmin();
 
   return (
-    <div className="min-h-screen bg-[var(--background)]">
-      <header className="h-14 border-b border-[var(--border)] flex items-center justify-between px-6 shrink-0">
+    <div className="min-h-screen bg-background">
+      <header className="h-14 border-b border-border flex items-center justify-between px-6 shrink-0">
         <div className="flex items-center gap-3">
-          <ShieldCheck size={18} className="text-[var(--accent)]" />
-          <span className="text-sm font-semibold text-[var(--foreground)]">
+          <ShieldCheck size={18} className="text-accent" />
+          <span className="text-sm font-semibold text-foreground">
             Admin Panel
           </span>
           <Badge variant="muted">Admin</Badge>
         </div>
-        <nav className="flex items-center gap-6 text-xs text-[var(--muted)]">
-          <Link href="/admin" className="hover:text-[var(--foreground)] transition-colors">
+        <nav className="flex items-center gap-6 text-xs text-muted">
+          <Link href="/admin" className="hover:text-foreground transition-colors">
             Stats
           </Link>
-          <Link href="/admin/users" className="hover:text-[var(--foreground)] transition-colors">
+          <Link href="/admin/users" className="hover:text-foreground transition-colors">
             Users
           </Link>
-          <Link href="/admin/keyword-noise" className="hover:text-[var(--foreground)] transition-colors">
+          <Link href="/admin/keyword-noise" className="hover:text-foreground transition-colors">
             Keyword Noise
           </Link>
-          <Link href="/dashboard" className="hover:text-[var(--foreground)] transition-colors">
+          <Link href="/dashboard" className="hover:text-foreground transition-colors">
             ← Dashboard
           </Link>
         </nav>

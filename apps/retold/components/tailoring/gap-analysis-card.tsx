@@ -10,9 +10,9 @@ import Link from "next/link";
 import { cn } from "@/lib/cn";
 
 const PRIORITY_STYLES: Record<GapItem["priority"], string> = {
-  high: "bg-[var(--destructive)]/10 text-[var(--destructive)] border-[var(--destructive)]/20",
-  medium: "bg-yellow-400/10 text-yellow-400 border-yellow-400/20",
-  low: "bg-[var(--muted)]/10 text-[var(--muted)] border-[var(--muted)]/20",
+  high: "bg-destructive/10 text-destructive border-destructive/20",
+  medium: "bg-warning/10 text-warning border-warning/20",
+  low: "bg-muted/10 text-muted border-muted/20",
 };
 
 const PRIORITY_LABEL: Record<GapItem["priority"], string> = {
@@ -23,7 +23,7 @@ const PRIORITY_LABEL: Record<GapItem["priority"], string> = {
 
 function GapItemRow({ gap }: { gap: GapItem }) {
   return (
-    <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 space-y-2">
+    <div className="bg-surface border border-border rounded-xl p-4 space-y-2">
       <div className="flex items-start gap-3">
         <span
           className={cn(
@@ -34,13 +34,13 @@ function GapItemRow({ gap }: { gap: GapItem }) {
           {PRIORITY_LABEL[gap.priority]}
         </span>
         <div className="min-w-0">
-          <p className="text-sm font-medium text-[var(--foreground)] leading-snug">
+          <p className="text-sm font-medium text-foreground leading-snug">
             {gap.requirement}
           </p>
-          <p className="text-xs text-[var(--muted)] mt-1 leading-relaxed">
+          <p className="text-xs text-muted mt-1 leading-relaxed">
             {gap.suggestion}
           </p>
-          <p className="text-[10px] text-[var(--muted)] mt-1.5 opacity-70">
+          <p className="text-[10px] text-muted mt-1.5 opacity-70">
             Section: {gap.section}
           </p>
         </div>
@@ -96,8 +96,8 @@ export function GapAnalysisCard({
     <div className="mb-6">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <AlertTriangle size={14} className="text-[var(--destructive)] shrink-0" />
-          <span className="text-sm font-semibold text-[var(--foreground)]">
+          <AlertTriangle size={14} className="text-destructive shrink-0" />
+          <span className="text-sm font-semibold text-foreground">
             Gap Analysis
           </span>
         </div>
@@ -105,7 +105,7 @@ export function GapAnalysisCard({
           <button
             type="button"
             onClick={() => setExpanded((v) => !v)}
-            className="text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
+            className="text-muted hover:text-foreground transition-colors"
             aria-label={expanded ? "Collapse gap analysis" : "Expand gap analysis"}
           >
             {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -113,23 +113,23 @@ export function GapAnalysisCard({
         )}
       </div>
 
-      <p className="text-xs text-[var(--muted)] mb-3">
+      <p className="text-xs text-muted mb-3">
         AI-powered analysis of what&apos;s missing from your resume relative to the job
         description — with specific, actionable suggestions for each gap.
       </p>
 
       {locked && (
-        <div className="flex items-start gap-3 bg-[var(--surface)] border border-[var(--border)] rounded-xl px-4 py-3">
-          <Lock size={14} className="text-[var(--muted)] mt-0.5 shrink-0" />
+        <div className="flex items-start gap-3 bg-surface border border-border rounded-xl px-4 py-3">
+          <Lock size={14} className="text-muted mt-0.5 shrink-0" />
           <div>
-            <p className="text-sm text-[var(--foreground)]">
+            <p className="text-sm text-foreground">
               Gap Analysis is available on{" "}
-              <Link href="/dashboard/billing" className="text-[var(--accent)] hover:underline">
+              <Link href="/dashboard/billing" className="text-accent hover:underline">
                 Starter and above
               </Link>
               .
             </p>
-            <p className="text-xs text-[var(--muted)] mt-0.5">
+            <p className="text-xs text-muted mt-0.5">
               Upgrade to see exactly what&apos;s missing and how to close the gap.
             </p>
           </div>
@@ -143,14 +143,14 @@ export function GapAnalysisCard({
       )}
 
       {!locked && isGenerating && (
-        <div className="flex items-center gap-3 text-sm text-[var(--muted)]">
-          <div className="w-4 h-4 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
+        <div className="flex items-center gap-3 text-sm text-muted">
+          <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
           Analyzing gaps with Claude…
         </div>
       )}
 
       {!locked && error && (
-        <p className="text-sm text-[var(--destructive)]">{error}</p>
+        <p className="text-sm text-destructive">{error}</p>
       )}
 
       {!locked && gapAnalysis && expanded && (
@@ -160,15 +160,15 @@ export function GapAnalysisCard({
           ))}
 
           {gapAnalysis.skillsToAdd.length > 0 && (
-            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4">
-              <p className="text-xs font-medium text-[var(--foreground)] mb-2">
+            <div className="bg-surface border border-border rounded-xl p-4">
+              <p className="text-xs font-medium text-foreground mb-2">
                 Skills to add to your resume
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {gapAnalysis.skillsToAdd.map((skill) => (
                   <span
                     key={skill}
-                    className="text-xs px-2 py-0.5 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/20"
+                    className="text-xs px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20"
                   >
                     {skill}
                   </span>

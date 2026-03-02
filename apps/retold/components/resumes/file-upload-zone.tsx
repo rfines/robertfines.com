@@ -103,11 +103,11 @@ export function FileUploadZone({ onExtracted, disabled }: FileUploadZoneProps) {
       className={cn(
         "relative border-2 border-dashed rounded-xl p-10 text-center transition-colors cursor-pointer",
         isDragOver
-          ? "border-[var(--accent)] bg-[var(--accent)]/5"
-          : "border-[var(--border)] hover:border-[var(--accent)]/50",
+          ? "border-accent bg-accent/5"
+          : "border-border hover:border-accent/50",
         (disabled || state === "uploading" || state === "extracting") &&
           "pointer-events-none opacity-60",
-        state === "done" && "border-green-500/40 bg-green-500/5"
+        state === "done" && "border-success/40 bg-success/5"
       )}
       onClick={() => inputRef.current?.click()}
       onDragOver={(e) => {
@@ -129,25 +129,25 @@ export function FileUploadZone({ onExtracted, disabled }: FileUploadZoneProps) {
         <Upload
           size={24}
           className={cn(
-            state === "done" ? "text-green-400" : "text-[var(--muted)]"
+            state === "done" ? "text-success" : "text-muted"
           )}
         />
         <div>
-          <p className="text-sm font-medium text-[var(--foreground)]">{label}</p>
-          <p className="text-xs text-[var(--muted)] mt-1">PDF or DOCX, up to 10MB</p>
+          <p className="text-sm font-medium text-foreground">{label}</p>
+          <p className="text-xs text-muted mt-1">PDF or DOCX, up to 10MB</p>
         </div>
 
         {(state === "uploading" || state === "extracting") && (
-          <div className="w-full max-w-xs bg-[var(--border)] rounded-full h-1.5 mt-2">
+          <div className="w-full max-w-xs bg-border rounded-full h-1.5 mt-2">
             <div
-              className="bg-[var(--accent)] h-1.5 rounded-full transition-all duration-200"
+              className="bg-accent h-1.5 rounded-full transition-all duration-200"
               style={{ width: `${progress}%` }}
             />
           </div>
         )}
 
         {state === "error" && errorMsg && (
-          <p className="text-xs text-[var(--destructive)]">{errorMsg}</p>
+          <p className="text-xs text-destructive">{errorMsg}</p>
         )}
       </div>
     </div>

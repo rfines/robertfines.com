@@ -25,7 +25,7 @@ export function TailoredDeleteButton({ tailoredId }: { tailoredId: string }) {
   if (confirming) {
     return (
       <div className="flex items-center gap-2">
-        <span className="text-xs text-[var(--muted)]">Delete?</span>
+        <span className="text-xs text-muted">Delete?</span>
         <Button
           variant="destructive"
           size="sm"
@@ -51,7 +51,8 @@ export function TailoredDeleteButton({ tailoredId }: { tailoredId: string }) {
       variant="ghost"
       size="sm"
       onClick={() => setConfirming(true)}
-      className="text-[var(--muted)] hover:text-[var(--destructive)]"
+      className="text-muted hover:text-destructive"
+      aria-label="Delete tailored resume"
     >
       <Trash2 size={14} />
     </Button>

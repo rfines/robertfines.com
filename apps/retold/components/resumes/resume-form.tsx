@@ -97,7 +97,7 @@ export function ResumeForm({ plan }: Props) {
             value={candidateName}
             onChange={(e) => setCandidateName(e.target.value)}
           />
-          <p className="text-xs text-[var(--muted)] mt-1">
+          <p className="text-xs text-muted mt-1">
             Label whose resume this is for easy identification.
           </p>
         </div>
@@ -112,8 +112,8 @@ export function ResumeForm({ plan }: Props) {
               onClick={() => setMode(m)}
               className={`px-4 py-1.5 text-sm rounded-md transition-colors ${
                 mode === m
-                  ? "bg-[var(--accent)] text-white"
-                  : "text-[var(--muted)] hover:text-[var(--foreground)]"
+                  ? "bg-accent text-white"
+                  : "text-muted hover:text-foreground"
               }`}
             >
               {m === "text" ? "Paste text" : "Upload file"}
@@ -134,7 +134,7 @@ export function ResumeForm({ plan }: Props) {
                 required
               />
             </div>
-            {error && <p className="text-sm text-[var(--destructive)]">{error}</p>}
+            {error && <p className="text-sm text-destructive">{error}</p>}
             <Button
               type="submit"
               disabled={isSubmitting || !title.trim() || !rawText.trim()}
@@ -148,7 +148,7 @@ export function ResumeForm({ plan }: Props) {
               onExtracted={handleFileExtracted}
               disabled={isSubmitting}
             />
-            {error && <p className="text-sm text-[var(--destructive)]">{error}</p>}
+            {error && <p className="text-sm text-destructive">{error}</p>}
           </div>
         )}
       </div>

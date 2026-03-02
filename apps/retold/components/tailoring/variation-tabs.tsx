@@ -35,7 +35,7 @@ export function VariationTabs({ variations, activeId, plan, baseResumeText }: Va
   return (
     <div>
       {/* Tab bar */}
-      <div className="flex gap-1 mb-4 border-b border-[var(--border)]">
+      <div className="flex gap-1 mb-4 border-b border-border">
         {variations.map((v) => (
           <button
             key={v.id}
@@ -44,8 +44,8 @@ export function VariationTabs({ variations, activeId, plan, baseResumeText }: Va
             className={cn(
               "px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px",
               v.id === activeVariationId
-                ? "border-[var(--accent)] text-[var(--foreground)]"
-                : "border-transparent text-[var(--muted)] hover:text-[var(--foreground)]"
+                ? "border-accent text-foreground"
+                : "border-transparent text-muted hover:text-foreground"
             )}
           >
             Version {v.variationIndex + 1}

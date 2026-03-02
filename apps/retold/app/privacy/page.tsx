@@ -13,16 +13,16 @@ const SITE_URL = "https://www.retold.dev";
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Navbar */}
-      <nav className="sticky top-0 z-10 border-b border-[var(--border)] bg-[var(--background)]/90 backdrop-blur-sm">
+      <nav className="sticky top-0 z-10 border-b border-border bg-background/90 backdrop-blur-sm">
         <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="text-lg font-bold">
             Retold
           </Link>
           <Link
             href="/auth/signin"
-            className="text-sm font-medium text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
+            className="text-sm font-medium text-muted hover:text-foreground transition-colors"
           >
             Sign in
           </Link>
@@ -32,7 +32,7 @@ export default function PrivacyPage() {
       {/* Content */}
       <main className="max-w-3xl mx-auto px-6 py-16">
         <h1 className="text-3xl font-bold mb-2">Privacy Policy</h1>
-        <p className="text-sm text-[var(--muted)] mb-10">
+        <p className="text-sm text-muted mb-10">
           Effective date: {EFFECTIVE_DATE}
         </p>
 
@@ -41,7 +41,7 @@ export default function PrivacyPage() {
           <Section title="1. Overview">
             <p>
               Retold (&ldquo;we,&rdquo; &ldquo;our,&rdquo; or &ldquo;us&rdquo;) operates the website{" "}
-              <a href={SITE_URL} className="text-[var(--accent)] hover:underline">
+              <a href={SITE_URL} className="text-accent hover:underline">
                 {SITE_URL}
               </a>{" "}
               and the Retold application (the &ldquo;Service&rdquo;). This Privacy Policy explains what
@@ -52,7 +52,7 @@ export default function PrivacyPage() {
               By using the Service you agree to the practices described in this policy. If you do
               not agree, please do not use the Service.
             </p>
-            <p className="text-sm text-[var(--muted)] border border-[var(--border)] rounded-lg px-4 py-3 bg-[var(--surface)]">
+            <p className="text-sm text-muted border border-border rounded-lg px-4 py-3 bg-surface">
               <strong>Note:</strong> This policy is a working draft and has not yet been reviewed by
               legal counsel. It will be updated to reflect any additional legal requirements before
               the Service is publicly launched.
@@ -142,16 +142,16 @@ export default function PrivacyPage() {
               We share data with the following sub-processors only to the extent necessary to
               operate the Service:
             </p>
-            <div className="overflow-hidden rounded-xl border border-[var(--border)]">
+            <div className="overflow-hidden rounded-xl border border-border">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-[var(--surface)] border-b border-[var(--border)]">
+                  <tr className="bg-surface border-b border-border">
                     <th className="text-left px-4 py-3 font-semibold">Provider</th>
                     <th className="text-left px-4 py-3 font-semibold">Purpose</th>
                     <th className="text-left px-4 py-3 font-semibold">Data sent</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[var(--border)]">
+                <tbody className="divide-y divide-border">
                   <Row provider="Anthropic" purpose="AI text generation (Claude API)" data="Resume text, job descriptions" />
                   <Row provider="Stripe" purpose="Payment processing" data="Email, subscription metadata" />
                   <Row provider="Amazon Web Services (S3)" purpose="File storage for uploaded resumes" data="Resume file contents" />
@@ -167,7 +167,7 @@ export default function PrivacyPage() {
                 href="https://www.anthropic.com/legal/privacy"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[var(--accent)] hover:underline"
+                className="text-accent hover:underline"
               >
                 Privacy Policy
               </a>
@@ -180,7 +180,7 @@ export default function PrivacyPage() {
               We retain your account data and resume content for as long as your account is
               active. You may request deletion of your account and all associated data at any
               time by contacting us at{" "}
-              <a href={`mailto:${CONTACT_EMAIL}`} className="text-[var(--accent)] hover:underline">
+              <a href={`mailto:${CONTACT_EMAIL}`} className="text-accent hover:underline">
                 {CONTACT_EMAIL}
               </a>
               .
@@ -215,7 +215,7 @@ export default function PrivacyPage() {
             </ul>
             <p>
               To exercise any of these rights, email{" "}
-              <a href={`mailto:${CONTACT_EMAIL}`} className="text-[var(--accent)] hover:underline">
+              <a href={`mailto:${CONTACT_EMAIL}`} className="text-accent hover:underline">
                 {CONTACT_EMAIL}
               </a>
               . We will respond within 30 days.
@@ -263,12 +263,12 @@ export default function PrivacyPage() {
             <address className="not-italic mt-3 text-sm space-y-1">
               <p className="font-semibold">Retold</p>
               <p>
-                <a href={`mailto:${CONTACT_EMAIL}`} className="text-[var(--accent)] hover:underline">
+                <a href={`mailto:${CONTACT_EMAIL}`} className="text-accent hover:underline">
                   {CONTACT_EMAIL}
                 </a>
               </p>
               <p>
-                <a href={SITE_URL} className="text-[var(--accent)] hover:underline">
+                <a href={SITE_URL} className="text-accent hover:underline">
                   {SITE_URL}
                 </a>
               </p>
@@ -279,10 +279,10 @@ export default function PrivacyPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-[var(--border)] mt-16">
+      <footer className="border-t border-border mt-16">
         <div className="max-w-5xl mx-auto px-6 py-8 flex items-center justify-between">
           <span className="text-sm font-bold">Retold</span>
-          <p className="text-xs text-[var(--muted)]">© 2026 Retold. All rights reserved.</p>
+          <p className="text-xs text-muted">© 2026 Retold. All rights reserved.</p>
         </div>
       </footer>
     </div>
@@ -299,7 +299,7 @@ function Section({
   return (
     <section className="space-y-4">
       <h2 className="text-xl font-bold">{title}</h2>
-      <div className="space-y-3 text-sm leading-relaxed text-[var(--foreground)]">
+      <div className="space-y-3 text-sm leading-relaxed text-foreground">
         {children}
       </div>
     </section>
@@ -315,7 +315,7 @@ function SubSection({
 }) {
   return (
     <div className="space-y-2">
-      <h3 className="font-semibold text-[var(--foreground)]">{heading}</h3>
+      <h3 className="font-semibold text-foreground">{heading}</h3>
       <div className="space-y-2">{children}</div>
     </div>
   );
@@ -333,8 +333,8 @@ function Row({
   return (
     <tr>
       <td className="px-4 py-3 font-medium">{provider}</td>
-      <td className="px-4 py-3 text-[var(--muted)]">{purpose}</td>
-      <td className="px-4 py-3 text-[var(--muted)]">{data}</td>
+      <td className="px-4 py-3 text-muted">{purpose}</td>
+      <td className="px-4 py-3 text-muted">{data}</td>
     </tr>
   );
 }

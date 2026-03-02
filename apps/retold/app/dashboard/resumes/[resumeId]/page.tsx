@@ -71,17 +71,17 @@ export default async function ResumePage({ params }: Props) {
 
       {/* ATS Warnings */}
       {atsWarnings.length === 0 ? (
-        <div className="flex items-center gap-2 text-xs text-green-400 mb-4">
+        <div className="flex items-center gap-2 text-xs text-success mb-4">
           <CheckCircle size={14} />
           No ATS formatting issues detected
         </div>
       ) : (
         <details className="mb-4">
-          <summary className="cursor-pointer flex items-center gap-2 text-xs text-yellow-400 hover:text-[var(--foreground)] transition-colors select-none">
+          <summary className="cursor-pointer flex items-center gap-2 text-xs text-warning hover:text-foreground transition-colors select-none">
             <AlertTriangle size={14} />
             {atsWarnings.length} ATS formatting {atsWarnings.length === 1 ? "issue" : "issues"} detected — click to expand
           </summary>
-          <div className="mt-3 bg-[var(--surface)] border border-[var(--border)] rounded-xl divide-y divide-[var(--border)]">
+          <div className="mt-3 bg-surface border border-border rounded-xl divide-y divide-border">
             {atsWarnings.map((warning) => (
               <div key={warning.code} className="p-4">
                 <div className="flex items-start gap-2">
@@ -89,22 +89,22 @@ export default async function ResumePage({ params }: Props) {
                     size={13}
                     className={
                       warning.severity === "error"
-                        ? "text-[var(--destructive)] mt-0.5 shrink-0"
-                        : "text-yellow-400 mt-0.5 shrink-0"
+                        ? "text-destructive mt-0.5 shrink-0"
+                        : "text-warning mt-0.5 shrink-0"
                     }
                   />
                   <div>
                     <p
                       className={`text-xs font-medium ${
                         warning.severity === "error"
-                          ? "text-[var(--destructive)]"
-                          : "text-yellow-400"
+                          ? "text-destructive"
+                          : "text-warning"
                       }`}
                     >
                       {warning.message}
                     </p>
                     {warning.detail && (
-                      <p className="text-xs text-[var(--muted)] mt-0.5">
+                      <p className="text-xs text-muted mt-0.5">
                         {warning.detail}
                       </p>
                     )}
@@ -116,8 +116,8 @@ export default async function ResumePage({ params }: Props) {
         </details>
       )}
 
-      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6">
-        <pre className="text-xs text-[var(--foreground)] whitespace-pre-wrap font-mono leading-relaxed overflow-auto max-h-[60vh]">
+      <div className="bg-surface border border-border rounded-xl p-6">
+        <pre className="text-xs text-foreground whitespace-pre-wrap font-mono leading-relaxed overflow-auto max-h-[60vh]">
           {resume.rawText}
         </pre>
       </div>
@@ -125,7 +125,7 @@ export default async function ResumePage({ params }: Props) {
       {/* Tailoring History */}
       {resume.tailoredResumes.length > 0 && (
         <div className="mt-8">
-          <h2 className="text-sm font-semibold text-[var(--foreground)] mb-3">
+          <h2 className="text-sm font-semibold text-foreground mb-3">
             Tailored Versions ({resume.tailoredResumes.length})
           </h2>
           <div className="space-y-2">
@@ -139,14 +139,14 @@ export default async function ResumePage({ params }: Props) {
                 <Link
                   key={tr.id}
                   href={`/dashboard/tailored/${tr.id}`}
-                  className="flex items-center justify-between gap-4 p-3 rounded-lg border border-[var(--border)] hover:border-[var(--accent)]/50 transition-colors bg-[var(--surface)]"
+                  className="flex items-center justify-between gap-4 p-3 rounded-lg border border-border hover:border-accent/50 transition-colors bg-surface"
                 >
                   <div className="min-w-0">
-                    <p className="text-sm text-[var(--foreground)] truncate">
+                    <p className="text-sm text-foreground truncate">
                       {tr.jobTitle}
                       {tr.company ? ` — ${tr.company}` : ""}
                     </p>
-                    <p className="text-xs text-[var(--muted)] mt-0.5">{date}</p>
+                    <p className="text-xs text-muted mt-0.5">{date}</p>
                   </div>
                   {tr.intensity && (
                     <Badge variant="muted" className="shrink-0 capitalize">

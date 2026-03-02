@@ -44,13 +44,13 @@ export function BulletRewriterForm({ plan }: BulletRewriterFormProps) {
 
   if (locked) {
     return (
-      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6 flex items-start gap-4">
-        <Lock size={16} className="text-[var(--muted)] mt-0.5 shrink-0" />
+      <div className="bg-surface border border-border rounded-xl p-6 flex items-start gap-4">
+        <Lock size={16} className="text-muted mt-0.5 shrink-0" />
         <div>
-          <p className="text-sm text-[var(--foreground)] font-medium mb-1">
+          <p className="text-sm text-foreground font-medium mb-1">
             Bullet Rewriter is available on Starter and above
           </p>
-          <p className="text-xs text-[var(--muted)] mb-3">
+          <p className="text-xs text-muted mb-3">
             Upgrade to get three AI-powered rewrites for any bullet point — stronger verbs, better
             specificity, more impact.
           </p>
@@ -76,8 +76,8 @@ export function BulletRewriterForm({ plan }: BulletRewriterFormProps) {
       </div>
 
       {isLoading ? (
-        <div className="flex items-center gap-3 text-sm text-[var(--muted)]">
-          <div className="w-4 h-4 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
+        <div className="flex items-center gap-3 text-sm text-muted">
+          <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
           Rewriting with Claude… (~5 seconds)
         </div>
       ) : (
@@ -86,17 +86,17 @@ export function BulletRewriterForm({ plan }: BulletRewriterFormProps) {
         </Button>
       )}
 
-      {error && <p className="text-sm text-[var(--destructive)]">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
 
       {rewrites.length > 0 && (
         <div className="space-y-3">
-          <p className="text-sm font-medium text-[var(--foreground)]">Rewrites</p>
+          <p className="text-sm font-medium text-foreground">Rewrites</p>
           {rewrites.map((r, i) => (
             <div
               key={i}
-              className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 flex items-start justify-between gap-4"
+              className="bg-surface border border-border rounded-xl p-4 flex items-start justify-between gap-4"
             >
-              <p className="text-sm text-[var(--foreground)] leading-relaxed">{r}</p>
+              <p className="text-sm text-foreground leading-relaxed">{r}</p>
               <CopyButton text={r} />
             </div>
           ))}

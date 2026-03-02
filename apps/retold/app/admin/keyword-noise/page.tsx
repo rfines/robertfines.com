@@ -74,44 +74,44 @@ export default async function KeywordNoisePage() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold text-[var(--foreground)] mb-1">
+      <h1 className="text-xl font-semibold text-foreground mb-1">
         Keyword Noise
       </h1>
-      <p className="text-sm text-[var(--muted)] mb-8">
+      <p className="text-sm text-muted mb-8">
         Terms most commonly missing from tailored resumes across all users. High counts
         suggest stop word candidates. User flags (×3 weight) surface irrelevant terms faster.
       </p>
 
       {/* Top missing terms table */}
       <div className="mb-10">
-        <h2 className="text-sm font-semibold text-[var(--foreground)] mb-3">
+        <h2 className="text-sm font-semibold text-foreground mb-3">
           Top missing terms ({logs.length} resumes sampled)
         </h2>
         {ranked.length === 0 ? (
-          <p className="text-sm text-[var(--muted)]">No data yet — logs appear after users view tailored resumes.</p>
+          <p className="text-sm text-muted">No data yet — logs appear after users view tailored resumes.</p>
         ) : (
-          <div className="border border-[var(--border)] rounded-xl overflow-hidden">
+          <div className="border border-border rounded-xl overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[var(--border)] bg-[var(--surface)]">
-                  <th className="text-left px-4 py-2 text-xs font-medium text-[var(--muted)]">Term</th>
-                  <th className="text-right px-4 py-2 text-xs font-medium text-[var(--muted)]">In logs</th>
-                  <th className="text-right px-4 py-2 text-xs font-medium text-[var(--muted)]">User flags</th>
+                <tr className="border-b border-border bg-surface">
+                  <th className="text-left px-4 py-2 text-xs font-medium text-muted">Term</th>
+                  <th className="text-right px-4 py-2 text-xs font-medium text-muted">In logs</th>
+                  <th className="text-right px-4 py-2 text-xs font-medium text-muted">User flags</th>
                   <th className="px-4 py-2"></th>
                 </tr>
               </thead>
               <tbody>
                 {ranked.map(({ term, logCount, feedbackCount }) => (
-                  <tr key={term} className="border-b border-[var(--border)] last:border-0">
-                    <td className="px-4 py-2 font-mono text-xs text-[var(--foreground)]">
+                  <tr key={term} className="border-b border-border last:border-0">
+                    <td className="px-4 py-2 font-mono text-xs text-foreground">
                       {term}
                     </td>
-                    <td className="px-4 py-2 text-right text-xs text-[var(--muted)]">
+                    <td className="px-4 py-2 text-right text-xs text-muted">
                       {logCount}
                     </td>
-                    <td className="px-4 py-2 text-right text-xs text-[var(--muted)]">
+                    <td className="px-4 py-2 text-right text-xs text-muted">
                       {feedbackCount > 0 ? (
-                        <span className="text-yellow-400 font-medium">{feedbackCount}</span>
+                        <span className="text-warning font-medium">{feedbackCount}</span>
                       ) : (
                         "—"
                       )}
@@ -121,7 +121,7 @@ export default async function KeywordNoisePage() {
                         <input type="hidden" name="word" value={term} />
                         <button
                           type="submit"
-                          className="text-xs px-2 py-1 rounded bg-[var(--accent)]/10 text-[var(--accent)] hover:bg-[var(--accent)]/20 transition-colors"
+                          className="text-xs px-2 py-1 rounded bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
                         >
                           Add to stop list
                         </button>
@@ -137,16 +137,16 @@ export default async function KeywordNoisePage() {
 
       {/* Custom stop words */}
       <div>
-        <h2 className="text-sm font-semibold text-[var(--foreground)] mb-3">
+        <h2 className="text-sm font-semibold text-foreground mb-3">
           Custom stop words ({customStopWords.length})
         </h2>
-        <p className="text-xs text-[var(--muted)] mb-4">
+        <p className="text-xs text-muted mb-4">
           These are applied on top of the built-in stop word list when computing keyword matches.
           Deploy a code update to promote frequently-added terms into the static list.
         </p>
 
         {customStopWords.length === 0 ? (
-          <p className="text-sm text-[var(--muted)]">None added yet.</p>
+          <p className="text-sm text-muted">None added yet.</p>
         ) : (
           <div className="flex flex-wrap gap-2">
             {customStopWords.map((sw) => (
@@ -154,7 +154,7 @@ export default async function KeywordNoisePage() {
                 <input type="hidden" name="word" value={sw.word} />
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border border-[var(--border)] text-[var(--foreground)] hover:border-[var(--destructive)] hover:text-[var(--destructive)] transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border border-border text-foreground hover:border-destructive hover:text-destructive transition-colors"
                 >
                   {sw.word}
                   <span className="opacity-50">×</span>
@@ -170,11 +170,11 @@ export default async function KeywordNoisePage() {
             type="text"
             name="word"
             placeholder="Add a word manually…"
-            className="text-sm px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)] w-56"
+            className="text-sm px-3 py-1.5 rounded-lg border border-border bg-surface text-foreground placeholder:text-muted focus:outline-none focus:border-accent w-56"
           />
           <button
             type="submit"
-            className="text-sm px-3 py-1.5 rounded-lg bg-[var(--accent)] text-white hover:opacity-90 transition-opacity"
+            className="text-sm px-3 py-1.5 rounded-lg bg-accent text-white hover:opacity-90 transition-opacity"
           >
             Add
           </button>

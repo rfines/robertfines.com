@@ -1,14 +1,55 @@
 @import "tailwindcss";
 
+/* ─── Light theme (default) ─── */
 :root {
   --background: #fffbf5;
   --surface: #ffffff;
   --border: #e8ddd0;
   --foreground: #1c1410;
-  --muted: #7c6f64;
+  --muted: #6b5f54;
   --accent: #f59e0b;
   --accent-hover: #d97706;
   --destructive: #ef4444;
+
+  --success: #22c55e;
+  --warning: #eab308;
+  --info: #3b82f6;
+  --ring: #f59e0b;
+
+  --shadow-sm: 0 1px 2px 0 rgba(28, 20, 16, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(28, 20, 16, 0.07), 0 2px 4px -2px rgba(28, 20, 16, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(28, 20, 16, 0.08), 0 4px 6px -4px rgba(28, 20, 16, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(28, 20, 16, 0.1), 0 8px 10px -6px rgba(28, 20, 16, 0.04);
+
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+
+  --accent-glow: 0 0 20px rgba(245, 158, 11, 0.25);
+}
+
+/* ─── Dark theme ─── */
+.dark {
+  --background: #0c0a09;
+  --surface: #1c1917;
+  --border: #292524;
+  --foreground: #fafaf9;
+  --muted: #a8a29e;
+  --accent: #f59e0b;
+  --accent-hover: #fbbf24;
+  --destructive: #ef4444;
+
+  --success: #4ade80;
+  --warning: #facc15;
+  --info: #60a5fa;
+  --ring: #f59e0b;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+
+  --accent-glow: 0 0 20px rgba(245, 158, 11, 0.15);
 }
 
 @theme inline {
@@ -20,6 +61,10 @@
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-ring: var(--ring);
   --font-sans: var(--font-inter);
 }
 
@@ -27,4 +72,15 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
