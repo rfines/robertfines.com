@@ -15,7 +15,7 @@ const items = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
   { href: "/dashboard/resumes", label: "Resumes", icon: FileText },
   { href: "/dashboard/tailored", label: "Tailored", icon: Sparkles },
-  { href: "/dashboard/tools/bullet-rewriter", label: "Tools", icon: Wrench },
+  { href: "/dashboard/tools", label: "Tools", icon: Wrench },
   { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
 ];
 
