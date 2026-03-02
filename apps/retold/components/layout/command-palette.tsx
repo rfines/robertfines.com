@@ -71,31 +71,29 @@ export function CommandPalette() {
   // Group by section
   const sections = Array.from(new Set(filtered.map((i) => i.section)));
 
-  // Keyboard shortcut to open
+  // Reset state and open the palette
+  const openPalette = useCallback(() => {
+    setQuery("");
+    setActiveIndex(0);
+    setOpen(true);
+    setTimeout(() => inputRef.current?.focus(), 50);
+  }, []);
+
+  // Keyboard shortcut to open/close
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
-        setOpen((prev) => !prev);
+        if (open) {
+          setOpen(false);
+        } else {
+          openPalette();
+        }
       }
     }
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  // Focus input on open
-  useEffect(() => {
-    if (open) {
-      setQuery("");
-      setActiveIndex(0);
-      setTimeout(() => inputRef.current?.focus(), 50);
-    }
-  }, [open]);
-
-  // Reset active index when query changes
-  useEffect(() => {
-    setActiveIndex(0);
-  }, [query]);
+  }, [open, openPalette]);
 
   // Keyboard navigation within palette
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -111,6 +109,12 @@ export function CommandPalette() {
     } else if (e.key === "Escape") {
       setOpen(false);
     }
+  };
+
+  // Reset active index when query changes — derived via onChange handler
+  const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
+    setActiveIndex(0);
   };
 
   return (
@@ -141,7 +145,7 @@ export function CommandPalette() {
                 <input
                   ref={inputRef}
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={handleQueryChange}
                   onKeyDown={handleKeyDown}
                   placeholder="Type a command or search..."
                   className="w-full py-3 bg-transparent text-sm text-foreground placeholder:text-muted focus:outline-none"

@@ -5,7 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useState,
+  useSyncExternalStore,
 } from "react";
 
 type Theme = "light" | "dark" | "system";
@@ -47,40 +47,68 @@ function applyTheme(resolved: ResolvedTheme) {
 
 const STORAGE_KEY = "retold-theme";
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("system");
-  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>("light");
+// External store for theme — avoids setState-in-effect lint errors
+let listeners: Array<() => void> = [];
+let currentTheme: Theme = "system";
+let currentResolved: ResolvedTheme = "light";
 
-  // Initialize from localStorage on mount
-  useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
-    const initial = stored ?? "system";
-    setThemeState(initial);
-    const resolved = resolve(initial);
-    setResolvedTheme(resolved);
-    applyTheme(resolved);
-  }, []);
+function getThemeSnapshot() {
+  return { theme: currentTheme, resolved: currentResolved };
+}
+
+function getServerSnapshot() {
+  return { theme: "system" as Theme, resolved: "light" as ResolvedTheme };
+}
+
+function subscribe(listener: () => void) {
+  listeners = [...listeners, listener];
+  return () => {
+    listeners = listeners.filter((l) => l !== listener);
+  };
+}
+
+function emitChange() {
+  for (const listener of listeners) listener();
+}
+
+function updateTheme(next: Theme) {
+  currentTheme = next;
+  currentResolved = resolve(next);
+  applyTheme(currentResolved);
+  localStorage.setItem(STORAGE_KEY, next);
+  emitChange();
+}
+
+// Initialize from localStorage (runs once on module load in browser)
+if (typeof window !== "undefined") {
+  const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
+  currentTheme = stored ?? "system";
+  currentResolved = resolve(currentTheme);
+}
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const { theme, resolved: resolvedTheme } = useSyncExternalStore(
+    subscribe,
+    getThemeSnapshot,
+    getServerSnapshot
+  );
 
   // Listen for OS theme changes when in "system" mode
   useEffect(() => {
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     function handleChange() {
-      if (theme === "system") {
-        const resolved = getSystemTheme();
-        setResolvedTheme(resolved);
-        applyTheme(resolved);
+      if (currentTheme === "system") {
+        currentResolved = getSystemTheme();
+        applyTheme(currentResolved);
+        emitChange();
       }
     }
     mq.addEventListener("change", handleChange);
     return () => mq.removeEventListener("change", handleChange);
-  }, [theme]);
+  }, []);
 
   const setTheme = useCallback((next: Theme) => {
-    setThemeState(next);
-    localStorage.setItem(STORAGE_KEY, next);
-    const resolved = resolve(next);
-    setResolvedTheme(resolved);
-    applyTheme(resolved);
+    updateTheme(next);
   }, []);
 
   return (

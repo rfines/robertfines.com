@@ -37,10 +37,12 @@ export default async function LinkedInOptimizerPage({
   ]);
 
   // Compute staleness on the server — only pass a boolean to the client
+  /* eslint-disable react-hooks/purity -- server component, render runs once */
   const isStale =
     connection?.lastImportedAt != null &&
     Date.now() - connection.lastImportedAt.getTime() >
       LINKEDIN_STALENESS_DAYS * 24 * 60 * 60 * 1000;
+  /* eslint-enable react-hooks/purity */
 
   // Minimal shape exposed to the client
   const linkedInStatus = connection

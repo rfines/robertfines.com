@@ -3,9 +3,8 @@
 import {
   createContext,
   useContext,
-  useState,
-  useEffect,
   useCallback,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 
@@ -19,26 +18,53 @@ const SidebarContext = createContext<SidebarContextValue | null>(null);
 
 const STORAGE_KEY = "retold-sidebar-collapsed";
 
-export function SidebarProvider({ children }: { children: ReactNode }) {
-  const [collapsed, setCollapsedState] = useState(false);
+// External store to avoid setState-in-effect
+let sidebarListeners: Array<() => void> = [];
+let collapsedState = false;
 
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored === "true") setCollapsedState(true);
-    } catch {}
-  }, []);
+if (typeof window !== "undefined") {
+  try {
+    collapsedState = localStorage.getItem(STORAGE_KEY) === "true";
+  } catch {}
+}
+
+function getSnapshot() {
+  return collapsedState;
+}
+
+function getServerSnapshot() {
+  return false;
+}
+
+function subscribeSidebar(listener: () => void) {
+  sidebarListeners = [...sidebarListeners, listener];
+  return () => {
+    sidebarListeners = sidebarListeners.filter((l) => l !== listener);
+  };
+}
+
+function setCollapsedExternal(value: boolean) {
+  collapsedState = value;
+  try {
+    localStorage.setItem(STORAGE_KEY, String(value));
+  } catch {}
+  for (const listener of sidebarListeners) listener();
+}
+
+export function SidebarProvider({ children }: { children: ReactNode }) {
+  const collapsed = useSyncExternalStore(
+    subscribeSidebar,
+    getSnapshot,
+    getServerSnapshot
+  );
 
   const setCollapsed = useCallback((value: boolean) => {
-    setCollapsedState(value);
-    try {
-      localStorage.setItem(STORAGE_KEY, String(value));
-    } catch {}
+    setCollapsedExternal(value);
   }, []);
 
   const toggle = useCallback(() => {
-    setCollapsed(!collapsed);
-  }, [collapsed, setCollapsed]);
+    setCollapsedExternal(!collapsedState);
+  }, []);
 
   return (
     <SidebarContext.Provider value={{ collapsed, setCollapsed, toggle }}>
