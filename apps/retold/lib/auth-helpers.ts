@@ -7,5 +7,6 @@
 export function isEmailAllowed(email: string, allowedEmails: string[]): boolean {
   if (!email) return false;
   if (allowedEmails.length === 0) return true;
-  return allowedEmails.includes(email);
+  const normalized = email.toLowerCase();
+  return allowedEmails.some((e) => e.toLowerCase() === normalized);
 }
