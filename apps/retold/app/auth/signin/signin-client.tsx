@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { WaitlistForm } from "@/components/shared/waitlist-form";
 
 interface SignInClientProps {
   error?: string;
@@ -43,13 +44,24 @@ export function SignInClient({
           <p className="text-sm text-muted">Sign in to continue</p>
         </div>
 
-        {error && (
-          <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3 text-sm text-destructive text-center">
-            {error === "AccessDenied"
-              ? "Access denied. Contact the administrator to request access."
-              : "Something went wrong. Please try again."}
+        {error === "AccessDenied" ? (
+          <div className="bg-surface border border-border rounded-xl p-6 space-y-4">
+            <div className="text-center">
+              <p className="text-sm font-medium text-foreground">
+                Retold is in private beta
+              </p>
+              <p className="text-xs text-muted mt-1">
+                Join the waitlist and we&apos;ll let you know when
+                we&apos;re ready for you.
+              </p>
+            </div>
+            <WaitlistForm source="access-denied" compact />
           </div>
-        )}
+        ) : error ? (
+          <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3 text-sm text-destructive text-center">
+            Something went wrong. Please try again.
+          </div>
+        ) : null}
 
         <div className="bg-surface border border-border rounded-xl p-6 space-y-3 shadow-[var(--shadow-lg)]">
           <form action={signInGoogle}>

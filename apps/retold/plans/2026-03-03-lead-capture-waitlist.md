@@ -279,9 +279,9 @@ Also add a "Join waitlist" anchor link in the navbar alongside Features and Pric
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] Type checking passes: `pnpm typecheck`
-- [ ] Linting passes: `pnpm lint`
-- [ ] Build succeeds: `pnpm build`
+- [x] Type checking passes: `pnpm typecheck`
+- [x] Linting passes: `pnpm lint`
+- [x] Build succeeds: `pnpm build`
 
 #### Manual Verification:
 - [ ] Landing page shows "Get early access" section between pricing and bottom CTA

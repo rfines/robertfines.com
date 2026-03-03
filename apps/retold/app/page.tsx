@@ -16,6 +16,7 @@ import { PLAN_PRICING, type Plan } from "@/lib/plan";
 import { PLAN_FEATURES } from "@/lib/plan-features";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { RevealOnScroll } from "@/components/shared/reveal-on-scroll";
+import { WaitlistForm } from "@/components/shared/waitlist-form";
 
 const softwareApplicationJsonLd = {
   "@context": "https://schema.org",
@@ -193,6 +194,12 @@ export default async function LandingPage() {
             >
               Pricing
             </a>
+            <a
+              href="#waitlist"
+              className="text-sm text-muted hover:text-foreground transition-colors hidden sm:block"
+            >
+              Join waitlist
+            </a>
             <ThemeToggle />
             <Link
               href="/auth/signin"
@@ -368,6 +375,20 @@ export default async function LandingPage() {
           </RevealOnScroll>
         </div>
       </section>
+
+      {/* Waitlist / Early Access */}
+      <RevealOnScroll>
+        <section id="waitlist" className="border-t border-border">
+          <div className="max-w-lg mx-auto px-6 py-24 text-center">
+            <h2 className="text-3xl font-bold mb-4">Get early access</h2>
+            <p className="text-muted mb-8">
+              Retold is currently in private beta. Drop your email and
+              we&apos;ll let you know when spots open up.
+            </p>
+            <WaitlistForm source="landing" />
+          </div>
+        </section>
+      </RevealOnScroll>
 
       {/* CTA */}
       <RevealOnScroll>
