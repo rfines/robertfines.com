@@ -95,6 +95,14 @@ export type AdminUserPatchInput = z.infer<typeof adminUserPatchSchema>;
 export type CheckoutSessionInput = z.infer<typeof checkoutSessionSchema>;
 export type FeedbackInput = z.infer<typeof feedbackSchema>;
 
+export const waitlistSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  name: z.string().max(100).optional(),
+  source: z.string().max(100).optional(),
+});
+
+export type WaitlistInput = z.infer<typeof waitlistSchema>;
+
 // Re-exported from lib files for single-import convenience
 export type { KeywordMatchResult } from "@/lib/keyword-match";
 export type { AtsWarning } from "@/lib/ats-warnings";

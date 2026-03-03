@@ -176,3 +176,13 @@ model TermFeedback {
   @@unique([userId, tailoredResumeId, term])
   @@index([term])
 }
+
+model WaitlistEntry {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  source    String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
