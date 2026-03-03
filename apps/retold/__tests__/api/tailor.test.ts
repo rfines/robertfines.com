@@ -37,6 +37,10 @@ vi.mock("@/lib/ats-warnings", () => ({
   ]),
 }));
 
+vi.mock("@/lib/extract-jd-skills", () => ({
+  extractJdSkills: vi.fn().mockResolvedValue(["TypeScript", "React", "Node.js"]),
+}));
+
 import { POST } from "@/app/api/tailor/route";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";

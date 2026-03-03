@@ -9,7 +9,9 @@ import {
   Sparkles,
   Wrench,
   CreditCard,
+  MessageSquare,
 } from "lucide-react";
+import { useFeedback } from "@/components/shared/feedback-modal";
 
 const items = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
@@ -21,9 +23,22 @@ const items = [
 
 export function MobileNav() {
   const pathname = usePathname();
+  const { openFeedback } = useFeedback();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-surface border-t border-border pb-[env(safe-area-inset-bottom)]">
+    <>
+      {/* Feedback FAB */}
+      <button
+        onClick={openFeedback}
+        aria-label="Send feedback"
+        className="fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom)+0.75rem)] right-4 z-50 lg:hidden
+                   w-10 h-10 rounded-full bg-surface border border-border shadow-[var(--shadow-lg)]
+                   flex items-center justify-center text-muted hover:text-accent transition-colors"
+      >
+        <MessageSquare size={18} />
+      </button>
+
+      <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-surface border-t border-border pb-[env(safe-area-inset-bottom)]">
       <div className="flex items-center justify-around h-14">
         {items.map(({ href, label, icon: Icon }) => {
           const isActive =
@@ -46,5 +61,6 @@ export function MobileNav() {
         })}
       </div>
     </nav>
+    </>
   );
 }

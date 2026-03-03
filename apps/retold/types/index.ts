@@ -72,6 +72,19 @@ export const checkoutSessionSchema = z.object({
   priceId: z.string().min(1),
 });
 
+export const feedbackSchema = z.object({
+  category: z.enum([
+    "tailoring_quality",
+    "keyword_matching",
+    "export_formatting",
+    "feature_request",
+    "ui_usability",
+    "other",
+  ]),
+  details: z.string().min(1).max(500),
+  pagePath: z.string().max(200),
+});
+
 export type CreateResumeInput = z.infer<typeof createResumeSchema>;
 export type UpdateResumeInput = z.infer<typeof updateResumeSchema>;
 export type UploadResumeFileInput = z.infer<typeof uploadResumeFileSchema>;
@@ -80,6 +93,7 @@ export type PresignUploadInput = z.infer<typeof presignUploadSchema>;
 export type ExtractResumeInput = z.infer<typeof extractResumeSchema>;
 export type AdminUserPatchInput = z.infer<typeof adminUserPatchSchema>;
 export type CheckoutSessionInput = z.infer<typeof checkoutSessionSchema>;
+export type FeedbackInput = z.infer<typeof feedbackSchema>;
 
 // Re-exported from lib files for single-import convenience
 export type { KeywordMatchResult } from "@/lib/keyword-match";

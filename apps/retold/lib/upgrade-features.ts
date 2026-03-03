@@ -11,7 +11,8 @@ export type FeatureId =
   | "fix-ats-issues"
   | "custom-instructions"
   | "gap-analysis"
-  | "monthly-limit";
+  | "monthly-limit"
+  | "feedback";
 
 export interface FeatureMeta {
   name: string;
@@ -84,6 +85,12 @@ export const UPGRADE_FEATURES: Record<FeatureId, FeatureMeta> = {
     name: "More Tailoring Runs",
     valueProp:
       "You've used all your free tailoring runs this month. Upgrade for more runs — or go unlimited with Pro.",
+    requiredPlan: "starter",
+  },
+  feedback: {
+    name: "In-App Feedback",
+    valueProp:
+      "Share feedback directly with the Retold team to help shape the product roadmap.",
     requiredPlan: "starter",
   },
 };
