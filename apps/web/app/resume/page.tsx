@@ -5,12 +5,11 @@ const experience = [
     period: "Mar 2019 – Present",
     location: "Nashville, TN",
     bullets: [
-      "Architected configurable, multi-tenant platform services processing millions of requests daily across multiple global regions — enabling downstream teams to ship new capabilities without platform rewrites or service interruptions.",
-      "Established engineering standards that turned the platform into a force multiplier — shared service contracts, component libraries, and observability baselines that eliminated integration friction and allowed the broader engineering organization to build on the platform predictably and at speed.",
-      "Raised the reliability ceiling of a multi-region platform by replacing ad-hoc deployments with automated validation gates and staged rollouts — producing a consistent uptime track record that stakeholders could plan against and downstream teams could build on with confidence.",
-      "Partnered with product, operations, and global business stakeholders to translate complex, evolving requirements into durable platform abstractions, reducing the integration cost of new capabilities across teams.",
-      "Mentored engineers across levels on distributed systems and production ownership, reducing ramp time for new team members and growing mid-level engineers into independent contributors on complex platform work.",
-      "Applied hands-on expertise in agentic AI systems to reshape how the team builds — introducing autonomous pipelines for code generation, automated review, and AI-driven operations that compressed delivery cycles and positioned the team ahead of industry adoption curves.",
+      "Architected a configurable, multi-tenant platform processing millions of requests daily across global regionsworking directly with product, operations, and international stakeholders to get the abstractions right. 15+ products and more than a dozen teams currently build on it directly without platform-side changes.",
+      "Defined shared service contracts, component libraries, and observability baselines that became the default integration path for the broader engineering org. New team integrations that previously took about 6 weeks now land in 5 days on average.",
+      "Replaced ad-hoc deployments with automated validation gates and staged rollouts across a multi-region platform. Overall incident rate dropped 60%, deployment related incidents dropped by 75% and uptime stabilized at 99.6%, giving downstream teams an SLA they could actually plan against.",
+      "Mentored engineers on distributed systems design and production ownership. Cut new-hire ramp time on the platform — from 8 to 4 weeks — and developed mid-level engineers into leads on complex platform work. 11 mentees promoted within 4 years.",
+      "Built agentic AI pipelines for code generation, automated review, and operational tasks. Compressed the team's PR-to-merge cycle by ~25% and automated ~40% of routine review work — freeing engineers to focus on design problems instead of mechanical ones.",
     ],
   },
   {
@@ -19,8 +18,8 @@ const experience = [
     period: "Dec 2016 – Nov 2018",
     location: "Kansas City, MO",
     bullets: [
-      "Designed and delivered full-stack healthcare analytics features using React, Node.js, Elasticsearch, and Redis — contributing to a platform used by hospital systems to improve patient outcomes reporting.",
-      "Owned significant portions of the data pipeline and UI layer, improving query performance and making complex analytics accessible to non-technical clinical users.",
+      "Designed and shipped full-stack analytics features (React, Node.js, Elasticsearch, Redis) for a healthcare platform used by hospital systems for patient outcomes reporting. The query builder became a core part of how clinical teams tracked performance of targeted groups of patients.",
+      "Owned the data pipeline and analytics UI layer. Optimized query performance by 15% and built tools to create dashboards that clinical users could use without engineering support.",
     ],
   },
   {
