@@ -1,5 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+vi.mock("next/cache", () => ({
+  revalidatePath: vi.fn(),
+}));
+
+vi.mock("@/lib/auth", () => ({
+  auth: vi.fn(),
+}));
+
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     album: {
