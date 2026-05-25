@@ -37,4 +37,8 @@ jobs:
         run: pnpm test
         env:
           AUTH_SECRET: ci-test-secret-32-chars-minimum!!
+          AUTH_GOOGLE_ID: ci-unused
+          AUTH_GOOGLE_SECRET: ci-unused
+          AUTH_TRUST_HOST: "true"
+          ADMIN_EMAILS: ci-admin@example.com
           DATABASE_URL: postgresql://test:test@localhost:5432/test
